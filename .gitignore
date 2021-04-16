@@ -24,3 +24,6 @@ htmlcov/
 
 # Virtual Environment
 /venv/
+
+# This project
+Lib/blackrenderer/_version.py
