@@ -39,6 +39,10 @@ Install the requirements:
 - `$ pip install -r requirements.txt`
 - `$ pip install -r requirements-dev.txt`
 
+Install blackrenderer in editable mode:
+
+- `$ pip install -e .`
+
 Run the tests:
 
 - `$ pytest`
