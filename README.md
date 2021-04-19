@@ -18,9 +18,9 @@ Developing a pure Python renderer for COLRv1 fonts.
 
 Have Python 3.7 or higher installed, preferably from [python.org](https://www.python.org)
 
-Open Terminal
+Open Terminal.
 
-"cd" into the project repo directory
+"cd" into the project repo directory.
 
 Create a virtual environment:
 
@@ -32,7 +32,7 @@ Activate the venv:
 
 (You need to activate the virtual environment for every new terminal session.)
 
-Upgrade pip
+Upgrade pip:
 
 - `$ pip install --upgrade pip`
 
