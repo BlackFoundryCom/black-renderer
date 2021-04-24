@@ -12,6 +12,6 @@ surface = PixelSurface(minX, minY, maxX - minX, maxY - minY)
 backend = SkiaBackend(surface.canvas)
 print(font.keys())
 
-font.drawGlyph(sys.argv[2], backend)
+font.drawGlyph(glyphName, backend)
 
 surface.saveImage(f"{glyphName}.png")
