@@ -9,6 +9,8 @@ setup(
     packages=find_packages("Lib"),
     install_requires=[
         "fonttools >= 4.17.0",
+        "uharfbuzz",
     ],
+    extras_require={"skia": "skia-python"},
     setup_requires=["setuptools_scm"],
 )
