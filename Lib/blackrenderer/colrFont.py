@@ -60,6 +60,8 @@ class COLRFont:
         return self.colrGlyphs.keys()
 
     def getGlyphBounds(self, glyphName):
+        # TODO: hb must have have an efficient API for this --
+        # let's find it and add it to uharfbuzz
         pen = BoundsPen(None)
         self._drawGlyphOutline(glyphName, pen)
         return pen.bounds
