@@ -52,10 +52,6 @@ class COLRFont:
         yield
         self.setLocation(originalLocation)
 
-    def _drawGlyphOutline(self, glyphName, path):
-        gid = self.ttFont.getGlyphID(glyphName)
-        self.hbFont.draw_glyph_with_pen(gid, path)
-
     def keys(self):
         return self.colrGlyphs.keys()
 
@@ -134,6 +130,10 @@ class COLRFont:
         # ppPaint(paint.BackdropPaint, tab+1)
 
     # Utils
+
+    def _drawGlyphOutline(self, glyphName, path):
+        gid = self.ttFont.getGlyphID(glyphName)
+        self.hbFont.draw_glyph_with_pen(gid, path)
 
     def _getColor(self, colorIndex, alpha):
         if colorIndex == 0xFFFF:
