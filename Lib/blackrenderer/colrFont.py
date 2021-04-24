@@ -1,6 +1,5 @@
 from contextlib import contextmanager
 from io import BytesIO
-from typing import ContextManager
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables.otTables import PaintFormat
@@ -38,7 +37,7 @@ class COLRFont:
 
     def setLocation(self, location):
         self.location = location
-        self.hbFont.set_variations(varLocation)
+        self.hbFont.set_variations(location)
 
     @contextmanager
     def tmpLocation(self, location):
@@ -125,12 +124,12 @@ class COLRFont:
             self._drawPaint(paint.Paint, backend)
 
     def _drawPaintComposite(self, paint, backend):
-        XXX
-        print("Composite with CompositeMode=", paint.CompositeMode)
-        print("Composite source:")
-        ppPaint(paint.SourcePaint, tab+1)
-        print("Composite backdrop:")
-        ppPaint(paint.BackdropPaint, tab+1)
+        print("_drawPaintComposite")
+        # print("Composite with CompositeMode=", paint.CompositeMode)
+        # print("Composite source:")
+        # ppPaint(paint.SourcePaint, tab+1)
+        # print("Composite backdrop:")
+        # ppPaint(paint.BackdropPaint, tab+1)
 
     # Utils
 
