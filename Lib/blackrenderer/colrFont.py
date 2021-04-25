@@ -107,21 +107,19 @@ class COLRFont:
     def _drawPaintTransform(self, paint, backend):
         t = paint.Transform
         transform = (t.xx, t.yx, t.xy, t.yy, t.dx, t.dy)
-        with backend.savedState():
-            backend.transform(transform)
-            self._drawPaint(paint.Paint, backend)
+        self._applyTransform(transform, paint.Paint, backend)
 
     def _drawPaintTranslate(self, paint, backend):
-        with backend.transform(...):
-            self._drawPaint(paint.Paint, backend)
+        transform = ...
+        self._applyTransform(transform, paint.Paint, backend)
 
     def _drawPaintRotate(self, paint, backend):
-        with backend.transform(...):
-            self._drawPaint(paint.Paint, backend)
+        transform = ...
+        self._applyTransform(transform, paint.Paint, backend)
 
     def _drawPaintSkew(self, paint, backend):
-        with backend.transform(...):
-            self._drawPaint(paint.Paint, backend)
+        transform = ...
+        self._applyTransform(transform, paint.Paint, backend)
 
     def _drawPaintComposite(self, paint, backend):
         print("_drawPaintComposite")
@@ -132,6 +130,11 @@ class COLRFont:
         # ppPaint(paint.BackdropPaint, tab+1)
 
     # Utils
+
+    def _applyTransform(self, transform, paint, backend):
+        with backend.savedState():
+            backend.transform(transform)
+            self._drawPaint(paint, backend)
 
     def _drawGlyphOutline(self, glyphName, path):
         gid = self.ttFont.getGlyphID(glyphName)
