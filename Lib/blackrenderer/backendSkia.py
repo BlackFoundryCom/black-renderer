@@ -74,7 +74,7 @@ class SkiaBackend:
     # TODO: blendMode for PaintComposite
 
 
-class PixelSurface:
+class SkiaPixelSurface:
     def __init__(self, x, y, width, height):
         self.surface = skia.Surface(width, height)
         canvas = self.canvas

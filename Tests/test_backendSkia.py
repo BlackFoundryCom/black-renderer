@@ -1,7 +1,7 @@
 import pathlib
 import pytest
 from blackrenderer.colrFont import COLRFont
-from blackrenderer.backendSkia import PixelSurface, SkiaBackend
+from blackrenderer.backendSkia import SkiaBackend, SkiaPixelSurface
 
 
 testDir = pathlib.Path(__file__).resolve().parent
@@ -21,9 +21,9 @@ def test_renderGlyph(glyphName):
 
     minX, minY, maxX, maxY = font.getGlyphBounds(glyphName)
 
-    surface = PixelSurface(minX, minY, maxX - minX, maxY - minY)
+    surface = SkiaPixelSurface(minX, minY, maxX - minX, maxY - minY)
     backend = SkiaBackend(surface.canvas)
 
     font.drawGlyph(glyphName, backend)
 
-    surface.saveImage(tmpOutputDir / f"{glyphName}.png")
+    surface.saveImage(tmpOutputDir / f"skia_{glyphName}.png")

@@ -1,3 +1,4 @@
 pytest
 skia-python
 numpy  # undeclared dependency of skia-python
+pycairo

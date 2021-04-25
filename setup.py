@@ -11,6 +11,9 @@ setup(
         "fonttools >= 4.17.0",
         "uharfbuzz",
     ],
-    extras_require={"skia": ["skia-python", "numpy"]},
+    extras_require={
+        "skia": ["skia-python", "numpy"],
+        "cairo": ["pycairo"],
+    },
     setup_requires=["setuptools_scm"],
 )
