@@ -90,10 +90,16 @@ class COLRFont:
         backend.fillSolid((r, g, b, a))
 
     def _drawPaintLinearGradient(self, paint, backend):
-        backend.fillLinearGradient(...)
+        colorLine = self._readColorLine(paint.ColorLine)
+        gradientAnchors = self._reduceThreeToTwoAnchors(paint)
+        backend.fillLinearGradient(colorLine, gradientAnchors)
+        # FIXME: We should carefully check (with custom test?) that the
+        # coordinates of the gradient anchors need not be transformed using
+        # python code here.
 
     def _drawPaintRadialGradient(self, paint, backend):
-        backend.fillRadialGradient(...)
+        colorLine = self._readColorLine(paint.ColorLine)
+        backend.fillRadialGradient(colorLine, paint)
 
     def _drawPaintSweepGradient(self, paint, backend):
         backend.fillSweepGradient(...)
@@ -162,3 +168,20 @@ class COLRFont:
             r, g, b, a = self.palettes[self.paletteIndex][colorIndex]
         a *= alpha
         return r, g, b, a
+
+    def _readColorLine(self, colorLineTable):
+        cl = colorLineTable
+        n = cl.StopCount
+        return [(cs.StopOffset, self._getColor(cs.Color.PaletteIndex, cs.Color.Alpha)) for cs in cl.ColorStop]
+
+    def _reduceThreeToTwoAnchors(self, p):
+        # FIXME: make sure the 3 points are not in degenrate position [see COLRv1 spec]
+        x02 = p.x2 - p.x0
+        y02 = p.y2 - p.y0
+        x01 = p.x1 - p.x0
+        y01 = p.y1 - p.y0
+        squaredNorm02 = x02*x02 + y02*y02
+        k = (x01*x02 + y01*y02) / squaredNorm02
+        x = p.x1 - k * x02
+        y = p.y1 - k * y02
+        return ((p.x0, p.y0), (x, y))

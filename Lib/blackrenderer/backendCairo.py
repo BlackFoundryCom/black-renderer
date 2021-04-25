@@ -69,9 +69,9 @@ class CairoBackend:
             self.clipRect = clipRect
         self.canvas.clip()
 
-    def fillSolid(self, color):
-        r, g, b, a = color
-        self.canvas.set_source_rgba(r, g, b, a)
+    def _fill(self):
+        # This function is reuse in fillSolid() and all 3 fill*Gradient()
+        # functions.
         self.canvas.save()
         self.canvas.identity_matrix()
         x1, y1, x2, y2 = self.clipRect
@@ -79,22 +79,32 @@ class CairoBackend:
         self.canvas.fill()
         self.canvas.restore()
 
-    def fillLinearGradient(self, *args):
-        print("fillLinearGradient")
-        from random import random
+    def fillSolid(self, color):
+        r, g, b, a = color
+        self.canvas.set_source_rgba(r, g, b, a)
+        self._fill()
 
-        self.fillSolid((1, random(), random(), 1))
+    def fillLinearGradient(self, colorLine, gradientAnchors):
+        (x0, y0), (x1, y1) = gradientAnchors
+        gr = cairo.LinearGradient(x0, y0, x1, y1)
+        # FIXME: one should clip offset below 0 or above 2 (and adjusting the
+        # stop color) because Cairo does not accept stops outsidee [0,1].
+        for (stop, (r,g,b,a)) in colorLine:
+            gr.add_color_stop_rgba(stop, r, g, b, a)
+        self.canvas.set_source(gr)
+        self._fill()
 
-    def fillRadialGradient(self, *args):
-        print("fillRadialGradient")
-        from random import random
-
-        self.fillSolid((1, random(), random(), 1))
+    def fillRadialGradient(self, colorLine, paintRadialGradient):
+        p = paintRadialGradient
+        gr = cairo.RadialGradient(p.x0, p.y0, p.r0, p.x1, p.y1, p.r1)
+        for (stop, (r,g,b,a)) in colorLine:
+            gr.add_color_stop_rgba(stop, r, g, b, a)
+        self.canvas.set_source(gr)
+        self._fill()
 
     def fillSweepGradient(self, *args):
         print("fillSweepGradient")
         from random import random
-
         self.fillSolid((1, random(), random(), 1))
 
     # TODO: blendMode for PaintComposite
@@ -106,9 +116,6 @@ class CairoPixelSurface:
     def __init__(self, x, y, width, height):
         self.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
         self.canvas = cairo.Context(self.surface)
-        # self.canvas.rectangle(0, 0, width, height)
-        # self.canvas.set_source_rgba(1,1,1,1)
-        # self.canvas.fill()
         self.canvas.translate(0, height)
         self.canvas.scale(1, -1)
         self.canvas.translate(-x, -y)
