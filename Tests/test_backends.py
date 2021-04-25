@@ -5,11 +5,6 @@ from blackrenderer.backendCairo import CairoPixelSurface
 from blackrenderer.backendSkia import SkiaPixelSurface
 
 
-surfaceFactories = {
-    "cairo": CairoPixelSurface,
-    "skia": SkiaPixelSurface,
-}
-
 testDir = pathlib.Path(__file__).resolve().parent
 dataDir = testDir / "data"
 tmpOutputDir = testDir / "tmpOutput"
@@ -19,6 +14,12 @@ if not tmpOutputDir.exists():
 
 testFont1 = dataDir / "noto-glyf_colr_1.ttf"
 testFont2 = dataDir / "samples-glyf_colr_1.ttf"
+
+
+surfaceFactories = {
+    "cairo": CairoPixelSurface,
+    "skia": SkiaPixelSurface,
+}
 
 
 @pytest.mark.parametrize("surfaceFactoryName", surfaceFactories.keys())
