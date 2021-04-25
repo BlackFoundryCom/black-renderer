@@ -70,17 +70,7 @@ class SVGBackend:
         self.clipStack = self.clipStack + ((path.svgPath(), self.currentTransform),)
 
     def fillSolid(self, color):
-        assert len(self.clipStack) > 0
-        fillPath, fillTransform = self.clipStack[-1]
-        clipPath, clipTransform = None, None
-        if len(self.clipStack) >= 2:
-            clipPath, clipTransform = self.clipStack[-2]
-            if len(self.clipStack) > 2:
-                logger.warning(
-                    "SVG backend does not support more than two nested clip paths"
-                )
-        paint = RGBAPaint(color)
-        self.elements.append((fillPath, fillTransform, clipPath, clipTransform, paint))
+        self._addElement(RGBAPaint(color))
 
     def fillLinearGradient(self, *args):
         print("fillLinearGradient")
@@ -101,6 +91,18 @@ class SVGBackend:
         self.fillSolid((1, random(), random(), 1))
 
     # TODO: blendMode for PaintComposite
+
+    def _addElement(self, paint):
+        assert len(self.clipStack) > 0
+        fillPath, fillTransform = self.clipStack[-1]
+        clipPath, clipTransform = None, None
+        if len(self.clipStack) >= 2:
+            clipPath, clipTransform = self.clipStack[-2]
+            if len(self.clipStack) > 2:
+                logger.warning(
+                    "SVG backend does not support more than two nested clip paths"
+                )
+        self.elements.append((fillPath, fillTransform, clipPath, clipTransform, paint))
 
 
 class RGBAPaint(tuple):
