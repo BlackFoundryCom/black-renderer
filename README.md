@@ -1,17 +1,17 @@
 # BlackRenderer
 
-Developing a pure Python renderer for COLRv1 fonts.
+Developing a Python-based renderer for COLRv1 fonts.
 
 ## Goals
 
 - Uses fonttools to parse COLRv1 data
 - Adapter classes for various 2D rendering back-ends:
   1. Debugging/printing (text dump of scene graph / 2D API calls)
-  2. DrawBot
-  3. Cocoa
-  4. skia-python
-  5. pycairo
-  6. SVG
+  2. skia-python
+  3. pycairo
+  4. SVG
+  5. DrawBot
+  6. Cocoa
   7. ...
 
 ## Install / Setting up an environment
