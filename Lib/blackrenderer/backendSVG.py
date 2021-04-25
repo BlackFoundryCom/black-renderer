@@ -111,8 +111,8 @@ class SVGSurface:
     fileExtension = ".svg"
 
     def __init__(self, x, y, width, height):
-        self.viewBox = 0, 0, width, height
-        transform = Transform(1, 0, 0, -1, 0, height)
+        self.viewBox = x, y, width, height
+        transform = Transform(1, 0, 0, -1, x, height + y)
         transform = transform.translate(-x, -y)
         self.backend = SVGBackend(transform)
 
