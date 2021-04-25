@@ -1,5 +1,7 @@
 from contextlib import contextmanager
 from io import BytesIO
+import math
+from fontTools.misc.transform import Transform
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables.otTables import PaintFormat
@@ -114,11 +116,19 @@ class COLRFont:
         self._applyTransform(transform, paint.Paint, backend)
 
     def _drawPaintRotate(self, paint, backend):
-        transform = ...
+        transform = Transform()
+        transform = transform.translate(paint.centerX, paint.centerY)
+        transform = transform.rotate(math.radians(paint.angle))
+        transform = transform.translate(-paint.centerX, -paint.centerY)
         self._applyTransform(transform, paint.Paint, backend)
 
     def _drawPaintSkew(self, paint, backend):
-        transform = ...
+        transform = Transform()
+        transform = transform.translate(paint.centerX, paint.centerY)
+        transform = transform.skew(
+            math.radians(paint.xSkewAngle), math.radians(paint.ySkewAngle)
+        )
+        transform = transform.translate(-paint.centerX, -paint.centerY)
         self._applyTransform(transform, paint.Paint, backend)
 
     def _drawPaintComposite(self, paint, backend):
