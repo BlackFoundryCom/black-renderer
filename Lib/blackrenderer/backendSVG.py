@@ -187,7 +187,7 @@ def colorToSVGAttrs(color):
         color = color[:3]
     attrs.append(("fill", formatColor(color)))
     if opacity != 1:
-        attrs.append(("fill-opacity", opacity))
+        attrs.append(("fill-opacity", formatNumber(opacity)))
     return attrs
 
 
