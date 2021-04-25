@@ -155,7 +155,7 @@ class SVGSurface:
             attrs = [("d", fillPath), ("transform", formatMatrix(fillTransform))]
             if clipPath is not None:
                 clipKey = clipPath, clipTransform
-                attrs.append(("clip-path", f"url({clipPaths[clipKey]}"))
+                attrs.append(("clip-path", f"url({clipPaths[clipKey]})"))
             attrs += colorToSVGAttrs(paint)  # XXX
             w.simpletag("path", attrs)
             w.newline()
