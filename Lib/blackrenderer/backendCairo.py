@@ -10,24 +10,24 @@ class CairoPen(BasePen):
 
     def __init__(self, context):
         super().__init__(None)
-        self._context = context
+        self.context = context
 
     def _moveTo(self, pt):
         x, y = pt
-        self._context.move_to(x, y)
+        self.context.move_to(x, y)
 
     def _lineTo(self, pt):
         x, y = pt
-        self._context.line_to(x, y)
+        self.context.line_to(x, y)
 
     def _curveToOne(self, pt1, pt2, pt3):
         x1, y1 = pt1
         x2, y2 = pt2
         x3, y3 = pt3
-        self._context.curve_to(x1, y1, x2, y2, x3, y3)
+        self.context.curve_to(x1, y1, x2, y2, x3, y3)
 
     def _closePath(self):
-        self._context.close_path()
+        self.context.close_path()
 
 
 class CairoBackend:
