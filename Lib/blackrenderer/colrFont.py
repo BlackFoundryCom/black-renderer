@@ -91,7 +91,7 @@ class COLRFont:
 
     def _drawPaintLinearGradient(self, paint, backend):
         colorLine = self._readColorLine(paint.ColorLine)
-        gradientAnchors = self._reduceThreeToTwoAnchors(paint)
+        gradientAnchors = self._reduceThreeAnchorsToTwo(paint)
         backend.fillLinearGradient(colorLine, gradientAnchors)
         # FIXME: We should carefully check (with custom test?) that the
         # coordinates of the gradient anchors need not be transformed using
@@ -171,11 +171,10 @@ class COLRFont:
 
     def _readColorLine(self, colorLineTable):
         cl = colorLineTable
-        n = cl.StopCount
         return [(cs.StopOffset, self._getColor(cs.Color.PaletteIndex, cs.Color.Alpha)) for cs in cl.ColorStop]
 
-    def _reduceThreeToTwoAnchors(self, p):
-        # FIXME: make sure the 3 points are not in degenrate position [see COLRv1 spec]
+    def _reduceThreeAnchorsToTwo(self, p):
+        # FIXME: make sure the 3 points are not in degenerate position [see COLRv1 spec].
         x02 = p.x2 - p.x0
         y02 = p.y2 - p.y0
         x01 = p.x1 - p.x0

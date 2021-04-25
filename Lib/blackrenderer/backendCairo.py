@@ -70,7 +70,7 @@ class CairoBackend:
         self.canvas.clip()
 
     def _fill(self):
-        # This function is reuse in fillSolid() and all 3 fill*Gradient()
+        # This function is reused in fillSolid() and all 3 fill*Gradient()
         # functions.
         self.canvas.save()
         self.canvas.identity_matrix()
@@ -87,8 +87,9 @@ class CairoBackend:
     def fillLinearGradient(self, colorLine, gradientAnchors):
         (x0, y0), (x1, y1) = gradientAnchors
         gr = cairo.LinearGradient(x0, y0, x1, y1)
-        # FIXME: one should clip offset below 0 or above 2 (and adjusting the
-        # stop color) because Cairo does not accept stops outsidee [0,1].
+        # FIXME: one should clip offset below 0 or above 1 (and adjusting the
+        # stop color) because Cairo does not seem to accept stops outside of
+        # the range [0,1].
         for (stop, (r,g,b,a)) in colorLine:
             gr.add_color_stop_rgba(stop, r, g, b, a)
         self.canvas.set_source(gr)
