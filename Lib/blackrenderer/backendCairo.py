@@ -42,9 +42,11 @@ class CairoBackend:
 
     @contextmanager
     def savedState(self):
+        prevClipRect = self.clipRect
         self.canvas.save()
         yield
         self.canvas.restore()
+        self.clipRect = prevClipRect
 
     def transform(self, transform):
         m = cairo.Matrix()
