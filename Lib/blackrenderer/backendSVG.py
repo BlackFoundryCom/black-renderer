@@ -67,7 +67,9 @@ class SVGBackend:
         self.currentTransform = self.currentTransform.transform(transform)
 
     def clipPath(self, path):
-        self.clipStack = self.clipStack + ((path.svgPath(), self.currentTransform),)
+        self.clipStack = tupleAppend(
+            self.clipStack, (path.svgPath(), self.currentTransform)
+        )
 
     def fillSolid(self, color):
         self._addElement(RGBAPaint(color))
@@ -203,3 +205,7 @@ def formatColor(color):
 def formatMatrix(t):
     assert len(t) == 6
     return "matrix(%s,%s,%s,%s,%s,%s)" % tuple(formatNumber(v) for v in t)
+
+
+def tupleAppend(tpl, item):
+    return tpl + (item,)
