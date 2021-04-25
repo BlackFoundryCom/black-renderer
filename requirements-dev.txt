@@ -1,2 +1,3 @@
 pytest
 skia-python
+numpy  # undeclated dependency of skia-python
