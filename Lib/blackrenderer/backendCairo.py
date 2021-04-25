@@ -31,6 +31,7 @@ class CairoPen(BasePen):
 
 class CairoBackend:
     def __init__(self, canvas, width, height):
+        # TODO: reword so we don't need to pass width and height
         self.canvas = canvas
         self.width = width
         self.height = height
