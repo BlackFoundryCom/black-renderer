@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 import os
+from fontTools.misc.arrayTools import calcBounds
 from fontTools.pens.basePen import BasePen
 from fontTools.pens.recordingPen import RecordingPen
 import cairo
@@ -30,11 +31,9 @@ class CairoPen(BasePen):
 
 
 class CairoBackend:
-    def __init__(self, canvas, width, height):
-        # TODO: reword so we don't need to pass width and height
+    def __init__(self, canvas):
         self.canvas = canvas
-        self.width = width
-        self.height = height
+        self.clipRect = None
         self._pen = CairoPen(canvas)
 
     @staticmethod
@@ -55,6 +54,11 @@ class CairoBackend:
     def clipPath(self, path):
         self.canvas.new_path()
         path.replay(self._pen)
+        x1, y1, x2, y2 = self.canvas.path_extents()
+        points = [(x1, y1), (x1, y2), (x2, y2), (x2, y1)]
+        points = [self.canvas.user_to_device(x, y) for x, y in points]
+        x1, y1, x2, y2 = calcBounds(points)
+        self.clipRect = (x1, y1, x2 - x1, y2 - y1)
         self.canvas.clip()
 
     def fillSolid(self, color):
@@ -62,7 +66,7 @@ class CairoBackend:
         self.canvas.set_source_rgba(r, g, b, a)
         self.canvas.save()
         self.canvas.identity_matrix()
-        self.canvas.rectangle(0, 0, self.width, self.height)
+        self.canvas.rectangle(*self.clipRect)
         self.canvas.fill()
         self.canvas.restore()
 

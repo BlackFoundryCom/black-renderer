@@ -22,7 +22,7 @@ def test_renderGlyph(glyphName):
     minX, minY, maxX, maxY = font.getGlyphBounds(glyphName)
 
     surface = CairoPixelSurface(minX, minY, maxX - minX, maxY - minY)
-    backend = CairoBackend(surface.canvas, maxX - minX, maxY - minY)
+    backend = CairoBackend(surface.canvas)
 
     font.drawGlyph(glyphName, backend)
 
