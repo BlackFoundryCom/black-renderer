@@ -84,6 +84,10 @@ class SkiaPixelSurface:
         self.canvas.scale(1, -1)
         self.canvas.translate(-x, -y)
 
+    @property
+    def backend(self):
+        return SkiaBackend(self.canvas)
+
     def saveImage(self, path, format=skia.kPNG):
         image = self.surface.makeImageSnapshot()
         image.save(os.fspath(path), format)

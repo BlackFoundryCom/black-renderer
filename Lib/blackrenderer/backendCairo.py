@@ -111,6 +111,10 @@ class CairoPixelSurface:
         self.canvas.scale(1, -1)
         self.canvas.translate(-x, -y)
 
+    @property
+    def backend(self):
+        return CairoBackend(self.canvas)
+
     def saveImage(self, path):
         self.surface.flush()
         self.surface.write_to_png(os.fspath(path))
