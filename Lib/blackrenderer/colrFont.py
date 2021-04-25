@@ -96,7 +96,8 @@ class COLRFont:
         path = backend.newPath()
         # paint.Glyph must not be a COLR glyph
         self._drawGlyphOutline(paint.Glyph, path)
-        with backend.clip(path):
+        with backend.savedState():
+            backend.clipPath(path)
             self._drawPaint(paint.Paint, backend)
 
     def _drawPaintColrGlyph(self, paint, backend):
@@ -106,7 +107,9 @@ class COLRFont:
     def _drawPaintTransform(self, paint, backend):
         t = paint.Transform
         transform = (t.xx, t.yx, t.xy, t.yy, t.dx, t.dy)
-        with backend.transform(transform):
+        print(transform)
+        with backend.savedState():
+            backend.transform(transform)
             self._drawPaint(paint.Paint, backend)
 
     def _drawPaintTranslate(self, paint, backend):

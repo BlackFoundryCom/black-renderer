@@ -40,20 +40,18 @@ class SkiaBackend:
         return SkiaPath()
 
     @contextmanager
-    def transform(self, transform):
-        matrix = skia.Matrix()
-        matrix.setAffine(transform)
+    def savedState(self):
         self.canvas.save()
-        self.canvas.concat(matrix)
         yield
         self.canvas.restore()
 
-    @contextmanager
-    def clip(self, path):
-        self.canvas.save()
+    def transform(self, transform):
+        matrix = skia.Matrix()
+        matrix.setAffine(transform)
+        self.canvas.concat(matrix)
+
+    def clipPath(self, path):
         self.canvas.clipPath(path.path)
-        yield
-        self.canvas.restore()
 
     def fillSolid(self, color):
         self.canvas.drawColor(skia.Color4f(tuple(color)))
