@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 import os
-from fontTools.misc.arrayTools import calcBounds
+from fontTools.misc.arrayTools import calcBounds, sectRect
 from fontTools.pens.basePen import BasePen
 from fontTools.pens.recordingPen import RecordingPen
 import cairo
@@ -59,8 +59,7 @@ class CairoBackend:
         x1, y1, x2, y2 = self.canvas.path_extents()
         points = [(x1, y1), (x1, y2), (x2, y2), (x2, y1)]
         points = [self.canvas.user_to_device(x, y) for x, y in points]
-        x1, y1, x2, y2 = calcBounds(points)
-        self.clipRect = (x1, y1, x2 - x1, y2 - y1)
+        self.clipRect = calcBounds(points)
         self.canvas.clip()
 
     def fillSolid(self, color):
@@ -68,7 +67,8 @@ class CairoBackend:
         self.canvas.set_source_rgba(r, g, b, a)
         self.canvas.save()
         self.canvas.identity_matrix()
-        self.canvas.rectangle(*self.clipRect)
+        x1, y1, x2, y2 = self.clipRect
+        self.canvas.rectangle(x1, y1, x2 - x1, y2 - y1)
         self.canvas.fill()
         self.canvas.restore()
 
