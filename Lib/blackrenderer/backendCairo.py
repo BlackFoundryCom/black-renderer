@@ -30,8 +30,10 @@ class CairoPen(BasePen):
 
 
 class CairoBackend:
-    def __init__(self, canvas):
+    def __init__(self, canvas, width, height):
         self.canvas = canvas
+        self.width = width
+        self.height = height
         self._pen = CairoPen(canvas)
 
     @staticmethod
@@ -57,8 +59,11 @@ class CairoBackend:
     def fillSolid(self, color):
         r, g, b, a = color
         self.canvas.set_source_rgba(r, g, b, a)
-        self.canvas.rectangle(0, 0, 2000, 2000)
+        self.canvas.save()
+        self.canvas.identity_matrix()
+        self.canvas.rectangle(0, 0, self.width, self.height)
         self.canvas.fill()
+        self.canvas.restore()
 
     def fillLinearGradient(self, *args):
         print("fillLinearGradient")
