@@ -152,11 +152,12 @@ class SVGSurface:
             w.newline()
 
         for fillPath, fillTransform, clipPath, clipTransform, paint in elements:
-            attrs = [("d", fillPath), ("transform", formatMatrix(fillTransform))]
+            attrs = [("d", fillPath)]
+            attrs += colorToSVGAttrs(paint)  # XXX needs work for gradients
+            attrs.append(("transform", formatMatrix(fillTransform)))
             if clipPath is not None:
                 clipKey = clipPath, clipTransform
                 attrs.append(("clip-path", f"url({clipPaths[clipKey]})"))
-            attrs += colorToSVGAttrs(paint)  # XXX
             w.simpletag("path", attrs)
             w.newline()
 
@@ -193,9 +194,8 @@ def colorToSVGAttrs(color):
 def formatColor(color):
     if not color:
         return "none"
-    assert len(color) == 3  # XXX make more general
-    color = [(int(round(c * 255))) for c in color]
-    return "#%02X%02X%02X" % tuple(color)
+    assert len(color) == 3
+    return "#%02X%02X%02X" % tuple(int(round(c * 255)) for c in color)
 
 
 def formatMatrix(t):
