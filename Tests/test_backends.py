@@ -3,7 +3,7 @@ import pytest
 from blackrenderer.colrFont import COLRFont
 from blackrenderer.backendCairo import CairoPixelSurface
 from blackrenderer.backendSkia import SkiaPixelSurface
-
+from blackrenderer.backendSVG import SVGSurface
 
 testDir = pathlib.Path(__file__).resolve().parent
 dataDir = testDir / "data"
@@ -19,6 +19,7 @@ testFont2 = dataDir / "samples-glyf_colr_1.ttf"
 backends = [
     ("cairo", CairoPixelSurface),
     ("skia", SkiaPixelSurface),
+    ("svg", SVGSurface),
 ]
 
 
@@ -30,6 +31,7 @@ def test_renderGlyph(backendName, surfaceFactory, glyphName):
     minX, minY, maxX, maxY = font.getGlyphBounds(glyphName)
 
     surface = surfaceFactory(minX, minY, maxX - minX, maxY - minY)
+    ext = surface.fileExtension
     font.drawGlyph(glyphName, surface.backend)
 
-    surface.saveImage(tmpOutputDir / f"{backendName}_{glyphName}.png")
+    surface.saveImage(tmpOutputDir / f"{backendName}_{glyphName}{ext}")

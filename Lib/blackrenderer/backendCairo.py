@@ -101,6 +101,8 @@ class CairoBackend:
 
 
 class CairoPixelSurface:
+    fileExtension = ".png"
+
     def __init__(self, x, y, width, height):
         self.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
         self.canvas = cairo.Context(self.surface)

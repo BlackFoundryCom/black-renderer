@@ -77,6 +77,8 @@ class SkiaBackend:
 
 
 class SkiaPixelSurface:
+    fileExtension = ".png"
+
     def __init__(self, x, y, width, height):
         self.surface = skia.Surface(width, height)
         self.canvas = self.surface.getCanvas()
