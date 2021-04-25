@@ -56,10 +56,18 @@ class CairoBackend:
     def clipPath(self, path):
         self.canvas.new_path()
         path.replay(self._pen)
+        # We calculate the bounds of the new clipping path in device
+        # coordinates, as at the time of drawing a solid fill we may
+        # be in a different coordinate space.
         x1, y1, x2, y2 = self.canvas.path_extents()
         points = [(x1, y1), (x1, y2), (x2, y2), (x2, y1)]
         points = [self.canvas.user_to_device(x, y) for x, y in points]
-        self.clipRect = calcBounds(points)
+        clipRect = calcBounds(points)
+        if self.clipRect is not None:
+            # Our clip gets added to an existing clip, so use intersection
+            self.clipRect = sectRect(self.clipRect, clipRect)
+        else:
+            self.clipRect = clipRect
         self.canvas.clip()
 
     def fillSolid(self, color):
