@@ -5,7 +5,6 @@ import skia
 
 
 class SkiaPath(BasePen):
-
     def __init__(self):
         super().__init__(None)
         self.path = skia.Path()
@@ -59,16 +58,19 @@ class SkiaBackend:
     def fillLinearGradient(self, *args):
         print("fillLinearGradient")
         from random import random
+
         self.fillSolid((1, random(), random(), 1))
 
     def fillRadialGradient(self, *args):
         print("fillRadialGradient")
         from random import random
+
         self.fillSolid((1, random(), random(), 1))
 
     def fillSweepGradient(self, *args):
         print("fillSweepGradient")
         from random import random
+
         self.fillSolid((1, random(), random(), 1))
 
     # TODO: blendMode for PaintComposite

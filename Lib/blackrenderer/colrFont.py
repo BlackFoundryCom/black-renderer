@@ -12,7 +12,6 @@ PAINT_NAMES = {PaintFormat[name].value: name for name in PaintFormat.__members__
 
 
 class COLRFont:
-
     def __init__(self, path):
         with open(path, "rb") as f:
             fontData = f.read()
@@ -27,7 +26,12 @@ class COLRFont:
         self.layers = colrTable.LayerV1List
         self.palettes = [
             [
-                (color.red/255, color.green/255, color.blue/255, color.alpha/255)
+                (
+                    color.red / 255,
+                    color.green / 255,
+                    color.blue / 255,
+                    color.alpha / 255,
+                )
                 for color in paletteRaw
             ]
             for paletteRaw in self.ttFont["CPAL"].palettes
