@@ -110,7 +110,7 @@ class COLRFont:
         self._applyTransform(transform, paint.Paint, backend)
 
     def _drawPaintTranslate(self, paint, backend):
-        transform = ...
+        transform = (1, 0, 0, 1, paint.dx, paint.dy)
         self._applyTransform(transform, paint.Paint, backend)
 
     def _drawPaintRotate(self, paint, backend):
