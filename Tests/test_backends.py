@@ -24,7 +24,7 @@ backends = [
 
 
 @pytest.mark.parametrize("backendName, surfaceFactory", backends)
-@pytest.mark.parametrize("glyphName", ["uni2693", "uni2694"])
+@pytest.mark.parametrize("glyphName", ["uni2693", "uni2694", "u1F30A", "u1F943"])
 def test_renderGlyph(backendName, surfaceFactory, glyphName):
     font = COLRFont(testFont1)
 
