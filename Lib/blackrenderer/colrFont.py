@@ -99,6 +99,7 @@ class COLRFont:
 
     def _drawPaintRadialGradient(self, paint, backend):
         colorLine = self._readColorLine(paint.ColorLine)
+        # FIXME: don't "leak" Paint objects to the backend
         backend.fillRadialGradient(colorLine, paint)
 
     def _drawPaintSweepGradient(self, paint, backend):
