@@ -177,6 +177,7 @@ class COLRFont:
             for cs in colorLineTable.ColorStop
         ]
 
+
 def _reduceThreeAnchorsToTwo(p):
     # FIXME: make sure the 3 points are not in degenerate position [see COLRv1 spec].
     x02 = p.x2 - p.x0
