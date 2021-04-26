@@ -79,11 +79,9 @@ class SVGBackend:
         gradient = LinearGradientPaint(tuple(colorLine), pt1, pt2)
         self._addElement(gradient, self.currentTransform)
 
-    def fillRadialGradient(self, *args):
-        print("fillRadialGradient")
-        from random import random
-
-        self.fillSolid((1, random(), random(), 1))
+    def fillRadialGradient(self, colorLine, pt1, radius1, pt2, radius2):
+        gradient = RadialGradientPaint(tuple(colorLine), pt1, radius1, pt2, radius2)
+        self._addElement(gradient, self.currentTransform)
 
     def fillSweepGradient(self, *args):
         print("fillSweepGradient")
@@ -110,36 +108,66 @@ class SVGBackend:
         )
 
 
-class LinearGradientPaint(NamedTuple):
+class RGBAPaint(tuple):
+    pass
 
+
+class LinearGradientPaint(NamedTuple):
     colorLine: tuple
     pt1: tuple
     pt2: tuple
 
-    def toXML(self, writer, gradientID, transform):
-        attrs = [
-            ("id", gradientID),
-            ("gradientUnits", "userSpaceOnUse"),
-            ("x1", formatNumber(self.pt1[0])),
-            ("y1", formatNumber(self.pt1[1])),
-            ("x2", formatNumber(self.pt2[0])),
-            ("y2", formatNumber(self.pt2[1])),
+    def toSVG(self, writer, gradientID, transform):
+        attrNumbers = [
+            ("x1", self.pt1[0]),
+            ("y1", self.pt1[1]),
+            ("x2", self.pt2[0]),
+            ("y2", self.pt2[1]),
         ]
-        if transform != (1, 0, 0, 1, 0, 0):
-            attrs.append(("gradientTransform", formatMatrix(transform)))
-        writer.begintag("linearGradient", attrs)
-        writer.newline()
-        for stop, rgba in self.colorLine:
-            attrs = [("offset", f"{round(stop * 100)}%")]
-            attrs += colorToSVGAttrs(rgba, "stop-color", "stop-opacity")
-            writer.simpletag("stop", attrs)
-            writer.newline()
-        writer.endtag("linearGradient")
-        writer.newline()
+        _gradientToSVG(
+            writer, "linearGradient", gradientID, self.colorLine, transform, attrNumbers
+        )
 
 
-class RGBAPaint(tuple):
-    pass
+class RadialGradientPaint(NamedTuple):
+    colorLine: tuple
+    pt1: tuple
+    radius1: float
+    pt2: tuple
+    radius2: float
+
+    def toSVG(self, writer, gradientID, transform):
+        attrNumbers = [
+            ("fx", self.pt1[0]),
+            ("fy", self.pt1[1]),
+            ("fr", self.radius1),
+            ("cx", self.pt2[0]),
+            ("cy", self.pt2[1]),
+            ("r", self.radius2),
+        ]
+        _gradientToSVG(
+            writer, "radialGradient", gradientID, self.colorLine, transform, attrNumbers
+        )
+
+
+def _gradientToSVG(writer, gradientTag, gradientID, colorLine, transform, attrNumbers):
+    attrs = [
+        ("id", gradientID),
+        ("gradientUnits", "userSpaceOnUse"),
+    ]
+    for attrName, value in attrNumbers:
+        attrs.append((attrName, formatNumber(value)))
+    if transform != (1, 0, 0, 1, 0, 0):
+        attrs.append(("gradientTransform", formatMatrix(transform)))
+    writer.begintag(gradientTag, attrs)
+    writer.newline()
+    for stop, rgba in colorLine:
+        attrs = [("offset", f"{round(stop * 100)}%")]
+        attrs += colorToSVGAttrs(rgba, "stop-color", "stop-opacity")
+        writer.simpletag("stop", attrs)
+        writer.newline()
+    writer.endtag(gradientTag)
+    writer.newline()
 
 
 class SVGSurface:
@@ -184,7 +212,7 @@ class SVGSurface:
             w.begintag("defs")
             w.newline()
             for (gradient, gradientTransform), gradientID in gradients.items():
-                gradient.toXML(w, gradientID, gradientTransform)
+                gradient.toSVG(w, gradientID, gradientTransform)
             w.endtag("defs")
             w.newline()
 
