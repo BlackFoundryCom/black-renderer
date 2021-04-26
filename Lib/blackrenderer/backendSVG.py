@@ -193,14 +193,6 @@ class SVGSurface:
             if not isinstance(paint, RGBAPaint) and gradientKey not in gradients:
                 gradients[gradientKey] = f"gradient_{len(gradients)}"
 
-        docAttrs = {
-            "width": formatNumber(self.viewBox[2]),
-            "height": formatNumber(self.viewBox[3]),
-            "preserveAspectRatio": "xMinYMin slice",
-            "viewBox": " ".join(formatNumber(n) for n in self.viewBox),
-            "version": "1.1",
-            "xmlns": "http://www.w3.org/2000/svg",
-        }
         root = ET.Element(
             "svg",
             width=formatNumber(self.viewBox[2]),
