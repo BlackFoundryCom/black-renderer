@@ -62,8 +62,7 @@ class SkiaBackend:
             colors=colors,
             positions=stops,
         )
-        paint = skia.Paint(Shader=shader)
-        self.canvas.drawPaint(paint)
+        self.canvas.drawPaint(skia.Paint(Shader=shader))
 
     def fillRadialGradient(self, colorLine, startPt, startRadius, endPt, endRadius):
         colors, stops = _unpackColorLine(colorLine)
@@ -75,8 +74,7 @@ class SkiaBackend:
             colors=colors,
             positions=stops,
         )
-        paint = skia.Paint(Shader=shader)
-        self.canvas.drawPaint(paint)
+        self.canvas.drawPaint(skia.Paint(Shader=shader))
 
     def fillSweepGradient(self, *args):
         print("fillSweepGradient")
