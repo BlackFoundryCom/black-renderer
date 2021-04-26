@@ -3,7 +3,7 @@ import logging
 from typing import NamedTuple
 from fontTools.misc.transform import Transform
 from fontTools.pens.basePen import BasePen
-from fontTools.misc.xmlWriter import XMLWriter
+from fontTools.misc import etree as ET
 
 
 logger = logging.getLogger(__name__)
@@ -118,15 +118,15 @@ class LinearGradientPaint(NamedTuple):
     pt1: tuple
     pt2: tuple
 
-    def toSVG(self, writer, gradientID, transform):
+    def toSVG(self, gradientID, transform):
         attrNumbers = [
             ("x1", self.pt1[0]),
             ("y1", self.pt1[1]),
             ("x2", self.pt2[0]),
             ("y2", self.pt2[1]),
         ]
-        _gradientToSVG(
-            writer, "linearGradient", gradientID, self.colorLine, transform, attrNumbers
+        return _gradientToSVG(
+            "linearGradient", gradientID, self.colorLine, transform, attrNumbers
         )
 
 
@@ -137,7 +137,7 @@ class RadialGradientPaint(NamedTuple):
     pt2: tuple
     radius2: float
 
-    def toSVG(self, writer, gradientID, transform):
+    def toSVG(self, gradientID, transform):
         attrNumbers = [
             ("fx", self.pt1[0]),
             ("fy", self.pt1[1]),
@@ -146,29 +146,26 @@ class RadialGradientPaint(NamedTuple):
             ("cy", self.pt2[1]),
             ("r", self.radius2),
         ]
-        _gradientToSVG(
-            writer, "radialGradient", gradientID, self.colorLine, transform, attrNumbers
+        return _gradientToSVG(
+            "radialGradient", gradientID, self.colorLine, transform, attrNumbers
         )
 
 
-def _gradientToSVG(writer, gradientTag, gradientID, colorLine, transform, attrNumbers):
-    attrs = [
-        ("id", gradientID),
-        ("gradientUnits", "userSpaceOnUse"),
-    ]
+def _gradientToSVG(gradientTag, gradientID, colorLine, transform, attrNumbers):
+    element = ET.Element(gradientTag)
+    element.attrib["id"] = gradientID
+    element.attrib["gradientUnits"] = "userSpaceOnUse"
     for attrName, value in attrNumbers:
-        attrs.append((attrName, formatNumber(value)))
+        element.attrib[attrName] = formatNumber(value)
     if transform != (1, 0, 0, 1, 0, 0):
-        attrs.append(("gradientTransform", formatMatrix(transform)))
-    writer.begintag(gradientTag, attrs)
-    writer.newline()
+        element.attrib["gradientTransform"] = formatMatrix(transform)
     for stop, rgba in colorLine:
-        attrs = [("offset", f"{round(stop * 100)}%")]
-        attrs += colorToSVGAttrs(rgba, "stop-color", "stop-opacity")
-        writer.simpletag("stop", attrs)
-        writer.newline()
-    writer.endtag(gradientTag)
-    writer.newline()
+        stopElement = ET.Element("stop")
+        stopElement.attrib["offset"] = f"{round(stop * 100)}%"
+        for attr, value in colorToSVGAttrs(rgba, "stop-color", "stop-opacity"):
+            stopElement.attrib[attr] = value
+        element.append(stopElement)
+    return element
 
 
 class SVGSurface:
@@ -180,7 +177,7 @@ class SVGSurface:
         self.backend = SVGBackend(transform)
 
     def saveImage(self, path):
-        with open(path, "w") as f:
+        with open(path, "wb") as f:
             self.writeSVG(f)
 
     def writeSVG(self, stream):
@@ -195,35 +192,36 @@ class SVGSurface:
             if not isinstance(paint, RGBAPaint) and gradientKey not in gradients:
                 gradients[gradientKey] = f"gradient_{len(gradients)}"
 
-        w = XMLWriter(stream)
-        docAttrs = [
-            ("width", formatNumber(self.viewBox[2])),
-            ("height", formatNumber(self.viewBox[3])),
-            ("preserveAspectRatio", "xMinYMin slice"),
-            ("viewBox", " ".join(formatNumber(n) for n in self.viewBox)),
-            ("version", "1.1"),
-            ("xmlns", "http://www.w3.org/2000/svg"),
-            ("xmlns:xlink", "http://www.w3.org/1999/xlink"),
-        ]
-        w.begintag("svg", docAttrs)
-        w.newline()
+        docAttrs = {
+            "width": formatNumber(self.viewBox[2]),
+            "height": formatNumber(self.viewBox[3]),
+            "preserveAspectRatio": "xMinYMin slice",
+            "viewBox": " ".join(formatNumber(n) for n in self.viewBox),
+            "version": "1.1",
+            "xmlns": "http://www.w3.org/2000/svg",
+        }
+        root = ET.Element(
+            "svg",
+            width=formatNumber(self.viewBox[2]),
+            height=formatNumber(self.viewBox[3]),
+            preserveAspectRatio="xMinYMin slice",
+            viewBox=" ".join(formatNumber(n) for n in self.viewBox),
+            version="1.1",
+            xmlns="http://www.w3.org/2000/svg",
+        )
+
+        # root.attrib["xmlns:link"] = "http://www.w3.org/1999/xlink"
+
         if gradients:
-            w.begintag("defs")
-            w.newline()
+            defs = ET.SubElement(root, "defs")
             for (gradient, gradientTransform), gradientID in gradients.items():
-                gradient.toSVG(w, gradientID, gradientTransform)
-            w.endtag("defs")
-            w.newline()
+                defs.append(gradient.toSVG(gradientID, gradientTransform))
 
         for (clipPath, clipTransform), clipID in clipPaths.items():
-            w.begintag("clipPath", id=clipID)
-            w.newline()
-            w.simpletag(
-                "path", [("d", clipPath), ("transform", formatMatrix(clipTransform))]
+            clipElement = ET.SubElement(root, "clipPath", id=clipID)
+            ET.SubElement(
+                clipElement, "path", d=clipPath, transform=formatMatrix(clipTransform)
             )
-            w.newline()
-            w.endtag("clipPath")
-            w.newline()
 
         for fillPath, fillT, clipPath, clipT, paint, paintT in elements:
             attrs = [("d", fillPath)]
@@ -235,11 +233,10 @@ class SVGSurface:
             if clipPath is not None:
                 clipKey = clipPath, clipTransform
                 attrs.append(("clip-path", f"url(#{clipPaths[clipKey]})"))
-            w.simpletag("path", attrs)
-            w.newline()
+            ET.SubElement(root, "path", dict(attrs))
 
-        w.endtag("svg")
-        w.newline()
+        tree = ET.ElementTree(root)
+        tree.write(stream, pretty_print=True, xml_declaration=True)
 
 
 def formatCoord(pt):
