@@ -91,7 +91,7 @@ class COLRFont:
 
     def _drawPaintLinearGradient(self, paint, backend):
         colorLine = self._readColorLine(paint.ColorLine)
-        pt1, pt2 = self._reduceThreeAnchorsToTwo(paint)
+        pt1, pt2 = _reduceThreeAnchorsToTwo(paint)
         backend.fillLinearGradient(colorLine, pt1, pt2)
         # FIXME: We should carefully check (with custom test?) that the
         # coordinates of the gradient anchors need not be transformed using
@@ -177,14 +177,14 @@ class COLRFont:
             for cs in colorLineTable.ColorStop
         ]
 
-    def _reduceThreeAnchorsToTwo(self, p):
-        # FIXME: make sure the 3 points are not in degenerate position [see COLRv1 spec].
-        x02 = p.x2 - p.x0
-        y02 = p.y2 - p.y0
-        x01 = p.x1 - p.x0
-        y01 = p.y1 - p.y0
-        squaredNorm02 = x02 * x02 + y02 * y02
-        k = (x01 * x02 + y01 * y02) / squaredNorm02
-        x = p.x1 - k * x02
-        y = p.y1 - k * y02
-        return ((p.x0, p.y0), (x, y))
+def _reduceThreeAnchorsToTwo(p):
+    # FIXME: make sure the 3 points are not in degenerate position [see COLRv1 spec].
+    x02 = p.x2 - p.x0
+    y02 = p.y2 - p.y0
+    x01 = p.x1 - p.x0
+    y01 = p.y1 - p.y0
+    squaredNorm02 = x02 * x02 + y02 * y02
+    k = (x01 * x02 + y01 * y02) / squaredNorm02
+    x = p.x1 - k * x02
+    y = p.y1 - k * y02
+    return ((p.x0, p.y0), (x, y))
