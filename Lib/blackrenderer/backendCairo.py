@@ -84,8 +84,10 @@ class CairoBackend:
         self.context.set_source(gr)
         self._fill()
 
-    def fillRadialGradient(self, colorLine, pt1, radius1, pt2, radius2):
-        gr = cairo.RadialGradient(pt1[0], pt1[1], radius1, pt2[0], pt2[1], radius2)
+    def fillRadialGradient(self, colorLine, startPt, startRadius, endPt, endRadius):
+        gr = cairo.RadialGradient(
+            startPt[0], startPt[1], startRadius, endPt[0], endPt[1], endRadius
+        )
         for (stop, (r, g, b, a)) in colorLine:
             gr.add_color_stop_rgba(stop, r, g, b, a)
         self.context.set_source(gr)
