@@ -91,8 +91,8 @@ class COLRFont:
 
     def _drawPaintLinearGradient(self, paint, backend):
         colorLine = self._readColorLine(paint.ColorLine)
-        gradientAnchors = self._reduceThreeAnchorsToTwo(paint)
-        backend.fillLinearGradient(colorLine, gradientAnchors)
+        pt1, pt2 = self._reduceThreeAnchorsToTwo(paint)
+        backend.fillLinearGradient(colorLine, pt1, pt2)
         # FIXME: We should carefully check (with custom test?) that the
         # coordinates of the gradient anchors need not be transformed using
         # python code here.
@@ -100,7 +100,9 @@ class COLRFont:
     def _drawPaintRadialGradient(self, paint, backend):
         colorLine = self._readColorLine(paint.ColorLine)
         # FIXME: don't "leak" Paint objects to the backend
-        backend.fillRadialGradient(colorLine, paint)
+        pt0 = (paint.x0, paint.y0)
+        pt1 = (paint.x1, paint.y1)
+        backend.fillRadialGradient(colorLine, pt0, paint.r0, pt1, paint.r1)
 
     def _drawPaintSweepGradient(self, paint, backend):
         backend.fillSweepGradient(...)

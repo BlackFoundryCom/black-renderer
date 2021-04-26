@@ -84,9 +84,8 @@ class CairoBackend:
         self.canvas.set_source_rgba(r, g, b, a)
         self._fill()
 
-    def fillLinearGradient(self, colorLine, gradientAnchors):
-        (x0, y0), (x1, y1) = gradientAnchors
-        gr = cairo.LinearGradient(x0, y0, x1, y1)
+    def fillLinearGradient(self, colorLine, pt1, pt2):
+        gr = cairo.LinearGradient(pt1[0], pt1[1], pt2[0], pt2[1])
         # FIXME: one should clip offset below 0 or above 1 (and adjusting the
         # stop color) because Cairo does not seem to accept stops outside of
         # the range [0,1].
@@ -95,9 +94,8 @@ class CairoBackend:
         self.canvas.set_source(gr)
         self._fill()
 
-    def fillRadialGradient(self, colorLine, paintRadialGradient):
-        p = paintRadialGradient
-        gr = cairo.RadialGradient(p.x0, p.y0, p.r0, p.x1, p.y1, p.r1)
+    def fillRadialGradient(self, colorLine, pt1, radius1, pt2, radius2):
+        gr = cairo.RadialGradient(pt1[0], pt1[1], radius1, pt2[0], pt2[1], radius2)
         for (stop, (r, g, b, a)) in colorLine:
             gr.add_color_stop_rgba(stop, r, g, b, a)
         self.canvas.set_source(gr)
