@@ -119,13 +119,14 @@ class LinearGradientPaint(NamedTuple):
     def toXML(self, writer, gradientID, transform):
         attrs = [
             ("id", gradientID),
-            ("gradientTransform", formatMatrix(transform)),
             ("gradientUnits", "userSpaceOnUse"),
             ("x1", formatNumber(self.pt1[0])),
             ("y1", formatNumber(self.pt1[1])),
             ("x2", formatNumber(self.pt2[0])),
             ("y2", formatNumber(self.pt2[1])),
         ]
+        if transform != (1, 0, 0, 1, 0, 0):
+            attrs.append(("gradientTransform", formatMatrix(transform)))
         writer.begintag("linearGradient", attrs)
         writer.newline()
         for stop, rgba in self.colorLine:
