@@ -172,10 +172,9 @@ class COLRFont:
         return r, g, b, a
 
     def _readColorLine(self, colorLineTable):
-        cl = colorLineTable
         return [
             (cs.StopOffset, self._getColor(cs.Color.PaletteIndex, cs.Color.Alpha))
-            for cs in cl.ColorStop
+            for cs in colorLineTable.ColorStop
         ]
 
     def _reduceThreeAnchorsToTwo(self, p):
