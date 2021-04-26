@@ -152,19 +152,20 @@ class RadialGradientPaint(NamedTuple):
 
 
 def _gradientToSVG(gradientTag, gradientID, colorLine, transform, attrNumbers):
-    element = ET.Element(gradientTag)
-    element.attrib["id"] = gradientID
-    element.attrib["gradientUnits"] = "userSpaceOnUse"
+    element = ET.Element(
+        gradientTag,
+        id=gradientID,
+        gradientUnits="userSpaceOnUse",
+    )
     for attrName, value in attrNumbers:
         element.attrib[attrName] = formatNumber(value)
     if transform != (1, 0, 0, 1, 0, 0):
         element.attrib["gradientTransform"] = formatMatrix(transform)
     for stop, rgba in colorLine:
-        stopElement = ET.Element("stop")
+        stopElement = ET.SubElement(element, "stop")
         stopElement.attrib["offset"] = f"{round(stop * 100)}%"
         for attr, value in colorToSVGAttrs(rgba, "stop-color", "stop-opacity"):
             stopElement.attrib[attr] = value
-        element.append(stopElement)
     return element
 
 
