@@ -70,8 +70,7 @@ class CairoBackend:
         self.context.clip()
 
     def fillSolid(self, color):
-        r, g, b, a = color
-        self.context.set_source_rgba(r, g, b, a)
+        self.context.set_source_rgba(*color)
         self._fill()
 
     def fillLinearGradient(self, colorLine, pt1, pt2):
@@ -79,8 +78,8 @@ class CairoBackend:
         # FIXME: one should clip offset below 0 or above 1 (and adjusting the
         # stop color) because Cairo does not seem to accept stops outside of
         # the range [0,1].
-        for (stop, (r, g, b, a)) in colorLine:
-            gr.add_color_stop_rgba(stop, r, g, b, a)
+        for stop, color in colorLine:
+            gr.add_color_stop_rgba(stop, *color)
         self.context.set_source(gr)
         self._fill()
 
@@ -88,8 +87,8 @@ class CairoBackend:
         gr = cairo.RadialGradient(
             startPt[0], startPt[1], startRadius, endPt[0], endPt[1], endRadius
         )
-        for (stop, (r, g, b, a)) in colorLine:
-            gr.add_color_stop_rgba(stop, r, g, b, a)
+        for stop, color in colorLine:
+            gr.add_color_stop_rgba(stop, *color)
         self.context.set_source(gr)
         self._fill()
 
