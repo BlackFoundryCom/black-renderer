@@ -79,8 +79,10 @@ class SVGBackend:
         gradient = LinearGradientPaint(tuple(colorLine), pt1, pt2)
         self._addElement(gradient, self.currentTransform)
 
-    def fillRadialGradient(self, colorLine, pt1, radius1, pt2, radius2):
-        gradient = RadialGradientPaint(tuple(colorLine), pt1, radius1, pt2, radius2)
+    def fillRadialGradient(self, colorLine, startPt, startRadius, endPt, endRadius):
+        gradient = RadialGradientPaint(
+            tuple(colorLine), startPt, startRadius, endPt, endRadius
+        )
         self._addElement(gradient, self.currentTransform)
 
     def fillSweepGradient(self, *args):
