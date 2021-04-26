@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 import logging
+from typing import NamedTuple
 from fontTools.misc.transform import Transform
 from fontTools.pens.basePen import BasePen
 from fontTools.misc.xmlWriter import XMLWriter
@@ -72,13 +73,11 @@ class SVGBackend:
         )
 
     def fillSolid(self, color):
-        self._addElement(RGBAPaint(color))
+        self._addElement(RGBAPaint(color), None)
 
-    def fillLinearGradient(self, *args):
-        print("fillLinearGradient")
-        from random import random
-
-        self.fillSolid((1, random(), random(), 1))
+    def fillLinearGradient(self, colorLine, pt1, pt2):
+        gradient = LinearGradientPaint(tuple(colorLine), pt1, pt2)
+        self._addElement(gradient, self.currentTransform)
 
     def fillRadialGradient(self, *args):
         print("fillRadialGradient")
@@ -94,7 +93,7 @@ class SVGBackend:
 
     # TODO: blendMode for PaintComposite
 
-    def _addElement(self, paint):
+    def _addElement(self, paint, paintTransform):
         assert len(self.clipStack) > 0
         fillPath, fillTransform = self.clipStack[-1]
         clipPath, clipTransform = None, None
@@ -104,7 +103,38 @@ class SVGBackend:
                 logger.warning(
                     "SVG backend does not support more than two nested clip paths"
                 )
-        self.elements.append((fillPath, fillTransform, clipPath, clipTransform, paint))
+        if paintTransform is not None:
+            paintTransform = fillTransform.inverse().transform(paintTransform)
+        self.elements.append(
+            (fillPath, fillTransform, clipPath, clipTransform, paint, paintTransform)
+        )
+
+
+class LinearGradientPaint(NamedTuple):
+
+    colorLine: tuple
+    pt1: tuple
+    pt2: tuple
+
+    def toXML(self, writer, gradientID, transform):
+        attrs = [
+            ("id", gradientID),
+            ("gradientTransform", formatMatrix(transform)),
+            ("gradientUnits", "userSpaceOnUse"),
+            ("x1", formatNumber(self.pt1[0])),
+            ("y1", formatNumber(self.pt1[1])),
+            ("x2", formatNumber(self.pt2[0])),
+            ("y2", formatNumber(self.pt2[1])),
+        ]
+        writer.begintag("linearGradient", attrs)
+        writer.newline()
+        for stop, rgba in self.colorLine:
+            attrs = [("offset", f"{round(stop * 100)}%")]
+            attrs += colorToSVGAttrs(rgba, "stop-color", "stop-opacity")
+            writer.simpletag("stop", attrs)
+            writer.newline()
+        writer.endtag("linearGradient")
+        writer.newline()
 
 
 class RGBAPaint(tuple):
@@ -127,10 +157,14 @@ class SVGSurface:
     def toSVG(self):
         elements = self.backend.elements
         clipPaths = {}
-        for fillPath, fillTransform, clipPath, clipTransform, paint in elements:
-            clipKey = clipPath, clipTransform
+        gradients = {}
+        for fillPath, fillT, clipPath, clipT, paint, paintT in elements:
+            clipKey = clipPath, clipT
             if clipPath is not None and clipKey not in clipPaths:
                 clipPaths[clipKey] = f"clip_{len(clipPaths)}"
+            gradientKey = paint, paintT
+            if not isinstance(paint, RGBAPaint) and gradientKey not in gradients:
+                gradients[gradientKey] = f"gradient_{len(gradients)}"
 
         f = StringIO()
         w = XMLWriter(f)
@@ -145,6 +179,14 @@ class SVGSurface:
         ]
         w.begintag("svg", docAttrs)
         w.newline()
+        if gradients:
+            w.begintag("defs")
+            w.newline()
+            for (gradient, gradientTransform), gradientID in gradients.items():
+                gradient.toXML(w, gradientID, gradientTransform)
+            w.endtag("defs")
+            w.newline()
+
         for (clipPath, clipTransform), clipID in clipPaths.items():
             w.begintag("clipPath", id=clipID)
             w.newline()
@@ -155,13 +197,16 @@ class SVGSurface:
             w.endtag("clipPath")
             w.newline()
 
-        for fillPath, fillTransform, clipPath, clipTransform, paint in elements:
+        for fillPath, fillT, clipPath, clipT, paint, paintT in elements:
             attrs = [("d", fillPath)]
-            attrs += colorToSVGAttrs(paint)  # XXX needs work for gradients
-            attrs.append(("transform", formatMatrix(fillTransform)))
+            if isinstance(paint, RGBAPaint):
+                attrs += colorToSVGAttrs(paint)
+            else:
+                attrs.append(("fill", f"url(#{gradients[paint, paintT]})"))
+            attrs.append(("transform", formatMatrix(fillT)))
             if clipPath is not None:
                 clipKey = clipPath, clipTransform
-                attrs.append(("clip-path", f"url({clipPaths[clipKey]})"))
+                attrs.append(("clip-path", f"url(#{clipPaths[clipKey]})"))
             w.simpletag("path", attrs)
             w.newline()
 
@@ -183,15 +228,15 @@ def formatNumber(n):
         return str(round(n, 4))  # 4 decimals enough?
 
 
-def colorToSVGAttrs(color):
+def colorToSVGAttrs(color, fillAttr="fill", opacityAttr="fill-opacity"):
     attrs = []
     opacity = 1
     if len(color) == 4:
         opacity = color[3]
         color = color[:3]
-    attrs.append(("fill", formatColor(color)))
+    attrs.append((fillAttr, formatColor(color)))
     if opacity != 1:
-        attrs.append(("fill-opacity", formatNumber(opacity)))
+        attrs.append((opacityAttr, formatNumber(opacity)))
     return attrs
 
 
