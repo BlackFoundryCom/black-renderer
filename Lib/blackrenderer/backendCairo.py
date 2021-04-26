@@ -69,16 +69,6 @@ class CairoBackend:
             self.clipRect = clipRect
         self.canvas.clip()
 
-    def _fill(self):
-        # This function is reused in fillSolid() and all 3 fill*Gradient()
-        # functions.
-        self.canvas.save()
-        self.canvas.identity_matrix()
-        x1, y1, x2, y2 = self.clipRect
-        self.canvas.rectangle(x1, y1, x2 - x1, y2 - y1)
-        self.canvas.fill()
-        self.canvas.restore()
-
     def fillSolid(self, color):
         r, g, b, a = color
         self.canvas.set_source_rgba(r, g, b, a)
@@ -108,6 +98,16 @@ class CairoBackend:
         self.fillSolid((1, random(), random(), 1))
 
     # TODO: blendMode for PaintComposite
+
+    def _fill(self):
+        # This function is reused in fillSolid() and all 3 fill*Gradient()
+        # functions.
+        self.canvas.save()
+        self.canvas.identity_matrix()
+        x1, y1, x2, y2 = self.clipRect
+        self.canvas.rectangle(x1, y1, x2 - x1, y2 - y1)
+        self.canvas.fill()
+        self.canvas.restore()
 
 
 class CairoPixelSurface:
