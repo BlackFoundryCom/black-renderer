@@ -30,10 +30,10 @@ class CairoPen(BasePen):
 
 
 class CairoBackend:
-    def __init__(self, canvas):
-        self.canvas = canvas
+    def __init__(self, context):
+        self.context = context
         self.clipRect = None
-        self._pen = CairoPen(canvas)
+        self._pen = CairoPen(context)
 
     @staticmethod
     def newPath():
@@ -42,36 +42,36 @@ class CairoBackend:
     @contextmanager
     def savedState(self):
         prevClipRect = self.clipRect
-        self.canvas.save()
+        self.context.save()
         yield
-        self.canvas.restore()
+        self.context.restore()
         self.clipRect = prevClipRect
 
     def transform(self, transform):
         m = cairo.Matrix()
         m.xx, m.xy, m.yx, m.yy, m.x0, m.y0 = transform
-        self.canvas.transform(m)
+        self.context.transform(m)
 
     def clipPath(self, path):
-        self.canvas.new_path()
+        self.context.new_path()
         path.replay(self._pen)
         # We calculate the bounds of the new clipping path in device
         # coordinates, as at the time of drawing a solid fill we may
         # be in a different coordinate space.
-        x1, y1, x2, y2 = self.canvas.path_extents()
+        x1, y1, x2, y2 = self.context.path_extents()
         points = [(x1, y1), (x1, y2), (x2, y2), (x2, y1)]
-        points = [self.canvas.user_to_device(x, y) for x, y in points]
+        points = [self.context.user_to_device(x, y) for x, y in points]
         clipRect = calcBounds(points)
         if self.clipRect is not None:
             # Our clip gets added to an existing clip, so use intersection
             self.clipRect = sectRect(self.clipRect, clipRect)
         else:
             self.clipRect = clipRect
-        self.canvas.clip()
+        self.context.clip()
 
     def fillSolid(self, color):
         r, g, b, a = color
-        self.canvas.set_source_rgba(r, g, b, a)
+        self.context.set_source_rgba(r, g, b, a)
         self._fill()
 
     def fillLinearGradient(self, colorLine, pt1, pt2):
@@ -81,14 +81,14 @@ class CairoBackend:
         # the range [0,1].
         for (stop, (r, g, b, a)) in colorLine:
             gr.add_color_stop_rgba(stop, r, g, b, a)
-        self.canvas.set_source(gr)
+        self.context.set_source(gr)
         self._fill()
 
     def fillRadialGradient(self, colorLine, pt1, radius1, pt2, radius2):
         gr = cairo.RadialGradient(pt1[0], pt1[1], radius1, pt2[0], pt2[1], radius2)
         for (stop, (r, g, b, a)) in colorLine:
             gr.add_color_stop_rgba(stop, r, g, b, a)
-        self.canvas.set_source(gr)
+        self.context.set_source(gr)
         self._fill()
 
     def fillSweepGradient(self, *args):
@@ -102,12 +102,12 @@ class CairoBackend:
     def _fill(self):
         # This function is reused in fillSolid() and all 3 fill*Gradient()
         # functions.
-        self.canvas.save()
-        self.canvas.identity_matrix()
+        self.context.save()
+        self.context.identity_matrix()
         x1, y1, x2, y2 = self.clipRect
-        self.canvas.rectangle(x1, y1, x2 - x1, y2 - y1)
-        self.canvas.fill()
-        self.canvas.restore()
+        self.context.rectangle(x1, y1, x2 - x1, y2 - y1)
+        self.context.fill()
+        self.context.restore()
 
 
 class CairoPixelSurface:
@@ -115,14 +115,14 @@ class CairoPixelSurface:
 
     def __init__(self, x, y, width, height):
         self.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
-        self.canvas = cairo.Context(self.surface)
-        self.canvas.translate(0, height)
-        self.canvas.scale(1, -1)
-        self.canvas.translate(-x, -y)
+        self.context = cairo.Context(self.surface)
+        self.context.translate(0, height)
+        self.context.scale(1, -1)
+        self.context.translate(-x, -y)
 
     @property
     def backend(self):
-        return CairoBackend(self.canvas)
+        return CairoBackend(self.context)
 
     def saveImage(self, path):
         self.surface.flush()
