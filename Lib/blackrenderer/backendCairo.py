@@ -117,9 +117,8 @@ class CairoPixelSurface:
     def __init__(self, x, y, width, height):
         self.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
         self.context = cairo.Context(self.surface)
-        self.context.translate(0, height)
+        self.context.translate(-x, height + y)
         self.context.scale(1, -1)
-        self.context.translate(-x, -y)
 
     @property
     def backend(self):

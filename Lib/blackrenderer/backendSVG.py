@@ -177,8 +177,7 @@ class SVGSurface:
 
     def __init__(self, x, y, width, height):
         self.viewBox = x, y, width, height
-        transform = Transform(1, 0, 0, -1, x, height + y)
-        transform = transform.translate(-x, -y)
+        transform = Transform(1, 0, 0, -1, 0, height + 2 * y)
         self.backend = SVGBackend(transform)
 
     def saveImage(self, path):

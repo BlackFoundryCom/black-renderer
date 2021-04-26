@@ -102,9 +102,8 @@ class SkiaPixelSurface:
     def __init__(self, x, y, width, height):
         self.surface = skia.Surface(width, height)
         self.canvas = self.surface.getCanvas()
-        self.canvas.translate(0, height)
+        self.canvas.translate(-x, height + y)
         self.canvas.scale(1, -1)
-        self.canvas.translate(-x, -y)
 
     @property
     def backend(self):
