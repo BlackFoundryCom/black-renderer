@@ -8,7 +8,7 @@ from fontTools.ttLib.tables.otTables import PaintFormat
 import uharfbuzz as hb
 
 
-PAINT_NAMES = {PaintFormat[name].value: name for name in PaintFormat.__members__}
+PAINT_NAMES = {v.value: k for k, v in PaintFormat.__members__.items()}
 
 
 class COLRFont:
