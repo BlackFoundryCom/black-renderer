@@ -90,7 +90,7 @@ class CairoBackend:
         # FIXME: one should clip offset below 0 or above 1 (and adjusting the
         # stop color) because Cairo does not seem to accept stops outside of
         # the range [0,1].
-        for (stop, (r,g,b,a)) in colorLine:
+        for (stop, (r, g, b, a)) in colorLine:
             gr.add_color_stop_rgba(stop, r, g, b, a)
         self.canvas.set_source(gr)
         self._fill()
@@ -98,7 +98,7 @@ class CairoBackend:
     def fillRadialGradient(self, colorLine, paintRadialGradient):
         p = paintRadialGradient
         gr = cairo.RadialGradient(p.x0, p.y0, p.r0, p.x1, p.y1, p.r1)
-        for (stop, (r,g,b,a)) in colorLine:
+        for (stop, (r, g, b, a)) in colorLine:
             gr.add_color_stop_rgba(stop, r, g, b, a)
         self.canvas.set_source(gr)
         self._fill()
@@ -106,6 +106,7 @@ class CairoBackend:
     def fillSweepGradient(self, *args):
         print("fillSweepGradient")
         from random import random
+
         self.fillSolid((1, random(), random(), 1))
 
     # TODO: blendMode for PaintComposite

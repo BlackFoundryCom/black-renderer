@@ -171,7 +171,10 @@ class COLRFont:
 
     def _readColorLine(self, colorLineTable):
         cl = colorLineTable
-        return [(cs.StopOffset, self._getColor(cs.Color.PaletteIndex, cs.Color.Alpha)) for cs in cl.ColorStop]
+        return [
+            (cs.StopOffset, self._getColor(cs.Color.PaletteIndex, cs.Color.Alpha))
+            for cs in cl.ColorStop
+        ]
 
     def _reduceThreeAnchorsToTwo(self, p):
         # FIXME: make sure the 3 points are not in degenerate position [see COLRv1 spec].
@@ -179,8 +182,8 @@ class COLRFont:
         y02 = p.y2 - p.y0
         x01 = p.x1 - p.x0
         y01 = p.y1 - p.y0
-        squaredNorm02 = x02*x02 + y02*y02
-        k = (x01*x02 + y01*y02) / squaredNorm02
+        squaredNorm02 = x02 * x02 + y02 * y02
+        k = (x01 * x02 + y01 * y02) / squaredNorm02
         x = p.x1 - k * x02
         y = p.y1 - k * y02
         return ((p.x0, p.y0), (x, y))
