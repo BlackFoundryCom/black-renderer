@@ -55,17 +55,28 @@ class SkiaBackend:
     def fillSolid(self, color):
         self.canvas.drawColor(skia.Color4f(tuple(color)))
 
-    def fillLinearGradient(self, *args):
-        print("fillLinearGradient")
-        from random import random
+    def fillLinearGradient(self, colorLine, pt1, pt2):
+        colors, stops = _unpackColorLine(colorLine)
+        shader = skia.GradientShader.MakeLinear(
+            points=[pt1, pt2],
+            colors=colors,
+            positions=stops,
+        )
+        paint = skia.Paint(Shader=shader)
+        self.canvas.drawPaint(paint)
 
-        self.fillSolid((1, random(), random(), 1))
-
-    def fillRadialGradient(self, *args):
-        print("fillRadialGradient")
-        from random import random
-
-        self.fillSolid((1, random(), random(), 1))
+    def fillRadialGradient(self, colorLine, pt1, radius1, pt2, radius2):
+        colors, stops = _unpackColorLine(colorLine)
+        shader = skia.GradientShader.MakeTwoPointConical(
+            start=pt1,
+            startRadius=radius1,
+            end=pt2,
+            endRadius=radius2,
+            colors=colors,
+            positions=stops,
+        )
+        paint = skia.Paint(Shader=shader)
+        self.canvas.drawPaint(paint)
 
     def fillSweepGradient(self, *args):
         print("fillSweepGradient")
@@ -74,6 +85,15 @@ class SkiaBackend:
         self.fillSolid((1, random(), random(), 1))
 
     # TODO: blendMode for PaintComposite
+
+
+def _unpackColorLine(colorLine):
+    colors = []
+    stops = []
+    for stop, color in colorLine:
+        colors.append(int(skia.Color4f(tuple(color))))
+        stops.append(stop)
+    return colors, stops
 
 
 class SkiaPixelSurface:
