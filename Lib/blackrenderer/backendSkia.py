@@ -65,13 +65,13 @@ class SkiaBackend:
         paint = skia.Paint(Shader=shader)
         self.canvas.drawPaint(paint)
 
-    def fillRadialGradient(self, colorLine, pt1, radius1, pt2, radius2):
+    def fillRadialGradient(self, colorLine, startPt, startRadius, endPt, endRadius):
         colors, stops = _unpackColorLine(colorLine)
         shader = skia.GradientShader.MakeTwoPointConical(
-            start=pt1,
-            startRadius=radius1,
-            end=pt2,
-            endRadius=radius2,
+            start=startPt,
+            startRadius=startRadius,
+            end=endPt,
+            endRadius=endRadius,
             colors=colors,
             positions=stops,
         )
