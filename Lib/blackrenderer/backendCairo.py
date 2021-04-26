@@ -49,7 +49,7 @@ class CairoBackend:
 
     def transform(self, transform):
         m = cairo.Matrix()
-        m.xx, m.xy, m.yx, m.yy, m.x0, m.y0 = transform
+        m.xx, m.yx, m.xy, m.yy, m.x0, m.y0 = transform
         self.context.transform(m)
 
     def clipPath(self, path):
