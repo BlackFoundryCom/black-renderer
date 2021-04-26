@@ -4,7 +4,6 @@ from typing import NamedTuple
 from fontTools.misc.transform import Transform
 from fontTools.pens.basePen import BasePen
 from fontTools.misc.xmlWriter import XMLWriter
-from io import StringIO
 
 
 logger = logging.getLogger(__name__)
@@ -182,9 +181,9 @@ class SVGSurface:
 
     def saveImage(self, path):
         with open(path, "w") as f:
-            f.write(self.toSVG())
+            self.writeSVG(f)
 
-    def toSVG(self):
+    def writeSVG(self, stream):
         elements = self.backend.elements
         clipPaths = {}
         gradients = {}
@@ -196,8 +195,7 @@ class SVGSurface:
             if not isinstance(paint, RGBAPaint) and gradientKey not in gradients:
                 gradients[gradientKey] = f"gradient_{len(gradients)}"
 
-        f = StringIO()
-        w = XMLWriter(f)
+        w = XMLWriter(stream)
         docAttrs = [
             ("width", formatNumber(self.viewBox[2])),
             ("height", formatNumber(self.viewBox[3])),
@@ -242,7 +240,6 @@ class SVGSurface:
 
         w.endtag("svg")
         w.newline()
-        return f.getvalue()
 
 
 def formatCoord(pt):
