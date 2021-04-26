@@ -50,7 +50,7 @@ class SkiaBackend:
         self.canvas.concat(matrix)
 
     def clipPath(self, path):
-        self.canvas.clipPath(path.path)
+        self.canvas.clipPath(path.path, doAntiAlias=True)
 
     def fillSolid(self, color):
         self.canvas.drawColor(skia.Color4f(tuple(color)))
