@@ -47,8 +47,9 @@ test_colorStops = [
 
 
 @pytest.mark.parametrize("stopOffsets", test_colorStops)
+@pytest.mark.parametrize("extend", [ExtendMode.PAD, ExtendMode.REPEAT, ExtendMode.REFLECT])
 @pytest.mark.parametrize("backendName, surfaceFactory", backends)
-def test_colorStops(backendName, surfaceFactory, stopOffsets):
+def test_colorStops(backendName, surfaceFactory, stopOffsets, extend):
     surface = surfaceFactory(0, 0, 600, 100)
     backend = surface.backend
     rectPath = backend.newPath()
@@ -61,7 +62,7 @@ def test_colorStops(backendName, surfaceFactory, stopOffsets):
     colorLine = [(stop1, color1), (stop2, color2)]
     with backend.savedState():
         backend.clipPath(rectPath)
-        backend.fillLinearGradient(colorLine, point1, point2, ExtendMode.PAD)
+        backend.fillLinearGradient(colorLine, point1, point2, extend)
 
     for pos in [200, 400]:
         rectPath = backend.newPath()
@@ -72,7 +73,7 @@ def test_colorStops(backendName, surfaceFactory, stopOffsets):
 
     ext = surface.fileExtension
     stopsString = "_".join(str(s) for s in stopOffsets)
-    surface.saveImage(tmpOutputDir / f"colorStops_{backendName}_{stopsString}{ext}")
+    surface.saveImage(tmpOutputDir / f"colorStops_{backendName}_{stopsString}_{extend.name}{ext}")
 
 
 def drawRect(path, x, y, w, h):
