@@ -95,11 +95,13 @@ class CGBackend:
             return
         colors, stops = _unpackColorLine(colorLine)
         gradient = CG.CGGradientCreateWithColors(None, colors, stops)
-        CG.CGContextDrawLinearGradient(
+        CG.CGContextDrawRadialGradient(
             self.context,
             gradient,
-            (100, 100),
-            (800, 900),
+            startPt,
+            startRadius,
+            endPt,
+            endRadius,
             CG.kCGGradientDrawsBeforeStartLocation
             | CG.kCGGradientDrawsAfterEndLocation,
         )
