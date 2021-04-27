@@ -8,6 +8,7 @@ from blackrenderer.backendCG import CGPixelSurface
 from blackrenderer.backendSkia import SkiaPixelSurface
 from blackrenderer.backendSVG import SVGSurface
 
+
 testDir = pathlib.Path(__file__).resolve().parent
 dataDir = testDir / "data"
 tmpOutputDir = testDir / "tmpOutput"
