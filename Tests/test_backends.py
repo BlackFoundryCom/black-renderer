@@ -3,8 +3,18 @@ import pytest
 import sys
 from fontTools.ttLib.tables.otTables import ExtendMode
 from blackrenderer.colrFont import COLRFont
-from blackrenderer.backendCairo import CairoPixelSurface
-from blackrenderer.backendSkia import SkiaPixelSurface
+try:
+    from blackrenderer.backendCairo import CairoPixelSurface
+except ImportError:
+    CairoPixelSurface = None
+try:
+    from blackrenderer.backendCG import CGPixelSurface
+except ImportError:
+    CGPixelSurface = None
+try:
+    from blackrenderer.backendSkia import SkiaPixelSurface
+except ImportError:
+    SkiaPixelSurface = None
 from blackrenderer.backendSVG import SVGSurface
 
 
@@ -21,12 +31,11 @@ testFont2 = dataDir / "samples-glyf_colr_1.ttf"
 
 backends = [
     ("cairo", CairoPixelSurface),
+    ("cg", CGPixelSurface),
     ("skia", SkiaPixelSurface),
     ("svg", SVGSurface),
 ]
-if sys.platform == "darwin":
-    from blackrenderer.backendCG import CGPixelSurface
-    backends.append(("cg", CGPixelSurface))
+backends = [(name, surface) for name, surface in backends if surface is not None]
 
 
 @pytest.mark.parametrize("glyphName", ["uni2693", "uni2694", "u1F30A", "u1F943"])
