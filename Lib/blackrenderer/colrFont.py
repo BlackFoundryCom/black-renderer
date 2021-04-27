@@ -24,18 +24,7 @@ class COLRFont:
             for glyph in colrTable.BaseGlyphV1List.BaseGlyphV1Record
         }
         self.layers = colrTable.LayerV1List
-        self.palettes = [
-            [
-                (
-                    color.red / 255,
-                    color.green / 255,
-                    color.blue / 255,
-                    color.alpha / 255,
-                )
-                for color in paletteRaw
-            ]
-            for paletteRaw in self.ttFont["CPAL"].palettes
-        ]
+        self.palettes = _unpackPalettes(self.ttFont["CPAL"].palettes)
         self.paletteIndex = 0
 
         self.hbFont = hb.Font(hb.Face(fontData))
@@ -192,3 +181,10 @@ def _reduceThreeAnchorsToTwo(p):
     x = p.x1 - k * x02
     y = p.y1 - k * y02
     return ((p.x0, p.y0), (x, y))
+
+
+def _unpackPalettes(palettes):
+    return [
+        [(c.red / 255, c.green / 255, c.blue / 255, c.alpha / 255) for c in p]
+        for p in palettes
+    ]
