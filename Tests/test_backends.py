@@ -4,7 +4,6 @@ import sys
 from fontTools.ttLib.tables.otTables import ExtendMode
 from blackrenderer.colrFont import COLRFont
 from blackrenderer.backendCairo import CairoPixelSurface
-from blackrenderer.backendCG import CGPixelSurface
 from blackrenderer.backendSkia import SkiaPixelSurface
 from blackrenderer.backendSVG import SVGSurface
 
@@ -26,6 +25,7 @@ backends = [
     ("svg", SVGSurface),
 ]
 if sys.platform == "darwin":
+    from blackrenderer.backendCG import CGPixelSurface
     backends.append(("cg", CGPixelSurface))
 
 
