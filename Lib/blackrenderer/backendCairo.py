@@ -113,8 +113,6 @@ class CairoBackend:
     # TODO: blendMode for PaintComposite
 
     def _fill(self):
-        # This function is reused in fillSolid() and all 3 fill*Gradient()
-        # functions.
         self.context.save()
         self.context.identity_matrix()
         x1, y1, x2, y2 = self.clipRect
