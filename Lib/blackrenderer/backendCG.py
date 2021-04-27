@@ -5,9 +5,6 @@ from fontTools.ttLib.tables.otTables import ExtendMode
 import Quartz as CG
 
 
-rgbColorSpace = CG.CGColorSpaceCreateDeviceRGB()
-
-
 class CGPathPen(BasePen):
     def __init__(self):
         super().__init__(None)
@@ -81,7 +78,7 @@ class CGBackend:
         if self.clipIsEmpty:
             return
         colors, stops = _unpackColorLine(colorLine)
-        gradient = CG.CGGradientCreateWithColors(rgbColorSpace, colors, stops)
+        gradient = CG.CGGradientCreateWithColors(None, colors, stops)
         CG.CGContextDrawLinearGradient(
             self.context,
             gradient,
@@ -97,7 +94,7 @@ class CGBackend:
         if self.clipIsEmpty:
             return
         colors, stops = _unpackColorLine(colorLine)
-        gradient = CG.CGGradientCreateWithColors(rgbColorSpace, colors, stops)
+        gradient = CG.CGGradientCreateWithColors(None, colors, stops)
         CG.CGContextDrawLinearGradient(
             self.context,
             gradient,
@@ -131,6 +128,8 @@ class CGPixelSurface:
     fileExtension = ".png"
 
     def __init__(self, x, y, width, height):
+        rgbColorSpace = CG.CGColorSpaceCreateDeviceRGB()
+        # rgbColorSpace = CG.CGColorSpaceCreateWithName(CG.kCGColorSpaceSRGB)
         self.context = CG.CGBitmapContextCreate(
             None, width, height, 8, 0, rgbColorSpace, CG.kCGImageAlphaPremultipliedFirst
         )
