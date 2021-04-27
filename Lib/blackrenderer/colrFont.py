@@ -101,7 +101,9 @@ class COLRFont:
         colorLine = self._readColorLine(paint.ColorLine)
         pt0 = (paint.x0, paint.y0)
         pt1 = (paint.x1, paint.y1)
-        backend.fillRadialGradient(colorLine, pt0, paint.r0, pt1, paint.r1, paint.ColorLine.Extend)
+        backend.fillRadialGradient(
+            colorLine, pt0, paint.r0, pt1, paint.r1, paint.ColorLine.Extend
+        )
 
     def _drawPaintSweepGradient(self, paint, backend):
         backend.fillSweepGradient(...)
