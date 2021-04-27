@@ -96,6 +96,7 @@ class COLRFont:
         # FIXME: We should carefully check (with custom test?) that the
         # coordinates of the gradient anchors need not be transformed using
         # python code here.
+        # https://github.com/BlackFoundryCom/black-renderer/issues/2
 
     def _drawPaintRadialGradient(self, paint, backend):
         colorLine = self._readColorLine(paint.ColorLine)
