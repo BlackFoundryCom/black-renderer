@@ -1,5 +1,6 @@
 import pathlib
 import pytest
+from fontTools.ttLib.tables.otTables import ExtendMode
 from blackrenderer.colrFont import COLRFont
 from blackrenderer.backendCairo import CairoPixelSurface
 from blackrenderer.backendSkia import SkiaPixelSurface
@@ -60,7 +61,7 @@ def test_colorStops(backendName, surfaceFactory, stopOffsets):
     colorLine = [(stop1, color1), (stop2, color2)]
     with backend.savedState():
         backend.clipPath(rectPath)
-        backend.fillLinearGradient(colorLine, point1, point2)
+        backend.fillLinearGradient(colorLine, point1, point2, ExtendMode.PAD)
 
     for pos in [200, 400]:
         rectPath = backend.newPath()
