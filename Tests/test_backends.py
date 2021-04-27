@@ -1,8 +1,8 @@
 import pathlib
 import pytest
-import sys
 from fontTools.ttLib.tables.otTables import ExtendMode
 from blackrenderer.colrFont import COLRFont
+
 try:
     from blackrenderer.backendCairo import CairoPixelSurface
 except ImportError:
