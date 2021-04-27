@@ -6,7 +6,8 @@ from fontTools.pens.recordingPen import RecordingPen
 from fontTools.ttLib.tables.otTables import ExtendMode
 import cairo
 
-_extendMap = {
+
+_extendModeMap = {
     ExtendMode.PAD: cairo.Extend.PAD,
     ExtendMode.REPEAT: cairo.Extend.REPEAT,
     ExtendMode.REFLECT: cairo.Extend.REFLECT,
@@ -80,9 +81,9 @@ class CairoBackend:
         self.context.set_source_rgba(*color)
         self._fill()
 
-    def fillLinearGradient(self, colorLine, pt1, pt2, extend):
+    def fillLinearGradient(self, colorLine, pt1, pt2, extendMode):
         gr = cairo.LinearGradient(pt1[0], pt1[1], pt2[0], pt2[1])
-        gr.set_extend(_extendMap[extend])
+        gr.set_extend(_extendModeMap[extendMode])
         # FIXME: one should clip offset below 0 or above 1 (and adjusting the
         # stop color) because Cairo does not seem to accept stops outside of
         # the range [0,1].
@@ -92,12 +93,12 @@ class CairoBackend:
         self._fill()
 
     def fillRadialGradient(
-        self, colorLine, startPt, startRadius, endPt, endRadius, extend
+        self, colorLine, startPt, startRadius, endPt, endRadius, extendMode
     ):
         gr = cairo.RadialGradient(
             startPt[0], startPt[1], startRadius, endPt[0], endPt[1], endRadius
         )
-        gr.set_extend(_extendMap[extend])
+        gr.set_extend(_extendModeMap[extendMode])
         for stop, color in colorLine:
             gr.add_color_stop_rgba(stop, *color)
         self.context.set_source(gr)

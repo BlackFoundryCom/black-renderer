@@ -4,7 +4,8 @@ from fontTools.pens.basePen import BasePen
 from fontTools.ttLib.tables.otTables import ExtendMode
 import skia
 
-_extendMap = {
+
+_extendModeMap = {
     ExtendMode.PAD: skia.TileMode.kClamp,
     ExtendMode.REPEAT: skia.TileMode.kRepeat,
     ExtendMode.REFLECT: skia.TileMode.kMirror,
@@ -62,18 +63,18 @@ class SkiaBackend:
     def fillSolid(self, color):
         self.canvas.drawColor(skia.Color4f(tuple(color)))
 
-    def fillLinearGradient(self, colorLine, pt1, pt2, extend):
+    def fillLinearGradient(self, colorLine, pt1, pt2, extendMode):
         colors, stops = _unpackColorLine(colorLine)
         shader = skia.GradientShader.MakeLinear(
             points=[pt1, pt2],
             colors=colors,
             positions=stops,
-            mode=_extendMap[extend],
+            mode=_extendModeMap[extendMode],
         )
         self.canvas.drawPaint(skia.Paint(Shader=shader))
 
     def fillRadialGradient(
-        self, colorLine, startPt, startRadius, endPt, endRadius, extend
+        self, colorLine, startPt, startRadius, endPt, endRadius, extendMode
     ):
         colors, stops = _unpackColorLine(colorLine)
         shader = skia.GradientShader.MakeTwoPointConical(
@@ -83,7 +84,7 @@ class SkiaBackend:
             endRadius=endRadius,
             colors=colors,
             positions=stops,
-            mode=_extendMap[extend],
+            mode=_extendModeMap[extendMode],
         )
         self.canvas.drawPaint(skia.Paint(Shader=shader))
 
