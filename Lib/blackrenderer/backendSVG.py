@@ -4,9 +4,17 @@ from typing import NamedTuple
 from fontTools.misc.transform import Transform
 from fontTools.pens.basePen import BasePen
 from fontTools.misc import etree as ET
+from fontTools.ttLib.tables.otTables import ExtendMode
 
 
 logger = logging.getLogger(__name__)
+
+
+_extendModeMap = {
+    ExtendMode.PAD: "pad",
+    ExtendMode.REPEAT: "repeat",
+    ExtendMode.REFLECT: "reflect",
+}
 
 
 class SVGPath(BasePen):
@@ -75,14 +83,14 @@ class SVGBackend:
         self._addElement(RGBAPaint(color), None)
 
     def fillLinearGradient(self, colorLine, pt1, pt2, extendMode):
-        gradient = LinearGradientPaint(tuple(colorLine), pt1, pt2)
+        gradient = LinearGradientPaint(tuple(colorLine), pt1, pt2, extendMode)
         self._addElement(gradient, self.currentTransform)
 
     def fillRadialGradient(
         self, colorLine, startPt, startRadius, endPt, endRadius, extendMode
     ):
         gradient = RadialGradientPaint(
-            tuple(colorLine), startPt, startRadius, endPt, endRadius
+            tuple(colorLine), startPt, startRadius, endPt, endRadius, extendMode
         )
         self._addElement(gradient, self.currentTransform)
 
@@ -119,6 +127,7 @@ class LinearGradientPaint(NamedTuple):
     colorLine: tuple
     pt1: tuple
     pt2: tuple
+    extendMode: str
 
     def toSVG(self, gradientID, transform):
         attrNumbers = [
@@ -128,7 +137,12 @@ class LinearGradientPaint(NamedTuple):
             ("y2", self.pt2[1]),
         ]
         return _gradientToSVG(
-            "linearGradient", gradientID, self.colorLine, transform, attrNumbers
+            "linearGradient",
+            gradientID,
+            self.extendMode,
+            self.colorLine,
+            transform,
+            attrNumbers,
         )
 
 
@@ -138,6 +152,7 @@ class RadialGradientPaint(NamedTuple):
     radius1: float
     pt2: tuple
     radius2: float
+    extendMode: str
 
     def toSVG(self, gradientID, transform):
         attrNumbers = [
@@ -149,14 +164,22 @@ class RadialGradientPaint(NamedTuple):
             ("r", self.radius2),
         ]
         return _gradientToSVG(
-            "radialGradient", gradientID, self.colorLine, transform, attrNumbers
+            "radialGradient",
+            gradientID,
+            self.extendMode,
+            self.colorLine,
+            transform,
+            attrNumbers,
         )
 
 
-def _gradientToSVG(gradientTag, gradientID, colorLine, transform, attrNumbers):
+def _gradientToSVG(
+    gradientTag, gradientID, extendMode, colorLine, transform, attrNumbers
+):
     element = ET.Element(
         gradientTag,
         id=gradientID,
+        spreadMethod=_extendModeMap[extendMode],
         gradientUnits="userSpaceOnUse",
     )
     for attrName, value in attrNumbers:
