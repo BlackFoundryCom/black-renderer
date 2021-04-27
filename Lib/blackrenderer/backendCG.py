@@ -89,7 +89,7 @@ class CGBackend:
         )
 
     def fillRadialGradient(
-        self, colorLine, startPt, startRadius, endPt, endRadius, extendMode
+        self, colorLine, startCenter, startRadius, endCenter, endRadius, extendMode
     ):
         if self.clipIsEmpty:
             return
@@ -98,9 +98,9 @@ class CGBackend:
         CG.CGContextDrawRadialGradient(
             self.context,
             gradient,
-            startPt,
+            startCenter,
             startRadius,
-            endPt,
+            endCenter,
             endRadius,
             CG.kCGGradientDrawsBeforeStartLocation
             | CG.kCGGradientDrawsAfterEndLocation,

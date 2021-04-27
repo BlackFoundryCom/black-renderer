@@ -87,10 +87,10 @@ class SVGBackend:
         self._addElement(gradient, self.currentTransform)
 
     def fillRadialGradient(
-        self, colorLine, startPt, startRadius, endPt, endRadius, extendMode
+        self, colorLine, startCenter, startRadius, endCenter, endRadius, extendMode
     ):
         gradient = RadialGradientPaint(
-            tuple(colorLine), startPt, startRadius, endPt, endRadius, extendMode
+            tuple(colorLine), startCenter, startRadius, endCenter, endRadius, extendMode
         )
         self._addElement(gradient, self.currentTransform)
 

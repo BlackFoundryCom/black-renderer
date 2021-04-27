@@ -93,10 +93,15 @@ class CairoBackend:
         self._fill()
 
     def fillRadialGradient(
-        self, colorLine, startPt, startRadius, endPt, endRadius, extendMode
+        self, colorLine, startCenter, startRadius, endCenter, endRadius, extendMode
     ):
         gr = cairo.RadialGradient(
-            startPt[0], startPt[1], startRadius, endPt[0], endPt[1], endRadius
+            startCenter[0],
+            startCenter[1],
+            startRadius,
+            endCenter[0],
+            endCenter[1],
+            endRadius,
         )
         gr.set_extend(_extendModeMap[extendMode])
         for stop, color in colorLine:
