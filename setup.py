@@ -14,6 +14,7 @@ setup(
     extras_require={
         "skia": ["skia-python", "numpy"],
         "cairo": ["pycairo"],
+        "cg": ["pyobjc; sys_platform == 'darwin'"],
     },
     setup_requires=["setuptools_scm"],
 )

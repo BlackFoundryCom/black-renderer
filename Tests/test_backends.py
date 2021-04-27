@@ -1,8 +1,10 @@
 import pathlib
 import pytest
+import sys
 from fontTools.ttLib.tables.otTables import ExtendMode
 from blackrenderer.colrFont import COLRFont
 from blackrenderer.backendCairo import CairoPixelSurface
+from blackrenderer.backendCG import CGPixelSurface
 from blackrenderer.backendSkia import SkiaPixelSurface
 from blackrenderer.backendSVG import SVGSurface
 
@@ -22,6 +24,8 @@ backends = [
     ("skia", SkiaPixelSurface),
     ("svg", SVGSurface),
 ]
+if sys.platform == "darwin":
+    backends.append(("cg", CGPixelSurface))
 
 
 @pytest.mark.parametrize("glyphName", ["uni2693", "uni2694", "u1F30A", "u1F943"])
