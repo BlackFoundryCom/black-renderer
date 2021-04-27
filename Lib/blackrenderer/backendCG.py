@@ -69,7 +69,11 @@ class CGBackend:
     def fillSolid(self, color):
         if self.clipIsEmpty:
             return
-        # color = CG.CGColorCreateGenericRGB(*color)
+        # I can't find a way to fill the entire clipping area without specifying
+        # a rect. Finding a good rect takes work because of transformations (see
+        # backendsCairo), so for now let's abuse CGContextDrawLinearGradient
+        # (which doesn't require a rect) and use a gradient with two identical
+        # colors.
         colorLine = [(0, color), (1, color)]
         self.fillLinearGradient(colorLine, (0, 0), (1000, 0), ExtendMode.PAD)
 
