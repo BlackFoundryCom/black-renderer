@@ -35,3 +35,48 @@ def test_renderGlyph(backendName, surfaceFactory, glyphName):
     font.drawGlyph(glyphName, surface.backend)
 
     surface.saveImage(tmpOutputDir / f"{backendName}_{glyphName}{ext}")
+
+
+test_colorStops = [
+    (0, 1),
+    (0.25, 0.75),
+    (0.25, 1.5),
+    (-0.5, 0.75),
+]
+
+
+@pytest.mark.parametrize("stopOffsets", test_colorStops)
+@pytest.mark.parametrize("backendName, surfaceFactory", backends)
+def test_colorStops(backendName, surfaceFactory, stopOffsets):
+    surface = surfaceFactory(0, 0, 600, 100)
+    backend = surface.backend
+    rectPath = backend.newPath()
+    drawRect(rectPath, 0, 0, 600, 100)
+    point1 = (200, 0)
+    point2 = (400, 0)
+    color1 = (1, 0, 0, 1)
+    color2 = (0, 0, 1, 1)
+    stop1, stop2 = stopOffsets
+    colorLine = [(stop1, color1), (stop2, color2)]
+    with backend.savedState():
+        backend.clipPath(rectPath)
+        backend.fillLinearGradient(colorLine, point1, point2)
+
+    for pos in [200, 400]:
+        rectPath = backend.newPath()
+        drawRect(rectPath, pos, 0, 1, 100)
+        with backend.savedState():
+            backend.clipPath(rectPath)
+            backend.fillSolid((0, 0, 0, 1))
+
+    ext = surface.fileExtension
+    stopsString = "_".join(str(s) for s in stopOffsets)
+    surface.saveImage(tmpOutputDir / f"colorStops_{backendName}_{stopsString}{ext}")
+
+
+def drawRect(path, x, y, w, h):
+    path.moveTo((x, y))
+    path.lineTo((x, y + h))
+    path.lineTo((x + w, y + h))
+    path.lineTo((x + w, y))
+    path.closePath()
