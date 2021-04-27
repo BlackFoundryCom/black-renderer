@@ -73,7 +73,7 @@ def test_colorStops(backendName, surfaceFactory, stopOffsets, extend):
 
     ext = surface.fileExtension
     stopsString = "_".join(str(s) for s in stopOffsets)
-    surface.saveImage(tmpOutputDir / f"colorStops_{backendName}_{stopsString}_{extend.name}{ext}")
+    surface.saveImage(tmpOutputDir / f"colorStops_{extend.name}_{stopsString}_{backendName}{ext}")
 
 
 def drawRect(path, x, y, w, h):
