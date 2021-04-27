@@ -17,15 +17,10 @@ class CGPathPen(BasePen):
         CG.CGPathAddLineToPoint(self.path, None, *pt)
 
     def _curveToOne(self, pt1, pt2, pt3):
-        x1, y1 = pt1
-        x2, y2 = pt2
-        x3, y3 = pt3
-        CG.CGPathAddCurveToPoint(self.path, None, x1, y1, x2, y2, x3, y3)
+        CG.CGPathAddCurveToPoint(self.path, None, *pt1, *pt2, *pt3)
 
     def _qCurveToOne(self, pt1, pt2):
-        x1, y1 = pt1
-        x2, y2 = pt2
-        CG.CGPathAddQuadCurveToPoint(self.path, None, x1, y1, x2, y2)
+        CG.CGPathAddQuadCurveToPoint(self.path, None, *pt1, *pt2)
 
     def _closePath(self):
         CG.CGPathCloseSubpath(self.path)

@@ -24,15 +24,10 @@ class SkiaPath(BasePen):
         self.path.lineTo(*pt)
 
     def _curveToOne(self, pt1, pt2, pt3):
-        x1, y1 = pt1
-        x2, y2 = pt2
-        x3, y3 = pt3
-        self.path.cubicTo(x1, y1, x2, y2, x3, y3)
+        self.path.cubicTo(*pt1, *pt2, *pt3)
 
     def _qCurveToOne(self, pt1, pt2):
-        x1, y1 = pt1
-        x2, y2 = pt2
-        self.path.quadTo(x1, y1, x2, y2)
+        self.path.quadTo(*pt1, *pt2)
 
     def _closePath(self):
         self.path.close()
