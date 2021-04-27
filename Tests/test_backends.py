@@ -49,7 +49,7 @@ def test_renderGlyph(backendName, surfaceFactory, glyphName):
     ext = surface.fileExtension
     font.drawGlyph(glyphName, surface.backend)
 
-    surface.saveImage(tmpOutputDir / f"{backendName}_{glyphName}{ext}")
+    surface.saveImage(tmpOutputDir / f"glyph_{glyphName}_{backendName}{ext}")
 
 
 test_colorStops = [
