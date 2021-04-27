@@ -57,7 +57,9 @@ class CGBackend:
     def clipPath(self, path):
         (x, y), (w, h) = CG.CGPathGetBoundingBox(path.path)
         if w == 0 and h == 0:
-            # The path is empty
+            # The path is empty, which causes *no* clip path to be set,
+            # which in turn would cause the entire canvas to be filled,
+            # so let's prevent that with a flag.
             self.clipIsEmpty = True
         else:
             self.clipIsEmpty = False
