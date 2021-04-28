@@ -1,6 +1,6 @@
 from functools import singledispatch
 from fontTools.ttLib.tables.otTables import ColorIndex, ColorLine, Paint
-from blackrenderer.colrFont import PAINT_NAMES
+from .font import PAINT_NAMES
 
 
 def dumpCOLRv1Glyph(font, glyphName):

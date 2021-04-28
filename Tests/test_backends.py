@@ -1,7 +1,7 @@
 import pathlib
 import pytest
 from fontTools.ttLib.tables.otTables import ExtendMode
-from blackrenderer.colrFont import COLRFont
+from blackrenderer.font import COLRFont
 from blackrenderer.backends import getSurface
 
 
