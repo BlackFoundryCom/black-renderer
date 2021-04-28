@@ -90,17 +90,13 @@ class COLRFont:
     def _drawPaintRadialGradient(self, paint, backend):
         minStop, maxStop, colorLine = self._readColorLine(paint.ColorLine)
         startCenter = (paint.x0, paint.y0)
-        startRadius = paint.r0
         endCenter = (paint.x1, paint.y1)
-        endRadius = paint.r1
         startCenter, endCenter = (
             _interpolatePoints(startCenter, endCenter, minStop),
             _interpolatePoints(startCenter, endCenter, maxStop),
         )
-        startRadius, endRadius = (
-            _interpolate(startRadius, endRadius, minStop),
-            _interpolate(startRadius, endRadius, maxStop),
-        )
+        startRadius = _interpolate(paint.r0, paint.r1, minStop)
+        endRadius = _interpolate(paint.r0, paint.r1, maxStop)
         backend.fillRadialGradient(
             colorLine,
             startCenter,
