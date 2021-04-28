@@ -1,6 +1,5 @@
 import pathlib
-from fontTools.ttLib.tables.otTables import ExtendMode
-from blackrenderer.font import COLRFont
+from blackrenderer.font import BlackRendererFont
 from blackrenderer.dumpCOLRv1Glyph import dumpCOLRv1Glyph
 
 
@@ -41,7 +40,7 @@ uni2693
 
 
 def test_dump(capsys):
-    font = COLRFont(testFont1)
+    font = BlackRendererFont(testFont1)
     dumpCOLRv1Glyph(font, "uni2693")
     captured = capsys.readouterr()
     assert expected_output == captured.out

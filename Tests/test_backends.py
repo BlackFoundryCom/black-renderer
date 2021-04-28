@@ -1,7 +1,7 @@
 import pathlib
 import pytest
 from fontTools.ttLib.tables.otTables import ExtendMode
-from blackrenderer.font import COLRFont
+from blackrenderer.font import BlackRendererFont
 from blackrenderer.backends import getSurface
 
 
@@ -25,7 +25,7 @@ backends = [(name, surface) for name, surface in backends if surface is not None
 @pytest.mark.parametrize("glyphName", ["uni2693", "uni2694", "u1F30A", "u1F943"])
 @pytest.mark.parametrize("backendName, surfaceFactory", backends)
 def test_renderGlyph(backendName, surfaceFactory, glyphName):
-    font = COLRFont(testFont1)
+    font = BlackRendererFont(testFont1)
 
     minX, minY, maxX, maxY = font.getGlyphBounds(glyphName)
 

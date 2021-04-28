@@ -11,7 +11,7 @@ import uharfbuzz as hb
 PAINT_NAMES = {v.value: k for k, v in PaintFormat.__members__.items()}
 
 
-class COLRFont:
+class BlackRendererFont:
     def __init__(self, path):
         with open(path, "rb") as f:
             fontData = f.read()
