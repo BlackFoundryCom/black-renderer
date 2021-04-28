@@ -3,6 +3,7 @@ import os
 from fontTools.pens.basePen import BasePen
 from fontTools.ttLib.tables.otTables import ExtendMode
 import Quartz as CG
+from .base import Backend, Surface
 
 
 class CGPathPen(BasePen):
@@ -26,7 +27,7 @@ class CGPathPen(BasePen):
         CG.CGPathCloseSubpath(self.path)
 
 
-class CGBackend:
+class CGBackend(Backend):
     def __init__(self, context):
         self.context = context
         self.clipIsEmpty = None
@@ -121,7 +122,7 @@ def _unpackColorLine(colorLine):
     return colors, stops
 
 
-class CGPixelSurface:
+class CGPixelSurface(Surface):
     fileExtension = ".png"
 
     def __init__(self, x, y, width, height):

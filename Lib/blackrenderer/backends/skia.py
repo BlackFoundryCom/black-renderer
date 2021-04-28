@@ -3,6 +3,7 @@ import os
 from fontTools.pens.basePen import BasePen
 from fontTools.ttLib.tables.otTables import ExtendMode
 import skia
+from .base import Backend, Surface
 
 
 _extendModeMap = {
@@ -33,7 +34,7 @@ class SkiaPath(BasePen):
         self.path.close()
 
 
-class SkiaBackend:
+class SkiaBackend(Backend):
     def __init__(self, canvas):
         self.canvas = canvas
 
@@ -101,7 +102,7 @@ def _unpackColorLine(colorLine):
     return colors, stops
 
 
-class SkiaPixelSurface:
+class SkiaPixelSurface(Surface):
     fileExtension = ".png"
 
     def __init__(self, x, y, width, height):

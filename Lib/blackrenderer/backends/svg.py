@@ -5,6 +5,7 @@ from fontTools.misc.transform import Transform
 from fontTools.pens.basePen import BasePen
 from fontTools.misc import etree as ET
 from fontTools.ttLib.tables.otTables import ExtendMode
+from .base import Backend, Surface
 
 
 logger = logging.getLogger(__name__)
@@ -53,7 +54,7 @@ class SVGPath(BasePen):
         return " ".join(self.segments)
 
 
-class SVGBackend:
+class SVGBackend(Backend):
     def __init__(self, transform):
         self.clipStack = ()
         self.currentTransform = transform
@@ -194,13 +195,17 @@ def _gradientToSVG(
     return element
 
 
-class SVGSurface:
+class SVGSurface(Surface):
     fileExtension = ".svg"
 
     def __init__(self, x, y, width, height):
         self.viewBox = x, y, width, height
         transform = Transform(1, 0, 0, -1, 0, height + 2 * y)
-        self.backend = SVGBackend(transform)
+        self._backend = SVGBackend(transform)
+
+    @property
+    def backend(self):
+        return self._backend
 
     def saveImage(self, path):
         with open(path, "wb") as f:

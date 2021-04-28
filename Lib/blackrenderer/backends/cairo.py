@@ -5,6 +5,7 @@ from fontTools.pens.basePen import BasePen
 from fontTools.pens.recordingPen import RecordingPen
 from fontTools.ttLib.tables.otTables import ExtendMode
 import cairo
+from .base import Backend, Surface
 
 
 _extendModeMap = {
@@ -32,7 +33,7 @@ class CairoPen(BasePen):
         self.context.close_path()
 
 
-class CairoBackend:
+class CairoBackend(Backend):
     def __init__(self, context):
         self.context = context
         self.clipRect = None
@@ -121,7 +122,7 @@ class CairoBackend:
         self.context.restore()
 
 
-class CairoPixelSurface:
+class CairoPixelSurface(Surface):
     fileExtension = ".png"
 
     def __init__(self, x, y, width, height):
