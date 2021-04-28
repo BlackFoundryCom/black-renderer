@@ -79,17 +79,16 @@ class COLRFont:
         backend.fillSolid((r, g, b, a))
 
     def _drawPaintLinearGradient(self, paint, backend):
-        colorLine = self._readColorLine(paint.ColorLine)
-        minStop, maxStop, colorLine = normalizeColorLine(colorLine)
+        minStop, maxStop, colorLine = self._readColorLine(paint.ColorLine)
         pt1, pt2 = _reduceThreeAnchorsToTwo(paint)
         pt1, pt2 = (
-            interpolatePoints(pt1, pt2, minStop),
-            interpolatePoints(pt1, pt2, maxStop),
+            _interpolatePoints(pt1, pt2, minStop),
+            _interpolatePoints(pt1, pt2, maxStop),
         )
         backend.fillLinearGradient(colorLine, pt1, pt2, paint.ColorLine.Extend)
 
     def _drawPaintRadialGradient(self, paint, backend):
-        colorLine = self._readColorLine(paint.ColorLine)
+        minStop, maxStop, colorLine = self._readColorLine(paint.ColorLine)
         pt0 = (paint.x0, paint.y0)
         pt1 = (paint.x1, paint.y1)
         backend.fillRadialGradient(
@@ -97,7 +96,7 @@ class COLRFont:
         )
 
     def _drawPaintSweepGradient(self, paint, backend):
-        colorLine = self._readColorLine(paint.ColorLine)
+        minStop, maxStop, colorLine = self._readColorLine(paint.ColorLine)
         center = paint.centerX, paint.centerY
         backend.fillSweepGradient(colorLine, center, paint.startAngle, paint.endAngle)
 
@@ -167,10 +166,12 @@ class COLRFont:
         return r, g, b, a
 
     def _readColorLine(self, colorLineTable):
-        return [
-            (cs.StopOffset, self._getColor(cs.Color.PaletteIndex, cs.Color.Alpha))
-            for cs in colorLineTable.ColorStop
-        ]
+        return _normalizeColorLine(
+            [
+                (cs.StopOffset, self._getColor(cs.Color.PaletteIndex, cs.Color.Alpha))
+                for cs in colorLineTable.ColorStop
+            ]
+        )
 
 
 def _reduceThreeAnchorsToTwo(p):
@@ -186,7 +187,7 @@ def _reduceThreeAnchorsToTwo(p):
     return ((p.x0, p.y0), (x, y))
 
 
-def normalizeColorLine(colorLine):
+def _normalizeColorLine(colorLine):
     stops = [stopOffset for stopOffset, color in colorLine]
     minStop = min(stops)
     maxStop = max(stops)
@@ -199,7 +200,7 @@ def normalizeColorLine(colorLine):
     return minStop, maxStop, colorLine
 
 
-def interpolatePoints(pt1, pt2, f):
+def _interpolatePoints(pt1, pt2, f):
     x1, y1 = pt1
     x2, y2 = pt2
     return (x1 + f * (x2 - x1), y1 + f * (y2 - y1))
