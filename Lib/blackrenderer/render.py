@@ -49,7 +49,8 @@ def renderText(
             yOffset=pos.y_offset,
         )
         glyphLine.append(g)
-    bounds = calcBounds(font, glyphLine, scaleFactor)
+    bounds = calcGlyphLineBounds(glyphLine, font)
+    bounds = scaleRect(bounds, scaleFactor, scaleFactor)
     bounds = insetRect(bounds, -margin, -margin)
     bounds = intRect(bounds)
     if outputPath is None or outputPath.suffix == ".svg":
@@ -73,7 +74,7 @@ def renderText(
         print(stream.getvalue().decode("utf-8").rstrip())
 
 
-def calcBounds(font, glyphLine, scaleFactor):
+def calcGlyphLineBounds(glyphLine, font):
     bounds = None
     x, y = 0, 0
     for glyph in glyphLine:
@@ -87,7 +88,7 @@ def calcBounds(font, glyphLine, scaleFactor):
             bounds = glyphBounds
         else:
             bounds = unionRect(bounds, glyphBounds)
-    return scaleRect(bounds, scaleFactor, scaleFactor)
+    return bounds
 
 
 class GlyphInfo(NamedTuple):
