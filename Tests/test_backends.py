@@ -4,18 +4,18 @@ from fontTools.ttLib.tables.otTables import ExtendMode
 from blackrenderer.colrFont import COLRFont
 
 try:
-    from blackrenderer.backendCairo import CairoPixelSurface
+    from blackrenderer.backends.cairo import CairoPixelSurface
 except ImportError:
     CairoPixelSurface = None
 try:
-    from blackrenderer.backendCG import CGPixelSurface
+    from blackrenderer.backends.coregraphics import CGPixelSurface
 except ImportError:
     CGPixelSurface = None
 try:
-    from blackrenderer.backendSkia import SkiaPixelSurface
+    from blackrenderer.backends.skia import SkiaPixelSurface
 except ImportError:
     SkiaPixelSurface = None
-from blackrenderer.backendSVG import SVGSurface
+from blackrenderer.backends.svg import SVGSurface
 
 
 testDir = pathlib.Path(__file__).resolve().parent
