@@ -84,7 +84,7 @@ class SkiaBackend(Backend):
         )
         self.canvas.drawPaint(skia.Paint(Shader=shader))
 
-    def fillSweepGradient(self, *args):
+    def fillSweepGradient(self, colorLine, center, startAngle, endAngle, extendMode):
         print("fillSweepGradient")
         from random import random
 

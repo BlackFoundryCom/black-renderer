@@ -95,7 +95,7 @@ class SVGBackend(Backend):
         )
         self._addElement(gradient, self.currentTransform)
 
-    def fillSweepGradient(self, colorLine, center, startAngle, endAngle):
+    def fillSweepGradient(self, colorLine, center, startAngle, endAngle, extendMode):
         print("fillSweepGradient")
         from random import random
 

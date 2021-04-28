@@ -40,7 +40,7 @@ class Backend(ABC):
         ...
 
     @abstractmethod
-    def fillSweepGradient(self, colorLine, center, startAngle, endAngle):
+    def fillSweepGradient(self, colorLine, center, startAngle, endAngle, extendMode):
         ...
 
 

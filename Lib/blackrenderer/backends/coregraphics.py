@@ -102,7 +102,7 @@ class CoreGraphicsBackend(Backend):
             | CG.kCGGradientDrawsAfterEndLocation,
         )
 
-    def fillSweepGradient(self, colorLine, center, startAngle, endAngle):
+    def fillSweepGradient(self, colorLine, center, startAngle, endAngle, extendMode):
         if self.clipIsEmpty:
             return
         print("fillSweepGradient")
