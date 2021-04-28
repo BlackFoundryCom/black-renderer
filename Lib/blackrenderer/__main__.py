@@ -17,9 +17,20 @@ def main():
     )
     parser.add_argument("--font-size", type=float, default=250)
     parser.add_argument("--margin", type=float, default=20)
+    parser.add_argument(
+        "--backend",
+        default="skia",
+        choices=["skia", "cairo", "coregraphics"],
+        help="The backend to use when rendering to .png",
+    )
     args = parser.parse_args()
     renderText(
-        args.font, args.text, args.output, fontSize=args.font_size, margin=args.margin
+        args.font,
+        args.text,
+        args.output,
+        fontSize=args.font_size,
+        margin=args.margin,
+        pngSurfaceName=args.backend,
     )
 
 

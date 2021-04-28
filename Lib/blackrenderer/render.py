@@ -20,7 +20,8 @@ def renderText(
     fontSize=250,
     margin=20,
     features=None,
-    variations=None
+    variations=None,
+    pngSurfaceName="skia",
 ):
     font = BlackRendererFont(fontPath)
     glyphNames = font.glyphNames
@@ -46,7 +47,7 @@ def renderText(
     if outputPath is None or outputPath.suffix == ".svg":
         surfaceFactory = getSurface("svg")
     else:
-        surfaceFactory = getSurface("skia")  # XXX switch backend
+        surfaceFactory = getSurface(pngSurfaceName)
     xMin, yMin, xMax, yMax = bounds
     surface = surfaceFactory(xMin, yMin, xMax - xMin, yMax - yMin)
     backend = surface.backend
