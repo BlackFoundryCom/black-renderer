@@ -211,7 +211,7 @@ class SVGSurface(Surface):
         if hasattr(pathOrFile, "write"):
             self.writeSVG(pathOrFile)
         else:
-            with open(path, "wb") as f:
+            with open(pathOrFile, "wb") as f:
                 self.writeSVG(f)
 
     def writeSVG(self, stream):
