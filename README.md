@@ -10,8 +10,7 @@ Developing a Python-based renderer for OpenType COLRv1 fonts with multiple backe
   2. skia-python
   3. pycairo
   4. SVG
-  5. DrawBot
-  6. Cocoa
+  6. CoreGraphics (macOS)
   7. ...
 
 ## Install / Setting up an environment
