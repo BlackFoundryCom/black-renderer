@@ -12,6 +12,7 @@ Developing a Python-based renderer for OpenType COLRv1 fonts with multiple backe
   4. SVG
   6. CoreGraphics (macOS)
   7. ...
+- hb-view-like command line app with switchable backend
 
 ## Install / Setting up an environment
 
