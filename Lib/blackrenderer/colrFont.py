@@ -89,10 +89,25 @@ class COLRFont:
 
     def _drawPaintRadialGradient(self, paint, backend):
         minStop, maxStop, colorLine = self._readColorLine(paint.ColorLine)
-        pt0 = (paint.x0, paint.y0)
-        pt1 = (paint.x1, paint.y1)
+        startCenter = (paint.x0, paint.y0)
+        startRadius = paint.r0
+        endCenter = (paint.x1, paint.y1)
+        endRadius = paint.r1
+        startCenter, endCenter = (
+            _interpolatePoints(startCenter, endCenter, minStop),
+            _interpolatePoints(startCenter, endCenter, maxStop),
+        )
+        startRadius, endRadius = (
+            _interpolate(startRadius, endRadius, minStop),
+            _interpolate(startRadius, endRadius, maxStop),
+        )
         backend.fillRadialGradient(
-            colorLine, pt0, paint.r0, pt1, paint.r1, paint.ColorLine.Extend
+            colorLine,
+            startCenter,
+            startRadius,
+            endCenter,
+            endRadius,
+            paint.ColorLine.Extend,
         )
 
     def _drawPaintSweepGradient(self, paint, backend):
@@ -200,6 +215,10 @@ def _normalizeColorLine(colorLine):
             for stopOffset, color in colorLine
         ]
     return minStop, maxStop, colorLine
+
+
+def _interpolate(v1, v2, f):
+    return v1 + f * (v2 - v1)
 
 
 def _interpolatePoints(pt1, pt2, f):
