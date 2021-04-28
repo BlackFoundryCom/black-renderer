@@ -60,13 +60,12 @@ def renderText(
     width = xMax - xMin
     surface = surfaceFactory(xMin, yMin, xMax - xMin, yMax - yMin)
     backend = surface.backend
-    with backend.savedState():
-        backend.transform((scaleFactor, 0, 0, scaleFactor, 0, 0))
-        for glyph in glyphLine:
-            with backend.savedState():
-                backend.transform((1, 0, 0, 1, glyph.xOffset, glyph.yOffset))
-                font.drawGlyph(glyph.name, backend)
-            backend.transform((1, 0, 0, 1, glyph.xAdvance, glyph.yAdvance))
+    backend.transform((scaleFactor, 0, 0, scaleFactor, 0, 0))
+    for glyph in glyphLine:
+        with backend.savedState():
+            backend.transform((1, 0, 0, 1, glyph.xOffset, glyph.yOffset))
+            font.drawGlyph(glyph.name, backend)
+        backend.transform((1, 0, 0, 1, glyph.xAdvance, glyph.yAdvance))
     if outputPath is not None:
         surface.saveImage(outputPath)
     else:
