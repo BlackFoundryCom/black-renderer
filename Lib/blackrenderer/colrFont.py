@@ -113,8 +113,10 @@ class COLRFont:
     def _drawPaintSweepGradient(self, paint, backend):
         minStop, maxStop, colorLine = self._readColorLine(paint.ColorLine)
         center = paint.centerX, paint.centerY
+        startAngle = _interpolate(paint.startAngle, paint.endAngle, minStop)
+        endAngle = _interpolate(paint.startAngle, paint.endAngle, maxStop)
         backend.fillSweepGradient(
-            colorLine, center, paint.startAngle, paint.endAngle, paint.ColorLine.Extend
+            colorLine, center, startAngle, endAngle, paint.ColorLine.Extend
         )
 
     def _drawPaintGlyph(self, paint, backend):
