@@ -47,7 +47,12 @@ class BlackRendererFont:
         yield
         self.setLocation(originalLocation)
 
-    def keys(self):
+    @property
+    def glyphNames(self):
+        return self.ttFont.getGlyphOrder()
+
+    @property
+    def colrGlyphNames(self):
         return self.colrGlyphs.keys()
 
     def getGlyphBounds(self, glyphName):
