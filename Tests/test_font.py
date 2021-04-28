@@ -1,6 +1,5 @@
 import pathlib
 from blackrenderer.font import BlackRendererFont
-from blackrenderer.dumpCOLRv1Glyph import dumpCOLRv1Glyph
 
 
 testDir = pathlib.Path(__file__).resolve().parent

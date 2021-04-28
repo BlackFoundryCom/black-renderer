@@ -57,7 +57,6 @@ def renderText(
     else:
         surfaceFactory = getSurface("skia")  # XXX switch backend
     xMin, yMin, xMax, yMax = bounds
-    width = xMax - xMin
     surface = surfaceFactory(xMin, yMin, xMax - xMin, yMax - yMin)
     backend = surface.backend
     backend.transform((scaleFactor, 0, 0, scaleFactor, 0, 0))
