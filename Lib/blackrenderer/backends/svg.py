@@ -207,9 +207,12 @@ class SVGSurface(Surface):
     def backend(self):
         return self._backend
 
-    def saveImage(self, path):
-        with open(path, "wb") as f:
-            self.writeSVG(f)
+    def saveImage(self, pathOrFile):
+        if hasattr(pathOrFile, "write"):
+            self.writeSVG(pathOrFile)
+        else:
+            with open(path, "wb") as f:
+                self.writeSVG(f)
 
     def writeSVG(self, stream):
         elements = self.backend.elements

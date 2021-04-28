@@ -1,3 +1,4 @@
+import io
 from typing import NamedTuple
 from fontTools.misc.arrayTools import (
     scaleRect,
@@ -69,7 +70,9 @@ def renderText(
     if outputPath is not None:
         surface.saveImage(outputPath)
     else:
-        xxx
+        stream = io.BytesIO()
+        surface.saveImage(stream)
+        print(stream.getvalue().decode("utf-8").rstrip())
 
 
 def calcBounds(font, glyphLine, scaleFactor):
