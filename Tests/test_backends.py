@@ -2,20 +2,7 @@ import pathlib
 import pytest
 from fontTools.ttLib.tables.otTables import ExtendMode
 from blackrenderer.colrFont import COLRFont
-
-try:
-    from blackrenderer.backends.cairo import CairoPixelSurface
-except ImportError:
-    CairoPixelSurface = None
-try:
-    from blackrenderer.backends.coregraphics import CGPixelSurface
-except ImportError:
-    CGPixelSurface = None
-try:
-    from blackrenderer.backends.skia import SkiaPixelSurface
-except ImportError:
-    SkiaPixelSurface = None
-from blackrenderer.backends.svg import SVGSurface
+from blackrenderer.backends import getSurface
 
 
 testDir = pathlib.Path(__file__).resolve().parent
@@ -29,12 +16,7 @@ testFont1 = dataDir / "noto-glyf_colr_1.ttf"
 testFont2 = dataDir / "samples-glyf_colr_1.ttf"
 
 
-backends = [
-    ("cairo", CairoPixelSurface),
-    ("cg", CGPixelSurface),
-    ("skia", SkiaPixelSurface),
-    ("svg", SVGSurface),
-]
+backends = [(name, getSurface(name)) for name in ["cairo", "coregraphics", "skia", "svg"]]
 backends = [(name, surface) for name, surface in backends if surface is not None]
 
 
