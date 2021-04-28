@@ -80,12 +80,13 @@ class COLRFont:
 
     def _drawPaintLinearGradient(self, paint, backend):
         colorLine = self._readColorLine(paint.ColorLine)
+        minStop, maxStop, colorLine = normalizeColorLine(colorLine)
         pt1, pt2 = _reduceThreeAnchorsToTwo(paint)
+        pt1, pt2 = (
+            interpolatePoints(pt1, pt2, minStop),
+            interpolatePoints(pt1, pt2, maxStop),
+        )
         backend.fillLinearGradient(colorLine, pt1, pt2, paint.ColorLine.Extend)
-        # FIXME: We should carefully check (with custom test?) that the
-        # coordinates of the gradient anchors need not be transformed using
-        # python code here.
-        # https://github.com/BlackFoundryCom/black-renderer/issues/2
 
     def _drawPaintRadialGradient(self, paint, backend):
         colorLine = self._readColorLine(paint.ColorLine)
@@ -183,6 +184,25 @@ def _reduceThreeAnchorsToTwo(p):
     x = p.x1 - k * x02
     y = p.y1 - k * y02
     return ((p.x0, p.y0), (x, y))
+
+
+def normalizeColorLine(colorLine):
+    stops = [stopOffset for stopOffset, color in colorLine]
+    minStop = min(stops)
+    maxStop = max(stops)
+    if minStop != maxStop:
+        stopExtent = maxStop - minStop
+        colorLine = [
+            ((stopOffset - minStop) / stopExtent, color)
+            for stopOffset, color in colorLine
+        ]
+    return minStop, maxStop, colorLine
+
+
+def interpolatePoints(pt1, pt2, f):
+    x1, y1 = pt1
+    x2, y2 = pt2
+    return (x1 + f * (x2 - x1), y1 + f * (y2 - y1))
 
 
 def _unpackPalettes(palettes):
