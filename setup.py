@@ -24,7 +24,7 @@ setup(
     name="blackrenderer",
     use_scm_version={"write_to": "Lib/blackrenderer/_version.py"},
     description=(
-        "A Python-based renderer for OpenType COLRv1 fonts with multiple backends."
+        "A Python-based renderer for OpenType COLRv1 fonts, with multiple backends."
     ),
     long_description=long_description,
     long_description_content_type="text/markdown",

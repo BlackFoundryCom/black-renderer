@@ -1,6 +1,6 @@
 # BlackRenderer
 
-Developing a Python-based renderer for OpenType COLRv1 fonts with multiple backends.
+Developing a Python-based renderer for OpenType COLRv1 fonts, with multiple backends.
 
 ## Goals
 
