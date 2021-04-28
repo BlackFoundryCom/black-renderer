@@ -3,7 +3,7 @@ import importlib
 
 _surfaces = {
     "cairo": "blackrenderer.backends.cairo.CairoPixelSurface",
-    "coregraphics": "blackrenderer.backends.coregraphics.CGPixelSurface",
+    "coregraphics": "blackrenderer.backends.coregraphics.CoreGraphicsPixelSurface",
     "skia": "blackrenderer.backends.skia.SkiaPixelSurface",
     "svg": "blackrenderer.backends.svg.SVGSurface",
 }

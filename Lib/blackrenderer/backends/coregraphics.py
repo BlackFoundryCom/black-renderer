@@ -6,7 +6,7 @@ import Quartz as CG
 from .base import Backend, Surface
 
 
-class CGPathPen(BasePen):
+class CoreGraphicsPathPen(BasePen):
     def __init__(self):
         super().__init__(None)
         self.path = CG.CGPathCreateMutable()
@@ -27,14 +27,14 @@ class CGPathPen(BasePen):
         CG.CGPathCloseSubpath(self.path)
 
 
-class CGBackend(Backend):
+class CoreGraphicsBackend(Backend):
     def __init__(self, context):
         self.context = context
         self.clipIsEmpty = None
 
     @staticmethod
     def newPath():
-        return CGPathPen()
+        return CoreGraphicsPathPen()
 
     @contextmanager
     def savedState(self):
@@ -122,7 +122,7 @@ def _unpackColorLine(colorLine):
     return colors, stops
 
 
-class CGPixelSurface(Surface):
+class CoreGraphicsPixelSurface(Surface):
     fileExtension = ".png"
 
     def __init__(self, x, y, width, height):
@@ -135,7 +135,7 @@ class CGPixelSurface(Surface):
 
     @property
     def backend(self):
-        return CGBackend(self.context)
+        return CoreGraphicsBackend(self.context)
 
     def saveImage(self, path):
         image = CG.CGBitmapContextCreateImage(self.context)
