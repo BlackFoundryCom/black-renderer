@@ -17,7 +17,7 @@ class COLRFont:
             fontData = f.read()
         file = BytesIO(fontData)
         self.ttFont = TTFont(file, lazy=True)
-        # TODO: also handle COLRv0
+        # TODO: also handle COLRv0, also handle non-color
         colrTable = self.ttFont["COLR"].table
         self.colrGlyphs = {
             glyph.BaseGlyph: glyph
