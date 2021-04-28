@@ -105,7 +105,7 @@ class CairoBackend(Backend):
         self.context.set_source(gr)
         self._fill()
 
-    def fillSweepGradient(self, *args):
+    def fillSweepGradient(self, colorLine, center, startAngle, endAngle):
         print("fillSweepGradient")
         from random import random
 
