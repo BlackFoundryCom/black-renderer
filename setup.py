@@ -28,7 +28,7 @@ setup(
     ),
     long_description=long_description,
     long_description_content_type="text/markdown",
-    author="BlackFoundry, Just van Rossum, Samuel Hornus",
+    author="Black Foundry, Just van Rossum, Samuel Hornus",
     author_email="justvanrossum@gmail.com",
     license="Apache Software License 2.0",
     url="https://github.com/BlackFoundryCom/black-renderer",
