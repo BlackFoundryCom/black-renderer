@@ -212,6 +212,13 @@ def _normalizeColorLine(colorLine):
             ((stopOffset - minStop) / stopExtent, color)
             for stopOffset, color in colorLine
         ]
+    else:
+        # Degenerate case. minStop and maxStop are used to reposition
+        # the gradients parameters (points, radii, angles), through
+        # interpolation. By setting minStop and maxStop to 0 and 1,
+        # we at least won't mess up the parameters.
+        # FIXME: should the gradient simply not be drawn in this case?
+        minStop, maxStop = 0, 1
     return minStop, maxStop, colorLine
 
 
