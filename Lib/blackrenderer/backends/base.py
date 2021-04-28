@@ -43,6 +43,14 @@ class Backend(ABC):
     def fillSweepGradient(self, colorLine, center, startAngle, endAngle, extendMode):
         ...
 
+    def translate(self, x, y):
+        self.transform((1, 0, 0, 1, x, y))
+
+    def scale(self, sx, sy=None):
+        if sy is None:
+            sy = sx
+        self.transform((sx, 0, 0, sy, 0, 0))
+
 
 class Surface(ABC):
     fileExtension = ".png"
