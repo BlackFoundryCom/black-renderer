@@ -30,6 +30,10 @@ class BlackRendererFont:
         self.hbFont = hb.Font(hb.Face(fontData))
         self.location = {}
 
+    @property
+    def unitsPerEm(self):
+        return self.hbFont.face.upem
+
     def setLocation(self, location):
         self.location = location
         self.hbFont.set_variations(location)

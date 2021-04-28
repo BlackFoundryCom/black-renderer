@@ -25,7 +25,7 @@ def renderText(
     font = BlackRendererFont(fontPath)
     glyphNames = font.glyphNames
 
-    scaleFactor = fontSize / font.hbFont.face.upem
+    scaleFactor = fontSize / font.unitsPerEm
 
     buf = hb.Buffer()
     buf.add_str(textString)
