@@ -38,17 +38,7 @@ def renderText(
 
     infos = buf.glyph_infos
     positions = buf.glyph_positions
-    glyphLine = []
-    for info, pos in zip(infos, positions):
-        g = GlyphInfo(
-            name=glyphNames[info.codepoint],
-            gid=info.codepoint,
-            xAdvance=pos.x_advance,
-            yAdvance=pos.y_advance,
-            xOffset=pos.x_offset,
-            yOffset=pos.y_offset,
-        )
-        glyphLine.append(g)
+    glyphLine = buildGlyphLine(infos, positions, glyphNames)
     bounds = calcGlyphLineBounds(glyphLine, font)
     bounds = scaleRect(bounds, scaleFactor, scaleFactor)
     bounds = insetRect(bounds, -margin, -margin)
@@ -72,6 +62,21 @@ def renderText(
         stream = io.BytesIO()
         surface.saveImage(stream)
         print(stream.getvalue().decode("utf-8").rstrip())
+
+
+def buildGlyphLine(infos, positions, glyphNames):
+    glyphLine = []
+    for info, pos in zip(infos, positions):
+        g = GlyphInfo(
+            name=glyphNames[info.codepoint],
+            gid=info.codepoint,
+            xAdvance=pos.x_advance,
+            yAdvance=pos.y_advance,
+            xOffset=pos.x_offset,
+            yOffset=pos.y_offset,
+        )
+        glyphLine.append(g)
+    return glyphLine
 
 
 def calcGlyphLineBounds(glyphLine, font):
