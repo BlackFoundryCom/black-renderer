@@ -17,8 +17,7 @@ testFont2 = dataDir / "samples-glyf_colr_1.ttf"
 
 
 backends = [
-    (name, getSurface(name))
-    for name in ["cairo", "coregraphics", "skia", "svg"]
+    (name, getSurface(name)) for name in ["cairo", "coregraphics", "skia", "svg"]
 ]
 backends = [(name, surface) for name, surface in backends if surface is not None]
 
