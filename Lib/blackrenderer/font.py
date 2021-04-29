@@ -17,14 +17,27 @@ class BlackRendererFont:
             fontData = f.read()
         file = BytesIO(fontData)
         self.ttFont = TTFont(file, lazy=True)
-        # TODO: also handle COLRv0, also handle non-color
-        colrTable = self.ttFont["COLR"].table
-        self.colrGlyphs = {
-            glyph.BaseGlyph: glyph
-            for glyph in colrTable.BaseGlyphV1List.BaseGlyphV1Record
-        }
-        self.layers = colrTable.LayerV1List
-        self.palettes = _unpackPalettes(self.ttFont["CPAL"].palettes)
+
+        self.textColor = (0, 0, 0, 1)
+        self.colrV0Glyphs = {}
+        self.colrV1Glyphs = {}
+
+        if "COLR" in self.ttFont:
+            colrTable = self.ttFont["COLR"]
+            if colrTable.version == 0:
+                self.colrV0Glyphs = colrTable.ColorLayers
+            else:  # >= 1
+                # Hm, a little sad we need to use an internal static method
+                self.colrV0Glyphs = colrTable._decompileColorLayersV0(colrTable.table)
+                colrTable = colrTable.table
+                self.colrV1Glyphs = {
+                    glyph.BaseGlyph: glyph
+                    for glyph in colrTable.BaseGlyphV1List.BaseGlyphV1Record
+                }
+                self.colrLayersV1 = colrTable.LayerV1List
+
+        if "CPAL" in self.ttFont:
+            self.palettes = _unpackPalettes(self.ttFont["CPAL"].palettes)
         self.paletteIndex = 0
 
         self.hbFont = hb.Font(hb.Face(fontData))
@@ -57,20 +70,49 @@ class BlackRendererFont:
 
     @property
     def colrGlyphNames(self):
-        return self.colrGlyphs.keys()
+        return self.colrV1Glyphs.keys()
 
     def getGlyphBounds(self, glyphName):
         # TODO: hb must have have an efficient API for this --
         # let's find it and add it to uharfbuzz
         pen = BoundsPen(None)
-        self._drawGlyphOutline(glyphName, pen)
+        if glyphName in self.colrV1Glyphs or glyphName not in self.colrV0Glyphs:
+            self._drawGlyphOutline(glyphName, pen)
+        else:
+            # For COLRv1, we take the union of all layer bounds
+            pen = BoundsPen(None)
+            for layer in self.colrV0Glyphs[glyphName]:
+                self._drawGlyphOutline(layer.name, pen)
         return pen.bounds
 
     def drawGlyph(self, glyphName, backend):
-        glyph = self.colrGlyphs[glyphName]
-        self._drawPaint(glyph.Paint, backend)
+        glyph = self.colrV1Glyphs.get(glyphName)
+        if glyph is not None:
+            self._drawPaint(glyph.Paint, backend)
+            return
+        glyph = self.colrV0Glyphs.get(glyphName)
+        if glyph is not None:
+            self._drawGlyphCOLRv0(glyph, backend)
+            return
+        else:
+            self._drawGlyphNoColor(glyphName, backend)
 
-    # Paint dispatch
+    def _drawGlyphNoColor(self, glyphName, backend):
+        path = backend.newPath()
+        self._drawGlyphOutline(glyphName, path)
+        with backend.savedState():
+            backend.clipPath(path)
+            backend.fillSolid(self.textColor)
+
+    def _drawGlyphCOLRv0(self, layers, backend):
+        for layer in layers:
+            path = backend.newPath()
+            self._drawGlyphOutline(layer.name, path)
+            with backend.savedState():
+                backend.clipPath(path)
+                backend.fillSolid(self._getColor(layer.colorID, 1))
+
+    # COLRv1 Paint dispatch
 
     def _drawPaint(self, paint, backend):
         paintName = PAINT_NAMES[paint.Format]
@@ -81,7 +123,7 @@ class BlackRendererFont:
         n = paint.NumLayers
         s = paint.FirstLayerIndex
         for i in range(s, s + n):
-            self._drawPaint(self.layers.Paint[i], backend)
+            self._drawPaint(self.colrLayersV1.Paint[i], backend)
 
     def _drawPaintSolid(self, paint, backend):
         r, g, b, a = self._getColor(paint.Color.PaletteIndex, paint.Color.Alpha)
@@ -183,7 +225,7 @@ class BlackRendererFont:
     def _getColor(self, colorIndex, alpha):
         if colorIndex == 0xFFFF:
             # TODO: find text foreground color
-            r, g, b, a = 0, 0, 0, 1
+            r, g, b, a = self.textColor
         else:
             r, g, b, a = self.palettes[self.paletteIndex][colorIndex]
         a *= alpha

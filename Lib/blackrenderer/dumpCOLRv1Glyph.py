@@ -5,7 +5,7 @@ from .font import PAINT_NAMES
 
 def dumpCOLRv1Glyph(font, glyphName):
     print(glyphName)
-    glyph = font.colrGlyphs[glyphName]
+    glyph = font.colrV1Glyphs[glyphName]
     d = unpackObject(glyph.Paint, font)
     printObject(d, 0)
 
@@ -30,7 +30,9 @@ def unpackPaint(paint: Paint, font):
     if paintName == "PaintColrLayers":
         n = paint.NumLayers
         s = paint.FirstLayerIndex
-        layers = [unpackObject(font.layers.Paint[i], font) for i in range(s, s + n)]
+        layers = [
+            unpackObject(font.colrLayersV1.Paint[i], font) for i in range(s, s + n)
+        ]
         d["Layers"] = layers
     else:
         for n, v in paint.__dict__.items():
