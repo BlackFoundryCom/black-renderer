@@ -5,7 +5,7 @@ from fontTools.misc.transform import Transform
 from fontTools.pens.basePen import BasePen
 from fontTools.misc import etree as ET
 from fontTools.ttLib.tables.otTables import ExtendMode
-from .base import Backend, Surface
+from .base import Canvas, Surface
 
 
 logger = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ class SVGPath(BasePen):
         return " ".join(self.segments)
 
 
-class SVGBackend(Backend):
+class SVGCanvas(Canvas):
     def __init__(self, transform):
         self.clipStack = ()
         self.currentTransform = transform
@@ -111,7 +111,7 @@ class SVGBackend(Backend):
             clipPath, clipTransform = self.clipStack[-2]
             if len(self.clipStack) > 2:
                 logger.warning(
-                    "SVG backend does not support more than two nested clip paths"
+                    "SVG canvas does not support more than two nested clip paths"
                 )
         if paintTransform is not None:
             paintTransform = fillTransform.inverse().transform(paintTransform)
@@ -201,11 +201,11 @@ class SVGSurface(Surface):
     def __init__(self, x, y, width, height):
         self.viewBox = x, y, width, height
         transform = Transform(1, 0, 0, -1, 0, height + 2 * y)
-        self._backend = SVGBackend(transform)
+        self._canvas = SVGCanvas(transform)
 
     @property
-    def backend(self):
-        return self._backend
+    def canvas(self):
+        return self._canvas
 
     def saveImage(self, pathOrFile):
         if hasattr(pathOrFile, "write"):
@@ -215,7 +215,7 @@ class SVGSurface(Surface):
                 self.writeSVG(f)
 
     def writeSVG(self, stream):
-        elements = self.backend.elements
+        elements = self.canvas.elements
         clipPaths = {}
         gradients = {}
         for fillPath, fillT, clipPath, clipT, paint, paintT in elements:

@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from contextlib import contextmanager
 
 
-class Backend(ABC):
+class Canvas(ABC):
     @abstractmethod
     def __init__(self, context):
         ...
@@ -61,7 +61,7 @@ class Surface(ABC):
 
     @property
     @abstractmethod
-    def backend(self):
+    def canvas(self):
         ...
 
     @abstractmethod

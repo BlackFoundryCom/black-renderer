@@ -3,7 +3,7 @@ import os
 from fontTools.pens.basePen import BasePen
 from fontTools.ttLib.tables.otTables import ExtendMode
 import Quartz as CG
-from .base import Backend, Surface
+from .base import Canvas, Surface
 
 
 class CoreGraphicsPathPen(BasePen):
@@ -27,7 +27,7 @@ class CoreGraphicsPathPen(BasePen):
         CG.CGPathCloseSubpath(self.path)
 
 
-class CoreGraphicsBackend(Backend):
+class CoreGraphicsCanvas(Canvas):
     def __init__(self, context):
         self.context = context
         self.clipIsEmpty = None
@@ -64,7 +64,7 @@ class CoreGraphicsBackend(Backend):
             return
         # I can't find a way to fill the entire clipping area without specifying
         # a rect. Finding a good rect takes work because of transformations (see
-        # backendsCairo), so for now let's abuse CGContextDrawLinearGradient
+        # backends.cairo), so for now let's abuse CGContextDrawLinearGradient
         # (which doesn't require a rect) and use a gradient with two identical
         # colors.
         colorLine = [(0, color), (1, color)]
@@ -134,8 +134,8 @@ class CoreGraphicsPixelSurface(Surface):
         CG.CGContextTranslateCTM(self.context, -x, -y)
 
     @property
-    def backend(self):
-        return CoreGraphicsBackend(self.context)
+    def canvas(self):
+        return CoreGraphicsCanvas(self.context)
 
     def saveImage(self, path):
         image = CG.CGBitmapContextCreateImage(self.context)

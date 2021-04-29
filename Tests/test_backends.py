@@ -31,7 +31,7 @@ def test_renderGlyph(backendName, surfaceFactory, glyphName):
 
     surface = surfaceFactory(minX, minY, maxX - minX, maxY - minY)
     ext = surface.fileExtension
-    font.drawGlyph(glyphName, surface.backend)
+    font.drawGlyph(glyphName, surface.canvas)
 
     surface.saveImage(tmpOutputDir / f"glyph_{glyphName}_{backendName}{ext}")
 
@@ -52,8 +52,8 @@ test_extendModes = [ExtendMode.PAD, ExtendMode.REPEAT, ExtendMode.REFLECT]
 @pytest.mark.parametrize("backendName, surfaceFactory", backends)
 def test_colorStops(backendName, surfaceFactory, stopOffsets, extend):
     surface = surfaceFactory(0, 0, 600, 100)
-    backend = surface.backend
-    rectPath = backend.newPath()
+    canvas = surface.canvas
+    rectPath = canvas.newPath()
     drawRect(rectPath, 0, 0, 600, 100)
     point1 = (200, 0)
     point2 = (400, 0)
@@ -61,16 +61,16 @@ def test_colorStops(backendName, surfaceFactory, stopOffsets, extend):
     color2 = (0, 0, 1, 1)
     stop1, stop2 = stopOffsets
     colorLine = [(stop1, color1), (stop2, color2)]
-    with backend.savedState():
-        backend.clipPath(rectPath)
-        backend.fillLinearGradient(colorLine, point1, point2, extend)
+    with canvas.savedState():
+        canvas.clipPath(rectPath)
+        canvas.fillLinearGradient(colorLine, point1, point2, extend)
 
     for pos in [200, 400]:
-        rectPath = backend.newPath()
+        rectPath = canvas.newPath()
         drawRect(rectPath, pos, 0, 1, 100)
-        with backend.savedState():
-            backend.clipPath(rectPath)
-            backend.fillSolid((0, 0, 0, 1))
+        with canvas.savedState():
+            canvas.clipPath(rectPath)
+            canvas.fillSolid((0, 0, 0, 1))
 
     ext = surface.fileExtension
     stopsString = "_".join(str(s) for s in stopOffsets)

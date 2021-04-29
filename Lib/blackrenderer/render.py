@@ -50,13 +50,13 @@ def renderText(
         surfaceFactory = getSurface(pngSurfaceName)
     xMin, yMin, xMax, yMax = bounds
     surface = surfaceFactory(xMin, yMin, xMax - xMin, yMax - yMin)
-    backend = surface.backend
-    backend.scale(scaleFactor)
+    canvas = surface.canvas
+    canvas.scale(scaleFactor)
     for glyph in glyphLine:
-        with backend.savedState():
-            backend.translate(glyph.xOffset, glyph.yOffset)
-            font.drawGlyph(glyph.name, backend)
-        backend.translate(glyph.xAdvance, glyph.yAdvance)
+        with canvas.savedState():
+            canvas.translate(glyph.xOffset, glyph.yOffset)
+            font.drawGlyph(glyph.name, canvas)
+        canvas.translate(glyph.xAdvance, glyph.yAdvance)
     if outputPath is not None:
         surface.saveImage(outputPath)
     else:
