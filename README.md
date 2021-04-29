@@ -4,6 +4,8 @@
 
 Developing a Python-based renderer for OpenType COLRv1 fonts, with multiple backends.
 
+![Big Smiley Face Icon](smile.png)
+
 ## Goals
 
 - Use fonttools to parse COLRv1 data
