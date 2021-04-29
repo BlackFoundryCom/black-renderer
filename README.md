@@ -1,3 +1,5 @@
+[![Python package](https://github.com/BlackFoundryCom/black-renderer/actions/workflows/run-tests.yml/badge.svg)](https://github.com/BlackFoundryCom/black-renderer/actions/workflows/run-tests.yml)
+
 # BlackRenderer
 
 Developing a Python-based renderer for OpenType COLRv1 fonts, with multiple backends.
