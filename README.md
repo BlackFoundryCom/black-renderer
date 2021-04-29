@@ -4,7 +4,7 @@ Developing a Python-based renderer for OpenType COLRv1 fonts, with multiple back
 
 ## Goals
 
-- Uses fonttools to parse COLRv1 data
+- Use fonttools to parse COLRv1 data
 - Adapter classes for various 2D rendering back-ends:
   1. Debugging/printing (text dump of scene graph / 2D API calls)
   2. skia-python
@@ -13,6 +13,12 @@ Developing a Python-based renderer for OpenType COLRv1 fonts, with multiple back
   6. CoreGraphics (macOS)
   7. ...
 - hb-view-like command line app with switchable backend
+
+## Usage
+
+BlackRenderer comes with an hb-view-like command line tool, that can be used like this:
+
+    $ python -m blackrenderer font.ttf ABC🤩 output.png --font-size=100
 
 ## Install / Setting up an environment
 
