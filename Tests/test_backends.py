@@ -21,6 +21,7 @@ backends = [(name, surface) for name, surface in backends if surface is not None
 testFonts = {
     "noto": dataDir / "noto-glyf_colr_1.ttf",
     "mutator": dataDir / "MutatorSans.ttf",
+    "twemoji": dataDir / "TwemojiMozilla.subset.default.3299.ttf",
 }
 
 
@@ -30,6 +31,7 @@ test_glyphs = [
     ("noto", "u1F30A"),
     ("noto", "u1F943"),
     ("mutator", "B"),
+    ("twemoji", "uni3299")
 ]
 
 
