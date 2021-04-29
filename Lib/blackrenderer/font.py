@@ -85,60 +85,60 @@ class BlackRendererFont:
                 self._drawGlyphOutline(layer.name, pen)
         return pen.bounds
 
-    def drawGlyph(self, glyphName, backend):
+    def drawGlyph(self, glyphName, canvas):
         glyph = self.colrV1Glyphs.get(glyphName)
         if glyph is not None:
-            self._drawPaint(glyph.Paint, backend)
+            self._drawPaint(glyph.Paint, canvas)
             return
         glyph = self.colrV0Glyphs.get(glyphName)
         if glyph is not None:
-            self._drawGlyphCOLRv0(glyph, backend)
+            self._drawGlyphCOLRv0(glyph, canvas)
             return
         else:
-            self._drawGlyphNoColor(glyphName, backend)
+            self._drawGlyphNoColor(glyphName, canvas)
 
-    def _drawGlyphNoColor(self, glyphName, backend):
-        path = backend.newPath()
+    def _drawGlyphNoColor(self, glyphName, canvas):
+        path = canvas.newPath()
         self._drawGlyphOutline(glyphName, path)
-        with backend.savedState():
-            backend.clipPath(path)
-            backend.fillSolid(self.textColor)
+        with canvas.savedState():
+            canvas.clipPath(path)
+            canvas.fillSolid(self.textColor)
 
-    def _drawGlyphCOLRv0(self, layers, backend):
+    def _drawGlyphCOLRv0(self, layers, canvas):
         for layer in layers:
-            path = backend.newPath()
+            path = canvas.newPath()
             self._drawGlyphOutline(layer.name, path)
-            with backend.savedState():
-                backend.clipPath(path)
-                backend.fillSolid(self._getColor(layer.colorID, 1))
+            with canvas.savedState():
+                canvas.clipPath(path)
+                canvas.fillSolid(self._getColor(layer.colorID, 1))
 
     # COLRv1 Paint dispatch
 
-    def _drawPaint(self, paint, backend):
+    def _drawPaint(self, paint, canvas):
         paintName = PAINT_NAMES[paint.Format]
         drawHandler = getattr(self, "_draw" + paintName)
-        drawHandler(paint, backend)
+        drawHandler(paint, canvas)
 
-    def _drawPaintColrLayers(self, paint, backend):
+    def _drawPaintColrLayers(self, paint, canvas):
         n = paint.NumLayers
         s = paint.FirstLayerIndex
         for i in range(s, s + n):
-            self._drawPaint(self.colrLayersV1.Paint[i], backend)
+            self._drawPaint(self.colrLayersV1.Paint[i], canvas)
 
-    def _drawPaintSolid(self, paint, backend):
+    def _drawPaintSolid(self, paint, canvas):
         r, g, b, a = self._getColor(paint.Color.PaletteIndex, paint.Color.Alpha)
-        backend.fillSolid((r, g, b, a))
+        canvas.fillSolid((r, g, b, a))
 
-    def _drawPaintLinearGradient(self, paint, backend):
+    def _drawPaintLinearGradient(self, paint, canvas):
         minStop, maxStop, colorLine = self._readColorLine(paint.ColorLine)
         pt1, pt2 = _reduceThreeAnchorsToTwo(paint)
         pt1, pt2 = (
             _interpolatePoints(pt1, pt2, minStop),
             _interpolatePoints(pt1, pt2, maxStop),
         )
-        backend.fillLinearGradient(colorLine, pt1, pt2, paint.ColorLine.Extend)
+        canvas.fillLinearGradient(colorLine, pt1, pt2, paint.ColorLine.Extend)
 
-    def _drawPaintRadialGradient(self, paint, backend):
+    def _drawPaintRadialGradient(self, paint, canvas):
         minStop, maxStop, colorLine = self._readColorLine(paint.ColorLine)
         startCenter = (paint.x0, paint.y0)
         endCenter = (paint.x1, paint.y1)
@@ -148,7 +148,7 @@ class BlackRendererFont:
         )
         startRadius = _interpolate(paint.r0, paint.r1, minStop)
         endRadius = _interpolate(paint.r0, paint.r1, maxStop)
-        backend.fillRadialGradient(
+        canvas.fillRadialGradient(
             colorLine,
             startCenter,
             startRadius,
@@ -157,53 +157,53 @@ class BlackRendererFont:
             paint.ColorLine.Extend,
         )
 
-    def _drawPaintSweepGradient(self, paint, backend):
+    def _drawPaintSweepGradient(self, paint, canvas):
         minStop, maxStop, colorLine = self._readColorLine(paint.ColorLine)
         center = paint.centerX, paint.centerY
         startAngle = _interpolate(paint.startAngle, paint.endAngle, minStop)
         endAngle = _interpolate(paint.startAngle, paint.endAngle, maxStop)
-        backend.fillSweepGradient(
+        canvas.fillSweepGradient(
             colorLine, center, startAngle, endAngle, paint.ColorLine.Extend
         )
 
-    def _drawPaintGlyph(self, paint, backend):
-        path = backend.newPath()
+    def _drawPaintGlyph(self, paint, canvas):
+        path = canvas.newPath()
         # paint.Glyph must not be a COLR glyph
         self._drawGlyphOutline(paint.Glyph, path)
-        with backend.savedState():
-            backend.clipPath(path)
-            self._drawPaint(paint.Paint, backend)
+        with canvas.savedState():
+            canvas.clipPath(path)
+            self._drawPaint(paint.Paint, canvas)
 
-    def _drawPaintColrGlyph(self, paint, backend):
+    def _drawPaintColrGlyph(self, paint, canvas):
         # paint.Glyph must be a COLR glyph (?)
-        self.drawGlyph(paint.Glyph, backend)
+        self.drawGlyph(paint.Glyph, canvas)
 
-    def _drawPaintTransform(self, paint, backend):
+    def _drawPaintTransform(self, paint, canvas):
         t = paint.Transform
         transform = (t.xx, t.yx, t.xy, t.yy, t.dx, t.dy)
-        self._applyTransform(transform, paint.Paint, backend)
+        self._applyTransform(transform, paint.Paint, canvas)
 
-    def _drawPaintTranslate(self, paint, backend):
+    def _drawPaintTranslate(self, paint, canvas):
         transform = (1, 0, 0, 1, paint.dx, paint.dy)
-        self._applyTransform(transform, paint.Paint, backend)
+        self._applyTransform(transform, paint.Paint, canvas)
 
-    def _drawPaintRotate(self, paint, backend):
+    def _drawPaintRotate(self, paint, canvas):
         transform = Transform()
         transform = transform.translate(paint.centerX, paint.centerY)
         transform = transform.rotate(math.radians(paint.angle))
         transform = transform.translate(-paint.centerX, -paint.centerY)
-        self._applyTransform(transform, paint.Paint, backend)
+        self._applyTransform(transform, paint.Paint, canvas)
 
-    def _drawPaintSkew(self, paint, backend):
+    def _drawPaintSkew(self, paint, canvas):
         transform = Transform()
         transform = transform.translate(paint.centerX, paint.centerY)
         transform = transform.skew(
             math.radians(paint.xSkewAngle), math.radians(paint.ySkewAngle)
         )
         transform = transform.translate(-paint.centerX, -paint.centerY)
-        self._applyTransform(transform, paint.Paint, backend)
+        self._applyTransform(transform, paint.Paint, canvas)
 
-    def _drawPaintComposite(self, paint, backend):
+    def _drawPaintComposite(self, paint, canvas):
         print("_drawPaintComposite")
         # print("Composite with CompositeMode=", paint.CompositeMode)
         # print("Composite source:")
@@ -213,10 +213,10 @@ class BlackRendererFont:
 
     # Utils
 
-    def _applyTransform(self, transform, paint, backend):
-        with backend.savedState():
-            backend.transform(transform)
-            self._drawPaint(paint, backend)
+    def _applyTransform(self, transform, paint, canvas):
+        with canvas.savedState():
+            canvas.transform(transform)
+            self._drawPaint(paint, canvas)
 
     def _drawGlyphOutline(self, glyphName, path):
         gid = self.ttFont.getGlyphID(glyphName)
