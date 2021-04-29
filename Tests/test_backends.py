@@ -31,7 +31,7 @@ test_glyphs = [
     ("noto", "u1F30A"),
     ("noto", "u1F943"),
     ("mutator", "B"),
-    ("twemoji", "uni3299")
+    ("twemoji", "uni3299"),
 ]
 
 
