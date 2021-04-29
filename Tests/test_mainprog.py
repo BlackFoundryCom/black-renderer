@@ -27,6 +27,8 @@ def test_mainprog(tmpdir, testString, fontPath, outputFormat):
         os.fspath(fontPath),
         testString,
         outputPath,
+        "--font-size",
+        "50",
     ]
     subprocess.check_output(args)
     assert os.path.isfile(outputPath)
