@@ -62,13 +62,8 @@ class CoreGraphicsCanvas(Canvas):
     def fillSolid(self, color):
         if self.clipIsEmpty:
             return
-        # I can't find a way to fill the entire clipping area without specifying
-        # a rect. Finding a good rect takes work because of transformations (see
-        # backends.cairo), so for now let's abuse CGContextDrawLinearGradient
-        # (which doesn't require a rect) and use a gradient with two identical
-        # colors.
-        colorLine = [(0, color), (1, color)]
-        self.fillLinearGradient(colorLine, (0, 0), (1000, 0), ExtendMode.PAD)
+        CG.CGContextSetRGBFillColor(self.context, *color)
+        CG.CGContextFillRect(self.context, CG.CGContextGetClipBoundingBox(self.context))
 
     def fillLinearGradient(self, colorLine, pt1, pt2, extendMode):
         if self.clipIsEmpty:
