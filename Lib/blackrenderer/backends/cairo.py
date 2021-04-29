@@ -99,12 +99,9 @@ class CairoCanvas(Canvas):
     # TODO: blendMode for PaintComposite
 
     def _fill(self):
-        self.context.save()
-        self.context.identity_matrix()
         x1, y1, x2, y2 = self.context.clip_extents()
         self.context.rectangle(x1, y1, x2 - x1, y2 - y1)
         self.context.fill()
-        self.context.restore()
 
 
 class CairoPixelSurface(Surface):
