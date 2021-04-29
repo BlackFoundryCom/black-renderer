@@ -26,21 +26,40 @@ class Canvas(ABC):
         ...
 
     @abstractmethod
-    def fillSolid(self, color):
+    def drawPathSolid(self, path, color):
         ...
 
     @abstractmethod
-    def fillLinearGradient(self, colorLine, pt1, pt2, extendMode):
-        ...
-
-    @abstractmethod
-    def fillRadialGradient(
-        self, colorLine, startCenter, startRadius, endCenter, endRadius, extendMode
+    def drawPathLinearGradient(
+        self, path, colorLine, pt1, pt2, extendMode, gradientTransform
     ):
         ...
 
     @abstractmethod
-    def fillSweepGradient(self, colorLine, center, startAngle, endAngle, extendMode):
+    def drawPathRadialGradient(
+        self,
+        path,
+        colorLine,
+        startCenter,
+        startRadius,
+        endCenter,
+        endRadius,
+        extendMode,
+        gradientTransform,
+    ):
+        ...
+
+    @abstractmethod
+    def drawPathSweepGradient(
+        self,
+        path,
+        colorLine,
+        center,
+        startAngle,
+        endAngle,
+        extendMode,
+        gradientTransform,
+    ):
         ...
 
     def translate(self, x, y):

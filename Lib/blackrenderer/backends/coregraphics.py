@@ -48,8 +48,7 @@ class CoreGraphicsCanvas(Canvas):
         CG.CGContextConcatCTM(self.context, transform)
 
     def clipPath(self, path):
-        (x, y), (w, h) = CG.CGPathGetBoundingBox(path.path)
-        if w == 0 and h == 0:
+        if CG.CGPathGetBoundingBox(path.path) == CG.CGRectNull:
             # The path is empty, which causes *no* clip path to be set,
             # which in turn would cause the entire canvas to be filled,
             # so let's prevent that with a flag.
@@ -59,51 +58,74 @@ class CoreGraphicsCanvas(Canvas):
             CG.CGContextAddPath(self.context, path.path)
             CG.CGContextClip(self.context)
 
-    def fillSolid(self, color):
+    def drawPathSolid(self, path, color):
         if self.clipIsEmpty:
             return
+        CG.CGContextAddPath(self.context, path.path)
         CG.CGContextSetRGBFillColor(self.context, *color)
-        CG.CGContextFillRect(self.context, CG.CGContextGetClipBoundingBox(self.context))
+        CG.CGContextFillPath(self.context)
 
-    def fillLinearGradient(self, colorLine, pt1, pt2, extendMode):
-        if self.clipIsEmpty:
-            return
-        colors, stops = _unpackColorLine(colorLine)
-        gradient = CG.CGGradientCreateWithColors(None, colors, stops)
-        CG.CGContextDrawLinearGradient(
-            self.context,
-            gradient,
-            pt1,
-            pt2,
-            CG.kCGGradientDrawsBeforeStartLocation
-            | CG.kCGGradientDrawsAfterEndLocation,
-        )
-
-    def fillRadialGradient(
-        self, colorLine, startCenter, startRadius, endCenter, endRadius, extendMode
+    def drawPathLinearGradient(
+        self, path, colorLine, pt1, pt2, extendMode, gradientTransform
     ):
-        if self.clipIsEmpty:
+        if self.clipIsEmpty or CG.CGPathGetBoundingBox(path.path) == CG.CGRectNull:
             return
         colors, stops = _unpackColorLine(colorLine)
         gradient = CG.CGGradientCreateWithColors(None, colors, stops)
-        CG.CGContextDrawRadialGradient(
-            self.context,
-            gradient,
-            startCenter,
-            startRadius,
-            endCenter,
-            endRadius,
-            CG.kCGGradientDrawsBeforeStartLocation
-            | CG.kCGGradientDrawsAfterEndLocation,
-        )
+        with self.savedState():
+            CG.CGContextAddPath(self.context, path.path)
+            CG.CGContextClip(self.context)
+            self.transform(gradientTransform)
+            CG.CGContextDrawLinearGradient(
+                self.context,
+                gradient,
+                pt1,
+                pt2,
+                CG.kCGGradientDrawsBeforeStartLocation
+                | CG.kCGGradientDrawsAfterEndLocation,
+            )
 
-    def fillSweepGradient(self, colorLine, center, startAngle, endAngle, extendMode):
-        if self.clipIsEmpty:
+    def drawPathRadialGradient(
+        self,
+        path,
+        colorLine,
+        startCenter,
+        startRadius,
+        endCenter,
+        endRadius,
+        extendMode,
+        gradientTransform,
+    ):
+        if self.clipIsEmpty or CG.CGPathGetBoundingBox(path.path) == CG.CGRectNull:
             return
-        print("fillSweepGradient")
-        from random import random
+        colors, stops = _unpackColorLine(colorLine)
+        gradient = CG.CGGradientCreateWithColors(None, colors, stops)
+        with self.savedState():
+            CG.CGContextAddPath(self.context, path.path)
+            CG.CGContextClip(self.context)
+            self.transform(gradientTransform)
+            CG.CGContextDrawRadialGradient(
+                self.context,
+                gradient,
+                startCenter,
+                startRadius,
+                endCenter,
+                endRadius,
+                CG.kCGGradientDrawsBeforeStartLocation
+                | CG.kCGGradientDrawsAfterEndLocation,
+            )
 
-        self.fillSolid((1, random(), random(), 1))
+    def drawPathSweepGradient(
+        self,
+        path,
+        colorLine,
+        center,
+        startAngle,
+        endAngle,
+        extendMode,
+        gradientTransform,
+    ):
+        self.drawPathSolid(path, colorLine[0][1])
 
     # TODO: blendMode for PaintComposite
 

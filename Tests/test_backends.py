@@ -1,5 +1,6 @@
 import pathlib
 import pytest
+from fontTools.misc.transform import Identity
 from fontTools.ttLib.tables.otTables import ExtendMode
 from blackrenderer.font import BlackRendererFont
 from blackrenderer.backends import getSurface
@@ -70,16 +71,12 @@ def test_colorStops(backendName, surfaceFactory, stopOffsets, extend):
     color2 = (0, 0, 1, 1)
     stop1, stop2 = stopOffsets
     colorLine = [(stop1, color1), (stop2, color2)]
-    with canvas.savedState():
-        canvas.clipPath(rectPath)
-        canvas.fillLinearGradient(colorLine, point1, point2, extend)
+    canvas.drawPathLinearGradient(rectPath, colorLine, point1, point2, extend, Identity)
 
     for pos in [200, 400]:
         rectPath = canvas.newPath()
         drawRect(rectPath, pos, 0, 1, 100)
-        with canvas.savedState():
-            canvas.clipPath(rectPath)
-            canvas.fillSolid((0, 0, 0, 1))
+        canvas.drawPathSolid(rectPath, (0, 0, 0, 1))
 
     ext = surface.fileExtension
     stopsString = "_".join(str(s) for s in stopOffsets)

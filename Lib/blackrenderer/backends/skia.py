@@ -56,22 +56,42 @@ class SkiaCanvas(Canvas):
     def clipPath(self, path):
         self.canvas.clipPath(path.path, doAntiAlias=True)
 
-    def fillSolid(self, color):
-        self.canvas.drawColor(skia.Color4f(tuple(color)))
+    def drawPathSolid(self, path, color):
+        paint = skia.Paint(
+            AntiAlias=True,
+            Color=skia.Color4f(tuple(color)),
+            Style=skia.Paint.kFill_Style,
+        )
+        self.canvas.drawPath(path.path, paint)
 
-    def fillLinearGradient(self, colorLine, pt1, pt2, extendMode):
+    def drawPathLinearGradient(
+        self, path, colorLine, pt1, pt2, extendMode, gradientTransform
+    ):
+        matrix = skia.Matrix()
+        matrix.setAffine(gradientTransform)
         colors, stops = _unpackColorLine(colorLine)
         shader = skia.GradientShader.MakeLinear(
             points=[pt1, pt2],
             colors=colors,
             positions=stops,
             mode=_extendModeMap[extendMode],
+            localMatrix=matrix,
         )
-        self.canvas.drawPaint(skia.Paint(Shader=shader))
+        self.canvas.drawPath(path.path, skia.Paint(Shader=shader))
 
-    def fillRadialGradient(
-        self, colorLine, startCenter, startRadius, endCenter, endRadius, extendMode
+    def drawPathRadialGradient(
+        self,
+        path,
+        colorLine,
+        startCenter,
+        startRadius,
+        endCenter,
+        endRadius,
+        extendMode,
+        gradientTransform,
     ):
+        matrix = skia.Matrix()
+        matrix.setAffine(gradientTransform)
         colors, stops = _unpackColorLine(colorLine)
         shader = skia.GradientShader.MakeTwoPointConical(
             start=startCenter,
@@ -81,14 +101,21 @@ class SkiaCanvas(Canvas):
             colors=colors,
             positions=stops,
             mode=_extendModeMap[extendMode],
+            localMatrix=matrix,
         )
-        self.canvas.drawPaint(skia.Paint(Shader=shader))
+        self.canvas.drawPath(path.path, skia.Paint(Shader=shader))
 
-    def fillSweepGradient(self, colorLine, center, startAngle, endAngle, extendMode):
-        print("fillSweepGradient")
-        from random import random
-
-        self.fillSolid((1, random(), random(), 1))
+    def drawPathSweepGradient(
+        self,
+        path,
+        colorLine,
+        center,
+        startAngle,
+        endAngle,
+        extendMode,
+        gradientTransform,
+    ):
+        self.drawPathSolid(path, colorLine[0][1])
 
     # TODO: blendMode for PaintComposite
 

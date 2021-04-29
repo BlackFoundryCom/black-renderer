@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 from io import BytesIO
 import math
-from fontTools.misc.transform import Transform
+from fontTools.misc.transform import Transform, Identity
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables.otTables import PaintFormat
@@ -42,6 +42,8 @@ class BlackRendererFont:
 
         self.hbFont = hb.Font(hb.Face(fontData))
         self.location = {}
+        self.currentTransform = Identity
+        self.currentPath = None
 
     @property
     def unitsPerEm(self):
@@ -104,17 +106,13 @@ class BlackRendererFont:
     def _drawGlyphNoColor(self, glyphName, canvas):
         path = canvas.newPath()
         self._drawGlyphOutline(glyphName, path)
-        with canvas.savedState():
-            canvas.clipPath(path)
-            canvas.fillSolid(self.textColor)
+        canvas.drawPathSolid(path, self.textColor)
 
     def _drawGlyphCOLRv0(self, layers, canvas):
         for layer in layers:
             path = canvas.newPath()
             self._drawGlyphOutline(layer.name, path)
-            with canvas.savedState():
-                canvas.clipPath(path)
-                canvas.fillSolid(self._getColor(layer.colorID, 1))
+            canvas.drawPathSolid(path, self._getColor(layer.colorID, 1))
 
     # COLRv1 Paint dispatch
 
@@ -126,12 +124,13 @@ class BlackRendererFont:
     def _drawPaintColrLayers(self, paint, canvas):
         n = paint.NumLayers
         s = paint.FirstLayerIndex
-        for i in range(s, s + n):
-            self._drawPaint(self.colrLayersV1.Paint[i], canvas)
+        with self._ensureClipAndSetPath(canvas, None):
+            for i in range(s, s + n):
+                self._drawPaint(self.colrLayersV1.Paint[i], canvas)
 
     def _drawPaintSolid(self, paint, canvas):
-        r, g, b, a = self._getColor(paint.Color.PaletteIndex, paint.Color.Alpha)
-        canvas.fillSolid((r, g, b, a))
+        color = self._getColor(paint.Color.PaletteIndex, paint.Color.Alpha)
+        canvas.drawPathSolid(self.currentPath, color)
 
     def _drawPaintLinearGradient(self, paint, canvas):
         minStop, maxStop, colorLine = self._readColorLine(paint.ColorLine)
@@ -140,7 +139,14 @@ class BlackRendererFont:
             _interpolatePoints(pt1, pt2, minStop),
             _interpolatePoints(pt1, pt2, maxStop),
         )
-        canvas.fillLinearGradient(colorLine, pt1, pt2, paint.ColorLine.Extend)
+        canvas.drawPathLinearGradient(
+            self.currentPath,
+            colorLine,
+            pt1,
+            pt2,
+            paint.ColorLine.Extend,
+            self.currentTransform,
+        )
 
     def _drawPaintRadialGradient(self, paint, canvas):
         minStop, maxStop, colorLine = self._readColorLine(paint.ColorLine)
@@ -152,13 +158,15 @@ class BlackRendererFont:
         )
         startRadius = _interpolate(paint.r0, paint.r1, minStop)
         endRadius = _interpolate(paint.r0, paint.r1, maxStop)
-        canvas.fillRadialGradient(
+        canvas.drawPathRadialGradient(
+            self.currentPath,
             colorLine,
             startCenter,
             startRadius,
             endCenter,
             endRadius,
             paint.ColorLine.Extend,
+            self.currentTransform,
         )
 
     def _drawPaintSweepGradient(self, paint, canvas):
@@ -166,21 +174,27 @@ class BlackRendererFont:
         center = paint.centerX, paint.centerY
         startAngle = _interpolate(paint.startAngle, paint.endAngle, minStop)
         endAngle = _interpolate(paint.startAngle, paint.endAngle, maxStop)
-        canvas.fillSweepGradient(
-            colorLine, center, startAngle, endAngle, paint.ColorLine.Extend
+        canvas.drawPathSweepGradient(
+            self.currentPath,
+            colorLine,
+            center,
+            startAngle,
+            endAngle,
+            paint.ColorLine.Extend,
+            self.currentTransform,
         )
 
     def _drawPaintGlyph(self, paint, canvas):
         path = canvas.newPath()
         # paint.Glyph must not be a COLR glyph
         self._drawGlyphOutline(paint.Glyph, path)
-        with canvas.savedState():
-            canvas.clipPath(path)
+        with self._ensureClipAndSetPath(canvas, path):
             self._drawPaint(paint.Paint, canvas)
 
     def _drawPaintColrGlyph(self, paint, canvas):
         # paint.Glyph must be a COLR glyph (?)
-        self.drawGlyph(paint.Glyph, canvas)
+        with self._ensureClipAndSetPath(canvas, None):
+            self.drawGlyph(paint.Glyph, canvas)
 
     def _drawPaintTransform(self, paint, canvas):
         t = paint.Transform
@@ -208,7 +222,8 @@ class BlackRendererFont:
         self._applyTransform(transform, paint.Paint, canvas)
 
     def _drawPaintComposite(self, paint, canvas):
-        print("_drawPaintComposite")
+        with self._ensureClipAndSetPath(canvas, None):
+            print("_drawPaintComposite")
         # print("Composite with CompositeMode=", paint.CompositeMode)
         # print("Composite source:")
         # ppPaint(paint.SourcePaint, tab+1)
@@ -217,10 +232,38 @@ class BlackRendererFont:
 
     # Utils
 
+    @contextmanager
+    def _ensureClipAndSetPath(self, canvas, path):
+        if self.currentPath is not None:
+            clipPath = self.currentPath
+            clipTransform = self.currentTransform
+            with canvas.savedState(), self._setPath(path), self._setTransform(Identity):
+                canvas.transform(clipTransform)
+                canvas.clipPath(clipPath)
+                yield
+        elif path is not None:
+            with self._setPath(path), self._setTransform(Identity):
+                yield
+        else:
+            yield
+
+    @contextmanager
+    def _setPath(self, path):
+        currentPath = self.currentPath
+        self.currentPath = path
+        yield
+        self.currentPath = currentPath
+
+    @contextmanager
+    def _setTransform(self, transform):
+        currentTransform = self.currentTransform
+        self.currentTransform = transform
+        yield
+        self.currentTransform = currentTransform
+
     def _applyTransform(self, transform, paint, canvas):
-        with canvas.savedState():
-            canvas.transform(transform)
-            self._drawPaint(paint, canvas)
+        self.currentTransform = self.currentTransform.transform(transform)
+        self._drawPaint(paint, canvas)
 
     def _drawGlyphOutline(self, glyphName, path):
         gid = self.ttFont.getGlyphID(glyphName)
