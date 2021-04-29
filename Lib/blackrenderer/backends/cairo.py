@@ -1,6 +1,5 @@
 from contextlib import contextmanager
 import os
-from fontTools.misc.arrayTools import calcBounds, sectRect
 from fontTools.pens.basePen import BasePen
 from fontTools.pens.recordingPen import RecordingPen
 from fontTools.ttLib.tables.otTables import ExtendMode
