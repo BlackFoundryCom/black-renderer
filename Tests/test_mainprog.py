@@ -1,0 +1,32 @@
+import os
+import pathlib
+import subprocess
+import pytest
+# from fontTools.ttLib.tables.otTables import ExtendMode
+# from blackrenderer.font import BlackRendererFont
+# from blackrenderer.backends import getSurface
+
+
+dataDir = pathlib.Path(__file__).resolve().parent / "data"
+
+
+testData = [
+    ("ABC", dataDir / "MutatorSans.ttf"),
+    ("\u2693\u2694", dataDir / "noto-glyf_colr_1.ttf"),
+    ("\u3299", dataDir / "TwemojiMozilla.subset.default.3299.ttf"),
+]
+
+@pytest.mark.parametrize("testString, fontPath", testData)
+@pytest.mark.parametrize("outputFormat", [".png", ".svg"])
+def test_mainprog(tmpdir, testString, fontPath, outputFormat):
+    outputPath = os.path.join(tmpdir, "test" + outputFormat)
+    args = [
+        "python",
+        "-m",
+        "blackrenderer",
+        os.fspath(fontPath),
+        testString,
+        outputPath,
+    ]
+    subprocess.check_output(args)
+    assert os.path.isfile(outputPath)
