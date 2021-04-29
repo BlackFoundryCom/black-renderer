@@ -110,10 +110,11 @@ class SkiaPixelSurface(Surface):
         self.skCanvas = self.surface.getCanvas()
         self.skCanvas.translate(-x, height + y)
         self.skCanvas.scale(1, -1)
+        self._canvas = SkiaCanvas(self.skCanvas)
 
     @property
     def canvas(self):
-        return SkiaCanvas(self.skCanvas)
+        return self._canvas
 
     def saveImage(self, path, format=skia.kPNG):
         image = self.surface.makeImageSnapshot()

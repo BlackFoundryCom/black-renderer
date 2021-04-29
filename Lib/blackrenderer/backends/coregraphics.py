@@ -132,10 +132,11 @@ class CoreGraphicsPixelSurface(Surface):
             None, width, height, 8, 0, rgbColorSpace, CG.kCGImageAlphaPremultipliedFirst
         )
         CG.CGContextTranslateCTM(self.context, -x, -y)
+        self._canvas = CoreGraphicsCanvas(self.context)
 
     @property
     def canvas(self):
-        return CoreGraphicsCanvas(self.context)
+        return self._canvas
 
     def saveImage(self, path):
         image = CG.CGBitmapContextCreateImage(self.context)

@@ -130,10 +130,11 @@ class CairoPixelSurface(Surface):
         self.context = cairo.Context(self.surface)
         self.context.translate(-x, height + y)
         self.context.scale(1, -1)
+        self._canvas = CairoCanvas(self.context)
 
     @property
     def canvas(self):
-        return CairoCanvas(self.context)
+        return self._canvas
 
     def saveImage(self, path):
         self.surface.flush()
