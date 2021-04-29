@@ -69,7 +69,11 @@ class BlackRendererFont:
         return self.ttFont.getGlyphOrder()
 
     @property
-    def colrGlyphNames(self):
+    def colrV0GlyphNames(self):
+        return self.colrV0Glyphs.keys()
+
+    @property
+    def colrV1GlyphNames(self):
         return self.colrV1Glyphs.keys()
 
     def getGlyphBounds(self, glyphName):
@@ -79,7 +83,7 @@ class BlackRendererFont:
         if glyphName in self.colrV1Glyphs or glyphName not in self.colrV0Glyphs:
             self._drawGlyphOutline(glyphName, pen)
         else:
-            # For COLRv1, we take the union of all layer bounds
+            # For COLRv0, we take the union of all layer bounds
             pen = BoundsPen(None)
             for layer in self.colrV0Glyphs[glyphName]:
                 self._drawGlyphOutline(layer.name, pen)
