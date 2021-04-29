@@ -36,7 +36,6 @@ class CairoPen(BasePen):
 class CairoCanvas(Canvas):
     def __init__(self, context):
         self.context = context
-        self.clipRect = None
         self._pen = CairoPen(context)
 
     @staticmethod
@@ -45,11 +44,9 @@ class CairoCanvas(Canvas):
 
     @contextmanager
     def savedState(self):
-        prevClipRect = self.clipRect
         self.context.save()
         yield
         self.context.restore()
-        self.clipRect = prevClipRect
 
     def transform(self, transform):
         m = cairo.Matrix()
@@ -59,18 +56,6 @@ class CairoCanvas(Canvas):
     def clipPath(self, path):
         self.context.new_path()
         path.replay(self._pen)
-        # We calculate the bounds of the new clipping path in device
-        # coordinates, as at the time of drawing a solid fill we may
-        # be in a different coordinate space.
-        x1, y1, x2, y2 = self.context.path_extents()
-        points = [(x1, y1), (x1, y2), (x2, y2), (x2, y1)]
-        points = [self.context.user_to_device(x, y) for x, y in points]
-        clipRect = calcBounds(points)
-        if self.clipRect is not None:
-            # Our clip gets added to an existing clip, so use intersection
-            self.clipRect = sectRect(self.clipRect, clipRect)
-        else:
-            self.clipRect = clipRect
         self.context.clip()
 
     def fillSolid(self, color):
@@ -116,7 +101,7 @@ class CairoCanvas(Canvas):
     def _fill(self):
         self.context.save()
         self.context.identity_matrix()
-        x1, y1, x2, y2 = self.clipRect
+        x1, y1, x2, y2 = self.context.clip_extents()
         self.context.rectangle(x1, y1, x2 - x1, y2 - y1)
         self.context.fill()
         self.context.restore()
