@@ -12,20 +12,31 @@ if not tmpOutputDir.exists():
     tmpOutputDir.mkdir()
 
 
-testFont1 = dataDir / "noto-glyf_colr_1.ttf"
-testFont2 = dataDir / "samples-glyf_colr_1.ttf"
-
-
 backends = [
     (name, getSurface(name)) for name in ["cairo", "coregraphics", "skia", "svg"]
 ]
 backends = [(name, surface) for name, surface in backends if surface is not None]
 
 
-@pytest.mark.parametrize("glyphName", ["uni2693", "uni2694", "u1F30A", "u1F943"])
+testFonts = {
+    "noto": dataDir / "noto-glyf_colr_1.ttf",
+    "mutator": dataDir / "MutatorSans.ttf",
+}
+
+
+test_glyphs = [
+    ("noto", "uni2693"),
+    ("noto", "uni2694"),
+    ("noto", "u1F30A"),
+    ("noto", "u1F943"),
+    ("mutator", "B"),
+]
+
+
+@pytest.mark.parametrize("fontName, glyphName", test_glyphs)
 @pytest.mark.parametrize("backendName, surfaceFactory", backends)
-def test_renderGlyph(backendName, surfaceFactory, glyphName):
-    font = BlackRendererFont(testFont1)
+def test_renderGlyph(backendName, surfaceFactory, fontName, glyphName):
+    font = BlackRendererFont(testFonts[fontName])
 
     minX, minY, maxX, maxY = font.getGlyphBounds(glyphName)
 
@@ -33,7 +44,7 @@ def test_renderGlyph(backendName, surfaceFactory, glyphName):
     ext = surface.fileExtension
     font.drawGlyph(glyphName, surface.canvas)
 
-    surface.saveImage(tmpOutputDir / f"glyph_{glyphName}_{backendName}{ext}")
+    surface.saveImage(tmpOutputDir / f"glyph_{fontName}_{glyphName}_{backendName}{ext}")
 
 
 test_colorStops = [
