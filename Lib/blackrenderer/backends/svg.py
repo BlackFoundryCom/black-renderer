@@ -80,43 +80,60 @@ class SVGCanvas(Canvas):
             self.clipStack, (path.svgPath(), self.currentTransform)
         )
 
-    def fillSolid(self, color):
-        self._addElement(RGBAPaint(color), None)
+    def drawPathSolid(self, path, color):
+        self._addElement(path.svgPath(), self.currentTransform, RGBAPaint(color), None)
 
-    def fillLinearGradient(self, colorLine, pt1, pt2, extendMode):
+    def drawPathLinearGradient(
+        self, path, colorLine, pt1, pt2, extendMode, gradientTransform
+    ):
         gradient = LinearGradientPaint(tuple(colorLine), pt1, pt2, extendMode)
-        self._addElement(gradient, self.currentTransform)
+        self._addElement(
+            path.svgPath(), self.currentTransform, gradient, gradientTransform
+        )
 
-    def fillRadialGradient(
-        self, colorLine, startCenter, startRadius, endCenter, endRadius, extendMode
+    def drawPathRadialGradient(
+        self,
+        path,
+        colorLine,
+        startCenter,
+        startRadius,
+        endCenter,
+        endRadius,
+        extendMode,
+        gradientTransform,
     ):
         gradient = RadialGradientPaint(
             tuple(colorLine), startCenter, startRadius, endCenter, endRadius, extendMode
         )
-        self._addElement(gradient, self.currentTransform)
+        self._addElement(
+            path.svgPath(), self.currentTransform, gradient, gradientTransform
+        )
 
-    def fillSweepGradient(self, colorLine, center, startAngle, endAngle, extendMode):
-        print("fillSweepGradient")
-        from random import random
-
-        self.fillSolid((1, random(), random(), 1))
+    def drawPathSweepGradient(
+        self,
+        path,
+        colorLine,
+        center,
+        startAngle,
+        endAngle,
+        extendMode,
+        gradientTransform,
+    ):
+        self.drawPathSolid(path, colorLine[0][1])
 
     # TODO: blendMode for PaintComposite
 
-    def _addElement(self, paint, paintTransform):
-        assert len(self.clipStack) > 0
-        fillPath, fillTransform = self.clipStack[-1]
+    def _addElement(self, fillPath, fillTransform, paint, gradientTransform):
         clipPath, clipTransform = None, None
-        if len(self.clipStack) >= 2:
-            clipPath, clipTransform = self.clipStack[-2]
-            if len(self.clipStack) > 2:
+        if self.clipStack:
+            clipPath, clipTransform = self.clipStack[-1]
+            if len(self.clipStack) > 1:
+                # FIXME: intersect clip paths with pathops
                 logger.warning(
                     "SVG canvas does not support more than two nested clip paths"
                 )
-        if paintTransform is not None:
-            paintTransform = fillTransform.inverse().transform(paintTransform)
         self.elements.append(
-            (fillPath, fillTransform, clipPath, clipTransform, paint, paintTransform)
+            (fillPath, fillTransform, clipPath, clipTransform, paint, gradientTransform)
         )
 
 

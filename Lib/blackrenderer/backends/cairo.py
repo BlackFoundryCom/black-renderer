@@ -57,23 +57,31 @@ class CairoCanvas(Canvas):
         path.replay(self._pen)
         self.context.clip()
 
-    def fillSolid(self, color):
+    def drawPathSolid(self, path, color):
         self.context.set_source_rgba(*color)
-        self._fill()
+        self.context.new_path()
+        path.replay(self._pen)
+        self.context.fill()
 
-    def fillLinearGradient(self, colorLine, pt1, pt2, extendMode):
+    def drawPathLinearGradient(
+        self, path, colorLine, pt1, pt2, extendMode, gradientTransform
+    ):
         gr = cairo.LinearGradient(pt1[0], pt1[1], pt2[0], pt2[1])
         gr.set_extend(_extendModeMap[extendMode])
-        # FIXME: one should clip offset below 0 or above 1 (and adjusting the
-        # stop color) because Cairo does not seem to accept stops outside of
-        # the range [0,1].
         for stop, color in colorLine:
             gr.add_color_stop_rgba(stop, *color)
-        self.context.set_source(gr)
-        self._fill()
+        self._drawGradient(path, gr, gradientTransform)
 
-    def fillRadialGradient(
-        self, colorLine, startCenter, startRadius, endCenter, endRadius, extendMode
+    def drawPathRadialGradient(
+        self,
+        path,
+        colorLine,
+        startCenter,
+        startRadius,
+        endCenter,
+        endRadius,
+        extendMode,
+        gradientTransform,
     ):
         gr = cairo.RadialGradient(
             startCenter[0],
@@ -86,21 +94,30 @@ class CairoCanvas(Canvas):
         gr.set_extend(_extendModeMap[extendMode])
         for stop, color in colorLine:
             gr.add_color_stop_rgba(stop, *color)
-        self.context.set_source(gr)
-        self._fill()
+        self._drawGradient(path, gr, gradientTransform)
 
-    def fillSweepGradient(self, colorLine, center, startAngle, endAngle, extendMode):
-        print("fillSweepGradient")
-        from random import random
-
-        self.fillSolid((1, random(), random(), 1))
+    def drawPathSweepGradient(
+        self,
+        path,
+        colorLine,
+        center,
+        startAngle,
+        endAngle,
+        extendMode,
+        gradientTransform,
+    ):
+        self.drawPathSolid(path, colorLine[0][1])
 
     # TODO: blendMode for PaintComposite
 
-    def _fill(self):
-        x1, y1, x2, y2 = self.context.clip_extents()
-        self.context.rectangle(x1, y1, x2 - x1, y2 - y1)
+    def _drawGradient(self, path, gradient, gradientTransform):
+        self.context.new_path()
+        path.replay(self._pen)
+        self.context.save()
+        self.transform(gradientTransform)
+        self.context.set_source(gradient)
         self.context.fill()
+        self.context.restore()
 
 
 class CairoPixelSurface(Surface):
