@@ -62,6 +62,8 @@ class Canvas(ABC):
     ):
         ...
 
+    # Generic convenience methods
+
     def translate(self, x, y):
         self.transform((1, 0, 0, 1, x, y))
 
@@ -69,6 +71,28 @@ class Canvas(ABC):
         if sy is None:
             sy = sx
         self.transform((sx, 0, 0, sy, 0, 0))
+
+    def drawRectSolid(self, rect, color):
+        self.drawPathSolid(self._rectPath(rect), color)
+
+    def drawRectLinearGradient(self, rect, *args, **kwargs):
+        self.drawPathLinearGradient(self._rectPath(rect), *args, **kwargs)
+
+    def drawRectRadialGradient(self, rect, *args, **kwargs):
+        self.drawPathRadialGradient(self._rectPath(rect), *args, **kwargs)
+
+    def drawRectSweepGradient(self, rect, *args, **kwargs):
+        self.drawPathSweepGradient(self._rectPath(rect), *args, **kwargs)
+
+    def _rectPath(self, rect):
+        x, y, w, h = rect
+        path = self.newPath()
+        path.moveTo((x, y))
+        path.lineTo((x, y + h))
+        path.lineTo((x + w, y + h))
+        path.lineTo((x + w, y))
+        path.closePath()
+        return path
 
 
 class Surface(ABC):
