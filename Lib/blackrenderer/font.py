@@ -94,7 +94,7 @@ class BlackRendererFont:
     def drawGlyph(self, glyphName, canvas):
         glyph = self.colrV1Glyphs.get(glyphName)
         if glyph is not None:
-            self._drawPaint(glyph.Paint, canvas)
+            self._drawGlyphCOLRv1(glyph, canvas)
             return
         glyph = self.colrV0Glyphs.get(glyphName)
         if glyph is not None:
@@ -113,6 +113,9 @@ class BlackRendererFont:
             path = canvas.newPath()
             self._drawGlyphOutline(layer.name, path)
             canvas.drawPathSolid(path, self._getColor(layer.colorID, 1))
+
+    def _drawGlyphCOLRv1(self, glyph, canvas):
+        self._drawPaint(glyph.Paint, canvas)
 
     # COLRv1 Paint dispatch
 
@@ -192,9 +195,8 @@ class BlackRendererFont:
             self._drawPaint(paint.Paint, canvas)
 
     def _drawPaintColrGlyph(self, paint, canvas):
-        # paint.Glyph must be a COLR glyph (?)
         with self._ensureClipAndSetPath(canvas, None):
-            self.drawGlyph(paint.Glyph, canvas)
+            self._drawGlyphCOLRv1(paint.Glyph, canvas)
 
     def _drawPaintTransform(self, paint, canvas):
         t = paint.Transform
