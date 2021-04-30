@@ -115,7 +115,20 @@ class SkiaCanvas(Canvas):
         extendMode,
         gradientTransform,
     ):
-        self.drawPathSolid(path, colorLine[0][1])
+        matrix = skia.Matrix()
+        matrix.setAffine(gradientTransform)
+        colors, stops = _unpackColorLine(colorLine)
+        shader = skia.GradientShader.MakeSweep(
+            cx=center[0],
+            cy=center[1],
+            colors=colors,
+            positions=stops,
+            mode=_extendModeMap[extendMode],
+            startAngle=startAngle,
+            endAngle=endAngle,
+            localMatrix=matrix,
+        )
+        self.canvas.drawPath(path.path, skia.Paint(Shader=shader))
 
     # TODO: blendMode for PaintComposite
 

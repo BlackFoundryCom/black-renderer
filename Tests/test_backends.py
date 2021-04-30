@@ -85,6 +85,32 @@ def test_colorStops(backendName, surfaceFactory, stopOffsets, extend):
     )
 
 
+@pytest.mark.parametrize("extend", test_extendModes)
+@pytest.mark.parametrize("backendName, surfaceFactory", backends)
+def test_sweepGradient(backendName, surfaceFactory, extend):
+    surface = surfaceFactory(0, 0, 200, 200)
+    canvas = surface.canvas
+    rectPath = canvas.newPath()
+    drawRect(rectPath, 0, 0, 200, 200)
+    center = (100, 100)
+    startAngle = 45
+    endAngle = 315
+    color1 = (1, 0, 0, 1)
+    color2 = (0, 0, 1, 1)
+    stopOffsets = [0, 1]
+    stop1, stop2 = stopOffsets
+    colorLine = [(stop1, color1), (stop2, color2)]
+    canvas.drawPathSweepGradient(
+        rectPath, colorLine, center, startAngle, endAngle, extend, Identity
+    )
+
+    ext = surface.fileExtension
+    stopsString = "_".join(str(s) for s in stopOffsets)
+    surface.saveImage(
+        tmpOutputDir / f"sweepGradient_{extend.name}_{stopsString}_{backendName}{ext}"
+    )
+
+
 def drawRect(path, x, y, w, h):
     path.moveTo((x, y))
     path.lineTo((x, y + h))
