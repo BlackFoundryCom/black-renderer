@@ -1,7 +1,5 @@
 import pathlib
 import pytest
-from fontTools.misc.transform import Identity
-from fontTools.ttLib.tables.otTables import ExtendMode
 from blackrenderer.font import BlackRendererFont
 from blackrenderer.backends import getSurface
 
@@ -48,72 +46,3 @@ def test_renderGlyph(backendName, surfaceFactory, fontName, glyphName):
     font.drawGlyph(glyphName, surface.canvas)
 
     surface.saveImage(tmpOutputDir / f"glyph_{fontName}_{glyphName}_{backendName}{ext}")
-
-
-test_colorStops = [
-    (0, 1),
-]
-
-test_extendModes = [ExtendMode.PAD, ExtendMode.REPEAT, ExtendMode.REFLECT]
-
-
-@pytest.mark.parametrize("stopOffsets", test_colorStops)
-@pytest.mark.parametrize("extend", test_extendModes)
-@pytest.mark.parametrize("backendName, surfaceFactory", backends)
-def test_colorStops(backendName, surfaceFactory, stopOffsets, extend):
-    surface = surfaceFactory(0, 0, 600, 100)
-    canvas = surface.canvas
-    rectPath = canvas.newPath()
-    drawRect(rectPath, 0, 0, 600, 100)
-    point1 = (200, 0)
-    point2 = (400, 0)
-    color1 = (1, 0, 0, 1)
-    color2 = (0, 0, 1, 1)
-    stop1, stop2 = stopOffsets
-    colorLine = [(stop1, color1), (stop2, color2)]
-    canvas.drawPathLinearGradient(rectPath, colorLine, point1, point2, extend, Identity)
-
-    for pos in [200, 400]:
-        rectPath = canvas.newPath()
-        drawRect(rectPath, pos, 0, 1, 100)
-        canvas.drawPathSolid(rectPath, (0, 0, 0, 1))
-
-    ext = surface.fileExtension
-    stopsString = "_".join(str(s) for s in stopOffsets)
-    surface.saveImage(
-        tmpOutputDir / f"colorStops_{extend.name}_{stopsString}_{backendName}{ext}"
-    )
-
-
-@pytest.mark.parametrize("extend", test_extendModes)
-@pytest.mark.parametrize("backendName, surfaceFactory", backends)
-def test_sweepGradient(backendName, surfaceFactory, extend):
-    surface = surfaceFactory(0, 0, 200, 200)
-    canvas = surface.canvas
-    rectPath = canvas.newPath()
-    drawRect(rectPath, 0, 0, 200, 200)
-    center = (100, 100)
-    startAngle = 45
-    endAngle = 315
-    color1 = (1, 0, 0, 1)
-    color2 = (0, 0, 1, 1)
-    stopOffsets = [0, 1]
-    stop1, stop2 = stopOffsets
-    colorLine = [(stop1, color1), (stop2, color2)]
-    canvas.drawPathSweepGradient(
-        rectPath, colorLine, center, startAngle, endAngle, extend, Identity
-    )
-
-    ext = surface.fileExtension
-    stopsString = "_".join(str(s) for s in stopOffsets)
-    surface.saveImage(
-        tmpOutputDir / f"sweepGradient_{extend.name}_{stopsString}_{backendName}{ext}"
-    )
-
-
-def drawRect(path, x, y, w, h):
-    path.moveTo((x, y))
-    path.lineTo((x, y + h))
-    path.lineTo((x + w, y + h))
-    path.lineTo((x + w, y))
-    path.closePath()
