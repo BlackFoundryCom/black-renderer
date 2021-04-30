@@ -42,8 +42,6 @@ class BlackRendererFont:
 
         self.hbFont = hb.Font(hb.Face(fontData))
         self.location = {}
-        self.currentTransform = Identity
-        self.currentPath = None
 
     @property
     def unitsPerEm(self):
@@ -94,6 +92,8 @@ class BlackRendererFont:
     def drawGlyph(self, glyphName, canvas):
         glyph = self.colrV1Glyphs.get(glyphName)
         if glyph is not None:
+            self.currentTransform = Identity
+            self.currentPath = None
             self._drawGlyphCOLRv1(glyph, canvas)
             return
         glyph = self.colrV0Glyphs.get(glyphName)
