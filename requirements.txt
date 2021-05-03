@@ -1,2 +1,2 @@
-fonttools==4.22.0
+fonttools==4.22.1
 uharfbuzz==0.14.0
