@@ -16,6 +16,7 @@ def main():
         "or '-', to print SVG to stdout",
     )
     parser.add_argument("--font-size", type=float, default=250)
+    parser.add_argument("--variations", type=parseVariations)
     parser.add_argument("--margin", type=float, default=20)
     parser.add_argument(
         "--backend",
@@ -30,6 +31,7 @@ def main():
         args.output,
         fontSize=args.font_size,
         margin=args.margin,
+        variations=args.variations,
         pngSurfaceName=args.backend,
     )
 
@@ -52,6 +54,17 @@ def outputFilePath(path):
             f"'{path}'"
         )
     return path
+
+
+def parseVariations(string):
+    location = {}
+    for item in string.split(","):
+        axisTag, axisValue = item.split("=")
+        axisValue = float(axisValue)
+        if len(axisTag) < 0:
+            axisTag += " " * (4 - len(axisTag))
+        location[axisTag] = axisValue
+    return location
 
 
 if __name__ == "__main__":
