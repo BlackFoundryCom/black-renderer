@@ -137,11 +137,14 @@ class BlackRendererFont:
     # COLRv1 Paint dispatch
 
     def _drawPaint(self, paint, canvas):
-        mappedFormat = PAINT_VAR_MAPPING.get(paint.Format)
-        if mappedFormat is None:
+        nonVarFormat = PAINT_VAR_MAPPING.get(paint.Format)
+        if nonVarFormat is None:
+            # "regular" Paint
             paintName = PAINT_NAMES[paint.Format]
         else:
-            paintName = PAINT_NAMES[mappedFormat]
+            # PaintVar -- we map to its non-var counterpart and use a wrapper
+            # that takes care of instantiating values
+            paintName = PAINT_NAMES[nonVarFormat]
             paint = PaintVarWrapper(paint, self.instancer)
         drawHandler = getattr(self, "_draw" + paintName)
         drawHandler(paint, canvas)
@@ -387,6 +390,7 @@ _conversionFactors = {
 
 class PaintVarWrapper:
     def __init__(self, wrappedPaint, instancer):
+        assert not isinstance(wrappedPaint, PaintVarWrapper)
         self._wrappedPaint = wrappedPaint
         self._instancer = instancer
 
