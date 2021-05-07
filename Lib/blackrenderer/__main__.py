@@ -60,6 +60,7 @@ def parseVariations(string):
     location = {}
     for item in string.split(","):
         axisTag, axisValue = item.split("=")
+        axisTag = axisTag.strip()
         axisValue = float(axisValue)
         if len(axisTag) < 0:
             axisTag += " " * (4 - len(axisTag))
