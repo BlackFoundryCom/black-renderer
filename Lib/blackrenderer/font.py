@@ -4,11 +4,20 @@ import math
 from fontTools.misc.transform import Transform, Identity
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.ttLib import TTFont
-from fontTools.ttLib.tables.otTables import PaintFormat
+from fontTools.ttLib.tables.otTables import PaintFormat, VariableValue
+from fontTools.ttLib.tables.otConverters import VarF2Dot14, VarFixed
+from fontTools.varLib.models import normalizeLocation, piecewiseLinearMap
+from fontTools.varLib.varStore import VarStoreInstancer
 import uharfbuzz as hb
 
 
 PAINT_NAMES = {v.value: k for k, v in PaintFormat.__members__.items()}
+PAINT_VAR_MAPPING = {
+    # Map PaintVarXxx Format to its corresponding non-var Format
+    v.value: PaintFormat[k.replace("PaintVar", "Paint")]
+    for k, v in PaintFormat.__members__.items()
+    if k.startswith("PaintVar")
+}
 
 
 class BlackRendererFont:
@@ -35,6 +44,12 @@ class BlackRendererFont:
                     for glyph in colrTable.BaseGlyphV1List.BaseGlyphV1Record
                 }
                 self.colrLayersV1 = colrTable.LayerV1List
+                if colrTable.VarStore is not None:
+                    self.instancer = VarStoreInstancer(
+                        colrTable.VarStore, self.ttFont["fvar"].axes
+                    )
+                else:
+                    self.instancer = None
 
         if "CPAL" in self.ttFont:
             self.palettes = _unpackPalettes(self.ttFont["CPAL"].palettes)
@@ -50,6 +65,8 @@ class BlackRendererFont:
     def setLocation(self, location):
         self.location = location
         self.hbFont.set_variations(location)
+        if self.instancer is not None:
+            self.instancer.setLocation(_normalizeLocation(location, self.ttFont))
 
     @contextmanager
     def tmpLocation(self, location):
@@ -120,7 +137,12 @@ class BlackRendererFont:
     # COLRv1 Paint dispatch
 
     def _drawPaint(self, paint, canvas):
-        paintName = PAINT_NAMES[paint.Format]
+        mappedFormat = PAINT_VAR_MAPPING.get(paint.Format)
+        if mappedFormat is None:
+            paintName = PAINT_NAMES[paint.Format]
+        else:
+            paintName = PAINT_NAMES[mappedFormat]
+            paint = PaintVarWrapper(paint, self.instancer)
         drawHandler = getattr(self, "_draw" + paintName)
         drawHandler(paint, canvas)
 
@@ -339,3 +361,50 @@ def _unpackPalettes(palettes):
         [(c.red / 255, c.green / 255, c.blue / 255, c.alpha / 255) for c in p]
         for p in palettes
     ]
+
+
+def _normalizeLocation(location, ttFont):
+    axisTriples = {
+        a.axisTag: (a.minValue, a.defaultValue, a.maxValue) for a in ttFont["fvar"].axes
+    }
+    location = normalizeLocation(location, axisTriples)
+    if "avar" in ttFont:
+        axisSegments = ttFont["avar"].segments
+        location = dict(location)
+        for axisTag in axisTriples:
+            if axisTag in location and axisTag in axisSegments:
+                location[axisTag] = piecewiseLinearMap(
+                    location[axisTag], axisSegments[axisTag]
+                )
+    return location
+
+
+_conversionFactors = {
+    VarF2Dot14: 1 / (1 << 14),
+    VarFixed: 1 / (1 << 16),
+}
+
+
+class PaintVarWrapper:
+    def __init__(self, wrappedPaint, instancer):
+        self._wrappedPaint = wrappedPaint
+        self._instancer = instancer
+
+    def __repr__(self):
+        return f"PaintVarWrapper({self.obj!r})"
+
+    def __getattr__(self, attrName):
+        value = getattr(self._wrappedPaint, attrName)
+        if isinstance(value, VariableValue):
+            if value.varIdx != 0xFFFFFFFF:
+                factor = _conversionFactors.get(
+                    type(self._wrappedPaint.getConverterByName(attrName)), 1
+                )
+                value = value.value + self._instancer[value.varIdx] * factor
+            else:
+                value = value.value
+        elif type(value).__name__.startswith("Var"):
+            value = PaintVarWrapper(value, self._instancer)
+        elif isinstance(value, list):
+            value = [PaintVarWrapper(item, self._instancer) for item in value]
+        return value
