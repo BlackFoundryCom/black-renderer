@@ -238,13 +238,15 @@ class BlackRendererFont:
     def _ensureClipAndSetPath(self, canvas, path):
         if self.currentPath is not None:
             clipPath = self.currentPath
-            clipTransform = self.currentTransform
+            transform = self.currentTransform
             with canvas.savedState(), self._setPath(path), self._setTransform(Identity):
-                canvas.transform(clipTransform)
+                canvas.transform(transform)
                 canvas.clipPath(clipPath)
                 yield
         elif path is not None:
-            with self._setPath(path), self._setTransform(Identity):
+            transform = self.currentTransform
+            with canvas.savedState(), self._setPath(path), self._setTransform(Identity):
+                canvas.transform(transform)
                 yield
         else:
             yield
