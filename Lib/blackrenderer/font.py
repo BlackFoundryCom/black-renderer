@@ -248,6 +248,13 @@ class BlackRendererFont:
         transform = transform.translate(-paint.centerX, -paint.centerY)
         self._applyTransform(transform, paint.Paint, canvas)
 
+    def _drawPaintScale(self, paint, canvas):
+        transform = Transform()
+        transform = transform.translate(paint.centerX, paint.centerY)
+        transform = transform.scale(paint.xScale, paint.yScale)
+        transform = transform.translate(-paint.centerX, -paint.centerY)
+        self._applyTransform(transform, paint.Paint, canvas)
+
     def _drawPaintComposite(self, paint, canvas):
         with self._ensureClipAndSetPath(canvas, None):
             print("_drawPaintComposite")
