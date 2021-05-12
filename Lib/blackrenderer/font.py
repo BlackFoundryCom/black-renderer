@@ -53,6 +53,8 @@ class BlackRendererFont:
 
         if "CPAL" in self.ttFont:
             self.palettes = _unpackPalettes(self.ttFont["CPAL"].palettes)
+        else:
+            self.palettes = None
         self.paletteIndex = 0
 
         self.hbFont = hb.Font(hb.Face(fontData))
