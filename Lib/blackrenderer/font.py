@@ -63,7 +63,6 @@ class BlackRendererFont:
             self.axisTags = []
 
         self.hbFont = hb.Font(hb.Face(fontData))
-        self.location = {}
 
     @property
     def unitsPerEm(self):
@@ -72,28 +71,35 @@ class BlackRendererFont:
     def setLocation(self, location):
         if location is None:
             location = {}
-        self.location = location
         self.hbFont.set_variations(location)
         if self.instancer is not None:
             normalizedAxisValues = self.hbFont.get_var_coords_normalized()
-            normalizedLocation = {
-                axisTag: axisValue
-                for axisTag, axisValue in zip(self.axisTags, normalizedAxisValues)
-            }
+            normalizedLocation = axisValuesToLocation(normalizedAxisValues, self.axisTags)
             self.instancer.setLocation(normalizedLocation)
 
     @contextmanager
-    def tmpLocation(self, location):
-        # XXX normalized vs user space
-        # TODO: wrap these in uharfbuzz:
-        # - hb_font_get_var_coords_normalized
-        # - hb_font_set_var_coords_normalized
-        originalLocation = self.location
-        combined = dict(originalLocation)
-        combined.update(location)
-        self.setLocation(combined)
-        yield
-        self.setLocation(originalLocation)
+    def pushNormalizedLocation(self, location):
+        orgAxisValues = self.hbFont.get_var_coords_normalized()
+        tmpAxisValues = list(orgAxisValues)
+        for axisIndex, axisTag in enumerate(self.axisTags):
+            axisValue = location.get(axisTag)
+            if axisValue is not None:
+                tmpAxisValues[axisIndex] = axisValue
+        tmpLocation = axisValuesToLocation(tmpAxisValues, self.axisTags)
+
+        self.hbFont.set_var_coords_normalized(tmpAxisValues)
+        if self.instancer is not None:
+            orgLocation = self.instancer.location
+            # FIXME: calling setLocation loses the internal instancer._scalars cache;
+            # perhaps a pushing a *new* instancer and reverting to the old one is
+            # faster, but this is currently not possible due to PaintVarXxx referencing
+            # self.instancer, too.
+            self.instancer.setLocation(tmpLocation)
+            yield
+            self.instancer.setLocation(orgLocation)
+        else:
+            yield
+        self.hbFont.set_var_coords_normalized(orgAxisValues)
 
     @property
     def glyphNames(self):
@@ -396,6 +402,13 @@ def _unpackPalettes(palettes):
         [(c.red / 255, c.green / 255, c.blue / 255, c.alpha / 255) for c in p]
         for p in palettes
     ]
+
+
+def axisValuesToLocation(normalizedAxisValues, axisTags):
+    return {
+        axisTag: axisValue
+        for axisTag, axisValue in zip(axisTags, normalizedAxisValues)
+    }
 
 
 _conversionFactors = {
