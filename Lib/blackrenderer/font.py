@@ -77,30 +77,6 @@ class BlackRendererFont:
             normalizedLocation = axisValuesToLocation(normalizedAxisValues, self.axisTags)
             self.instancer.setLocation(normalizedLocation)
 
-    @contextmanager
-    def pushNormalizedLocation(self, location):
-        orgAxisValues = self.hbFont.get_var_coords_normalized()
-        tmpAxisValues = list(orgAxisValues)
-        for axisIndex, axisTag in enumerate(self.axisTags):
-            axisValue = location.get(axisTag)
-            if axisValue is not None:
-                tmpAxisValues[axisIndex] = axisValue
-        tmpLocation = axisValuesToLocation(tmpAxisValues, self.axisTags)
-
-        self.hbFont.set_var_coords_normalized(tmpAxisValues)
-        if self.instancer is not None:
-            orgLocation = self.instancer.location
-            # FIXME: calling setLocation loses the internal instancer._scalars cache;
-            # perhaps a pushing a *new* instancer and reverting to the old one is
-            # faster, but this is currently not possible due to PaintVarXxx referencing
-            # self.instancer, too.
-            self.instancer.setLocation(tmpLocation)
-            yield
-            self.instancer.setLocation(orgLocation)
-        else:
-            yield
-        self.hbFont.set_var_coords_normalized(orgAxisValues)
-
     @property
     def glyphNames(self):
         return self.ttFont.getGlyphOrder()
@@ -286,6 +262,30 @@ class BlackRendererFont:
         # ppPaint(paint.BackdropPaint, tab+1)
 
     # Utils
+
+    @contextmanager
+    def _pushNormalizedLocation(self, location):
+        orgAxisValues = self.hbFont.get_var_coords_normalized()
+        tmpAxisValues = list(orgAxisValues)
+        for axisIndex, axisTag in enumerate(self.axisTags):
+            axisValue = location.get(axisTag)
+            if axisValue is not None:
+                tmpAxisValues[axisIndex] = axisValue
+        tmpLocation = axisValuesToLocation(tmpAxisValues, self.axisTags)
+
+        self.hbFont.set_var_coords_normalized(tmpAxisValues)
+        if self.instancer is not None:
+            orgLocation = self.instancer.location
+            # FIXME: calling setLocation loses the internal instancer._scalars cache;
+            # perhaps a pushing a *new* instancer and reverting to the old one is
+            # faster, but this is currently not possible due to PaintVarXxx referencing
+            # self.instancer, too.
+            self.instancer.setLocation(tmpLocation)
+            yield
+            self.instancer.setLocation(orgLocation)
+        else:
+            yield
+        self.hbFont.set_var_coords_normalized(orgAxisValues)
 
     @contextmanager
     def _ensureClipAndSetPath(self, canvas, path):
