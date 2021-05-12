@@ -264,14 +264,12 @@ class BlackRendererFont:
         # ppPaint(paint.BackdropPaint, tab+1)
 
     def _drawPaintLocation(self, paint, canvas):
-        try:
-            location = {
-                self.axisTags[coord.AxisIndex]: coord.AxisValue
-                for coord in paint.Coordinate
-            }
-        except IndexError:
-            # FIXME: Warn? Font uses axis index beyond fvar axis array
-            location = {}
+        numAxes = len(self.axisTags)
+        location = {
+            self.axisTags[coord.AxisIndex]: coord.AxisValue
+            for coord in paint.Coordinate
+            if coord.AxisIndex < numAxes
+        }
         with self._pushNormalizedLocation(location):
             self._drawPaint(paint.Paint, canvas)
 
