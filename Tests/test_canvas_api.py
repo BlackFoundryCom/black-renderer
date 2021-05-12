@@ -64,9 +64,10 @@ def test_sweepGradient(backendName, surfaceFactory, extend):
             (1, 0, 0, 1),
             (0, 1, 0, 1),
             (1, 1, 0, 1),
+            (1, 0.5, 1, 1),
             (0, 0, 1, 1),
             ]
-    stopOffsets = [0, 0.5, 0.6, 1]
+    stopOffsets = [0, 0.5, 0.5, 0.6, 1]
     colorLine = list(zip(stopOffsets, colors))
     canvas.drawRectSweepGradient(
         (0, 0, H, W), colorLine, center, startAngle, endAngle, extend, Identity
