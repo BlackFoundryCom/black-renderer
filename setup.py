@@ -37,7 +37,7 @@ setup(
     packages=find_packages("Lib"),
     install_requires=[
         "fonttools >= 4.17.0",
-        "uharfbuzz",
+        "uharfbuzz >= 0.16.0",
     ],
     extras_require={
         "skia": ["skia-python", "numpy"],
