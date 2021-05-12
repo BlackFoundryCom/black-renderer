@@ -301,26 +301,16 @@ class BlackRendererFont:
 
     @contextmanager
     def _ensureClipAndPushPath(self, canvas, path):
-        clipPath = self.currentPath
-        transform = self.currentTransform
-        with canvas.savedState(), self._pushPath(path), self._pushTransform(Identity):
-            canvas.transform(transform)
-            if clipPath is not None:
-                canvas.clipPath(clipPath)
-            yield
-
-    @contextmanager
-    def _pushPath(self, path):
         currentPath = self.currentPath
-        self.currentPath = path
-        yield
-        self.currentPath = currentPath
-
-    @contextmanager
-    def _pushTransform(self, transform):
         currentTransform = self.currentTransform
-        self.currentTransform = transform
-        yield
+        self.currentPath = path
+        self.currentTransform = Identity
+        with canvas.savedState():
+            canvas.transform(currentTransform)
+            if currentPath is not None:
+                canvas.clipPath(currentPath)
+            yield
+        self.currentPath = currentPath
         self.currentTransform = currentTransform
 
     def _applyTransform(self, transform, paint, canvas):
