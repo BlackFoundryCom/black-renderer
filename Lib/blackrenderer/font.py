@@ -2,7 +2,7 @@ from contextlib import contextmanager
 from io import BytesIO
 import math
 from fontTools.misc.transform import Transform, Identity
-from fontTools.pens.boundsPen import BoundsPen
+from fontTools.misc.arrayTools import unionRect
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables.otTables import PaintFormat, VariableValue
 from fontTools.ttLib.tables.otConverters import VarF2Dot14, VarFixed
@@ -104,17 +104,18 @@ class BlackRendererFont:
         return self.colrV1Glyphs.keys()
 
     def getGlyphBounds(self, glyphName):
-        # TODO: hb must have have an efficient API for this --
-        # let's find it and add it to uharfbuzz
-        pen = BoundsPen(None)
         if glyphName in self.colrV1Glyphs or glyphName not in self.colrV0Glyphs:
-            self._drawGlyphOutline(glyphName, pen)
+            bounds = self._getGlyphBounds(glyphName)
         else:
             # For COLRv0, we take the union of all layer bounds
-            pen = BoundsPen(None)
+            bounds = None
             for layer in self.colrV0Glyphs[glyphName]:
-                self._drawGlyphOutline(layer.name, pen)
-        return pen.bounds
+                layerBounds = self._getGlyphBounds(layer.name)
+                if bounds is None:
+                    bounds = layerBounds
+                else:
+                    bounds = unionRect(layerBounds, bounds)
+        return bounds
 
     def drawGlyph(self, glyphName, canvas):
         glyph = self.colrV1Glyphs.get(glyphName)
@@ -314,6 +315,16 @@ class BlackRendererFont:
     def _drawGlyphOutline(self, glyphName, path):
         gid = self.ttFont.getGlyphID(glyphName)
         self.hbFont.draw_glyph_with_pen(gid, path)
+
+    def _getGlyphBounds(self, glyphName):
+        gid = self.ttFont.getGlyphID(glyphName)
+        x, y, w, h = self.hbFont.get_glyph_extents(gid)
+        # convert from HB's x/y_bearing + extents to xMin, yMin, xMax, yMax
+        y += h
+        h = -h
+        w += x
+        h += y
+        return x, y, w, h
 
     def _getColor(self, colorIndex, alpha):
         if colorIndex == 0xFFFF:
