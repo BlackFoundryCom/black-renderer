@@ -149,7 +149,7 @@ class BlackRendererFont:
     def _drawPaintColrLayers(self, paint, canvas):
         n = paint.NumLayers
         s = paint.FirstLayerIndex
-        with self._ensureClipAndSetPath(canvas, None):
+        with self._ensureClipAndPushPath(canvas, None):
             for i in range(s, s + n):
                 self._drawPaint(self.colrLayersV1.Paint[i], canvas)
 
@@ -213,11 +213,11 @@ class BlackRendererFont:
         path = canvas.newPath()
         # paint.Glyph must not be a COLR glyph
         self._drawGlyphOutline(paint.Glyph, path)
-        with self._ensureClipAndSetPath(canvas, path):
+        with self._ensureClipAndPushPath(canvas, path):
             self._drawPaint(paint.Paint, canvas)
 
     def _drawPaintColrGlyph(self, paint, canvas):
-        with self._ensureClipAndSetPath(canvas, None):
+        with self._ensureClipAndPushPath(canvas, None):
             self._drawGlyphCOLRv1(paint.Glyph, canvas)
 
     def _drawPaintTransform(self, paint, canvas):
@@ -253,7 +253,7 @@ class BlackRendererFont:
         self._applyTransform(transform, paint.Paint, canvas)
 
     def _drawPaintComposite(self, paint, canvas):
-        with self._ensureClipAndSetPath(canvas, None):
+        with self._ensureClipAndPushPath(canvas, None):
             print("_drawPaintComposite")
         # print("Composite with CompositeMode=", paint.CompositeMode)
         # print("Composite source:")
@@ -288,31 +288,31 @@ class BlackRendererFont:
         self.hbFont.set_var_coords_normalized(orgAxisValues)
 
     @contextmanager
-    def _ensureClipAndSetPath(self, canvas, path):
+    def _ensureClipAndPushPath(self, canvas, path):
         if self.currentPath is not None:
             clipPath = self.currentPath
             transform = self.currentTransform
-            with canvas.savedState(), self._setPath(path), self._setTransform(Identity):
+            with canvas.savedState(), self._pushPath(path), self._pushTransform(Identity):
                 canvas.transform(transform)
                 canvas.clipPath(clipPath)
                 yield
         elif path is not None:
             transform = self.currentTransform
-            with canvas.savedState(), self._setPath(path), self._setTransform(Identity):
+            with canvas.savedState(), self._pushPath(path), self._pushTransform(Identity):
                 canvas.transform(transform)
                 yield
         else:
             yield
 
     @contextmanager
-    def _setPath(self, path):
+    def _pushPath(self, path):
         currentPath = self.currentPath
         self.currentPath = path
         yield
         self.currentPath = currentPath
 
     @contextmanager
-    def _setTransform(self, transform):
+    def _pushTransform(self, transform):
         currentTransform = self.currentTransform
         self.currentTransform = transform
         yield
