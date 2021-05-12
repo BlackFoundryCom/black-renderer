@@ -4,6 +4,7 @@ from fontTools.pens.basePen import BasePen
 from fontTools.ttLib.tables.otTables import ExtendMode
 import Quartz as CG
 from .base import Canvas, Surface
+from .sweepGradient import buildSweepGradientPatches
 
 
 class CoreGraphicsPathPen(BasePen):
@@ -125,7 +126,35 @@ class CoreGraphicsCanvas(Canvas):
         extendMode,
         gradientTransform,
     ):
-        self.drawPathSolid(path, colorLine[0][1])
+        from math import sqrt
+
+        if self.clipIsEmpty or CG.CGPathGetBoundingBox(path.path) == CG.CGRectNull:
+            return
+        with self.savedState():
+            CG.CGContextAddPath(self.context, path.path)
+            CG.CGContextClip(self.context)
+            self.transform(gradientTransform)
+            # find current path' extent
+            bb = CG.CGContextGetClipBoundingBox(self.context)
+            x1, y1 = bb.origin.x, bb.origin.y
+            x2 = x1 + bb.size.width
+            y2 = y1 + bb.size.height
+            maxX = max(d * d for d in (x1 - center[0], x2 - center[0]))
+            maxY = max(d * d for d in (y1 - center[1], y2 - center[1]))
+            R = sqrt(maxX + maxY)
+            # compute the triangle fan approximating the sweep gradient
+            patches = buildSweepGradientPatches(
+                colorLine, center, R, startAngle, endAngle, useGouraudShading=True
+            )
+            CG.CGContextSetAllowsAntialiasing(self.context, False)
+            for (P0, color0), (P1, color1) in patches:
+                color = 0.5 * (color0 + color1)
+                CG.CGContextMoveToPoint(self.context, center[0], center[1])
+                CG.CGContextAddLineToPoint(self.context, P0[0], P0[1])
+                CG.CGContextAddLineToPoint(self.context, P1[0], P1[1])
+                CG.CGContextSetRGBFillColor(self.context, *color)
+                CG.CGContextFillPath(self.context)
+            CG.CGContextSetAllowsAntialiasing(self.context, True)
 
     # TODO: blendMode for PaintComposite
 

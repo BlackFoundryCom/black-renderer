@@ -1,11 +1,12 @@
 from contextlib import contextmanager
 import os
+from math import sqrt
 from fontTools.pens.basePen import BasePen
 from fontTools.pens.recordingPen import RecordingPen
 from fontTools.ttLib.tables.otTables import ExtendMode
 import cairo
 from .base import Canvas, Surface
-
+from .sweepGradient import buildSweepGradientPatches
 
 _extendModeMap = {
     ExtendMode.PAD: cairo.Extend.PAD,
@@ -106,9 +107,32 @@ class CairoCanvas(Canvas):
         extendMode,
         gradientTransform,
     ):
-        self.drawPathSolid(path, colorLine[0][1])
+        # alloc the mesh pattern
+        pat = cairo.MeshPattern()
+        # find current path' extent
+        x1, y1, x2, y2 = self.context.clip_extents()
+        maxX = max(d * d for d in (x1 - center[0], x2 - center[0]))
+        maxY = max(d * d for d in (y1 - center[1], y2 - center[1]))
+        R = sqrt(maxX + maxY)
+        patches = buildSweepGradientPatches(
+            colorLine, center, R, startAngle, endAngle, useGouraudShading=False
+        )
+        for (P0, color0), C0, C1, (P1, color1) in patches:
+            # draw patch
+            pat.begin_patch()
+            pat.move_to(center[0], center[1])
+            pat.line_to(P0[0], P0[1])
+            pat.curve_to(C0[0], C0[1], C1[0], C1[1], P1[0], P1[1])
+            pat.line_to(center[0], center[1])
+            pat.set_corner_color_rgba(0, *color0)
+            pat.set_corner_color_rgba(1, *color0)
+            pat.set_corner_color_rgba(2, *color1)
+            pat.set_corner_color_rgba(3, *color1)
+            pat.end_patch()
+        self.context.set_source(pat)
+        self.context.paint()
 
-    # TODO: blendMode for PaintComposite
+    # TODO: blendMode for PaintComposite)
 
     def _drawGradient(self, path, gradient, gradientTransform):
         self.context.new_path()
