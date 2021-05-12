@@ -74,7 +74,9 @@ class BlackRendererFont:
         self.hbFont.set_variations(location)
         if self.instancer is not None:
             normalizedAxisValues = self.hbFont.get_var_coords_normalized()
-            normalizedLocation = axisValuesToLocation(normalizedAxisValues, self.axisTags)
+            normalizedLocation = axisValuesToLocation(
+                normalizedAxisValues, self.axisTags
+            )
             self.instancer.setLocation(normalizedLocation)
 
     @property
@@ -292,13 +294,17 @@ class BlackRendererFont:
         if self.currentPath is not None:
             clipPath = self.currentPath
             transform = self.currentTransform
-            with canvas.savedState(), self._pushPath(path), self._pushTransform(Identity):
+            with canvas.savedState(), self._pushPath(path), self._pushTransform(
+                Identity
+            ):
                 canvas.transform(transform)
                 canvas.clipPath(clipPath)
                 yield
         elif path is not None:
             transform = self.currentTransform
-            with canvas.savedState(), self._pushPath(path), self._pushTransform(Identity):
+            with canvas.savedState(), self._pushPath(path), self._pushTransform(
+                Identity
+            ):
                 canvas.transform(transform)
                 yield
         else:
@@ -406,8 +412,7 @@ def _unpackPalettes(palettes):
 
 def axisValuesToLocation(normalizedAxisValues, axisTags):
     return {
-        axisTag: axisValue
-        for axisTag, axisValue in zip(axisTags, normalizedAxisValues)
+        axisTag: axisValue for axisTag, axisValue in zip(axisTags, normalizedAxisValues)
     }
 
 
