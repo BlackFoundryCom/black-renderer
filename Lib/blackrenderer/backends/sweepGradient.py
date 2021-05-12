@@ -9,7 +9,7 @@ def buildSweepGradientPatches(
     startAngle,
     endAngle,
     useGouraudShading,
-    maxAngle=-1,
+    maxAngle=None,
 ):
     """Provides colorful triangular patches that mimic a sweep gradient.
 
@@ -29,19 +29,18 @@ def buildSweepGradientPatches(
     maxAngle -- largest desired angular extent of a single triangular patch."""
     patches = []
     # generate a fan of 'triangular' bezier patches, with center 'center' and radius 'radius'
-    degToRad = pi / 180.0
-    if maxAngle == -1:
+    if maxAngle is None:
         if useGouraudShading:
             maxAngle = pi / 360.0
         else:
-            maxAngle = pi / 2.0
+            maxAngle = pi / 8.0
     else:
         maxAngle = max(min(maxAngle, pi / 2), pi / 360)
     if useGouraudShading:
         # Use a slightly larger radius to make sure that disk with the original
         # radius completely fits within the straight-edged triangles that we
         # will generate
-        radius = radius / cos(maxAngle/2)
+        radius = radius / cos(maxAngle / 2)
     n = len(colorLine)
     center = Vector(center)
     for i in range(n - 1):
