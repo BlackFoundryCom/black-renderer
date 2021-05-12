@@ -25,19 +25,21 @@ testFonts = {
 
 
 test_glyphs = [
-    ("noto", "uni2693"),
-    ("noto", "uni2694"),
-    ("noto", "u1F30A"),
-    ("noto", "u1F943"),
-    ("mutator", "B"),
-    ("twemoji", "uni3299"),
+    ("noto", "uni2693", None),
+    ("noto", "uni2694", None),
+    ("noto", "u1F30A", None),
+    ("noto", "u1F943", None),
+    ("mutator", "B", None),
+    ("mutator", "D", {"wdth": 1000}),
+    ("twemoji", "uni3299", None),
 ]
 
 
-@pytest.mark.parametrize("fontName, glyphName", test_glyphs)
+@pytest.mark.parametrize("fontName, glyphName, location", test_glyphs)
 @pytest.mark.parametrize("backendName, surfaceFactory", backends)
-def test_renderGlyph(backendName, surfaceFactory, fontName, glyphName):
+def test_renderGlyph(backendName, surfaceFactory, fontName, glyphName, location):
     font = BlackRendererFont(testFonts[fontName])
+    font.setLocation(location)
 
     minX, minY, maxX, maxY = font.getGlyphBounds(glyphName)
 
