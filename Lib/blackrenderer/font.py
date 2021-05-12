@@ -6,7 +6,6 @@ from fontTools.misc.arrayTools import unionRect
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables.otTables import PaintFormat, VariableValue
 from fontTools.ttLib.tables.otConverters import VarF2Dot14, VarFixed
-from fontTools.varLib.models import normalizeLocation, piecewiseLinearMap
 from fontTools.varLib.varStore import VarStoreInstancer
 import uharfbuzz as hb
 
@@ -76,7 +75,12 @@ class BlackRendererFont:
         self.location = location
         self.hbFont.set_variations(location)
         if self.instancer is not None:
-            self.instancer.setLocation(_normalizeLocation(location, self.ttFont))
+            normalizedAxisValues = self.hbFont.get_var_coords_normalized()
+            normalizedLocation = {
+                axisTag: axisValue
+                for axisTag, axisValue in zip(self.axisTags, normalizedAxisValues)
+            }
+            self.instancer.setLocation(normalizedLocation)
 
     @contextmanager
     def tmpLocation(self, location):
@@ -392,22 +396,6 @@ def _unpackPalettes(palettes):
         [(c.red / 255, c.green / 255, c.blue / 255, c.alpha / 255) for c in p]
         for p in palettes
     ]
-
-
-def _normalizeLocation(location, ttFont):
-    axisTriples = {
-        a.axisTag: (a.minValue, a.defaultValue, a.maxValue) for a in ttFont["fvar"].axes
-    }
-    location = normalizeLocation(location, axisTriples)
-    if "avar" in ttFont:
-        axisSegments = ttFont["avar"].segments
-        location = dict(location)
-        for axisTag in axisTriples:
-            if axisTag in location and axisTag in axisSegments:
-                location[axisTag] = piecewiseLinearMap(
-                    location[axisTag], axisSegments[axisTag]
-                )
-    return location
 
 
 _conversionFactors = {
