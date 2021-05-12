@@ -1,11 +1,12 @@
 from contextlib import contextmanager
 import os
+from math import sqrt
 from fontTools.pens.basePen import BasePen
 from fontTools.pens.recordingPen import RecordingPen
 from fontTools.ttLib.tables.otTables import ExtendMode
 import cairo
 from .base import Canvas, Surface
-from math import sqrt
+from .sweepGradient import buildSweepGradientPatches
 
 _extendModeMap = {
     ExtendMode.PAD: cairo.Extend.PAD,
@@ -113,7 +114,7 @@ class CairoCanvas(Canvas):
         maxX = max(d * d for d in (x1 - center[0], x2 - center[0]))
         maxY = max(d * d for d in (y1 - center[1], y2 - center[1]))
         R = sqrt(maxX + maxY)
-        patches = self._buildSweepGradientPatches(colorLine, center, R, startAngle, endAngle, useGouraudShading=False)
+        patches = buildSweepGradientPatches(colorLine, center, R, startAngle, endAngle, useGouraudShading=False)
         for (P0, color0), C0, C1, (P1, color1) in patches:
             # draw patch
             pat.begin_patch()
