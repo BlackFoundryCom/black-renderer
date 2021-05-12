@@ -30,6 +30,7 @@ class BlackRendererFont:
         self.textColor = (0, 0, 0, 1)
         self.colrV0Glyphs = {}
         self.colrV1Glyphs = {}
+        self.instancer = None
 
         if "COLR" in self.ttFont:
             colrTable = self.ttFont["COLR"]
@@ -57,6 +58,11 @@ class BlackRendererFont:
             self.palettes = None
         self.paletteIndex = 0
 
+        if "fvar" in self.ttFont:
+            self.axisTags = [a.axisTag for a in self.ttFont["fvar"].axes]
+        else:
+            self.axisTags = []
+
         self.hbFont = hb.Font(hb.Face(fontData))
         self.location = {}
 
@@ -65,6 +71,8 @@ class BlackRendererFont:
         return self.hbFont.face.upem
 
     def setLocation(self, location):
+        if location is None:
+            location = {}
         self.location = location
         self.hbFont.set_variations(location)
         if self.instancer is not None:
