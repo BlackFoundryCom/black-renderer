@@ -249,6 +249,7 @@ class BlackRendererFont:
         self._applyTransform(transform, paint.Paint, canvas)
 
     def _drawPaintScale(self, paint, canvas):
+        # https://github.com/googlefonts/colr-gradients-spec/issues/279
         transform = Transform()
         transform = transform.translate(paint.centerX, paint.centerY)
         transform = transform.scale(paint.xScale, paint.yScale)
@@ -265,6 +266,7 @@ class BlackRendererFont:
         # ppPaint(paint.BackdropPaint, tab+1)
 
     def _drawPaintLocation(self, paint, canvas):
+        # https://github.com/googlefonts/colr-gradients-spec/issues/277
         numAxes = len(self.axisTags)
         location = {
             self.axisTags[coord.AxisIndex]: coord.AxisValue
