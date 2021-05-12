@@ -151,9 +151,10 @@ class BlackRendererFont:
     def _drawPaintColrLayers(self, paint, canvas):
         n = paint.NumLayers
         s = paint.FirstLayerIndex
-        for i in range(s, s + n):
-            with self._ensureClipAndPushPath(canvas, None):
-                self._drawPaint(self.colrLayersV1.Paint[i], canvas)
+        with self._ensureClipAndPushPath(canvas, None):
+            for i in range(s, s + n):
+                with self._savedTransform():
+                    self._drawPaint(self.colrLayersV1.Paint[i], canvas)
 
     def _drawPaintSolid(self, paint, canvas):
         color = self._getColor(paint.Color.PaletteIndex, paint.Color.Alpha)
@@ -306,11 +307,18 @@ class BlackRendererFont:
         self.currentPath = path
         self.currentTransform = Identity
         with canvas.savedState():
-            canvas.transform(currentTransform)
+            if currentTransform != Identity:
+                canvas.transform(currentTransform)
             if currentPath is not None:
                 canvas.clipPath(currentPath)
             yield
         self.currentPath = currentPath
+        self.currentTransform = currentTransform
+
+    @contextmanager
+    def _savedTransform(self):
+        currentTransform = self.currentTransform
+        yield
         self.currentTransform = currentTransform
 
     def _applyTransform(self, transform, paint, canvas):
