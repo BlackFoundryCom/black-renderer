@@ -303,9 +303,7 @@ class BlackRendererFont:
     def _ensureClipAndPushPath(self, canvas, path):
         clipPath = self.currentPath
         transform = self.currentTransform
-        with canvas.savedState(), self._pushPath(path), self._pushTransform(
-            Identity
-        ):
+        with canvas.savedState(), self._pushPath(path), self._pushTransform(Identity):
             canvas.transform(transform)
             if clipPath is not None:
                 canvas.clipPath(clipPath)
