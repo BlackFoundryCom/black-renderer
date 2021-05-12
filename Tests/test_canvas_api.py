@@ -7,6 +7,7 @@ from blackrenderer.backends import getSurface
 
 testDir = pathlib.Path(__file__).resolve().parent
 dataDir = testDir / "data"
+expectedOutputDir = testDir / "expectedOutput"
 tmpOutputDir = testDir / "tmpOutput"
 if not tmpOutputDir.exists():
     tmpOutputDir.mkdir()
@@ -46,9 +47,11 @@ def test_colorStops(backendName, surfaceFactory, stopOffsets, extend):
 
     ext = surface.fileExtension
     stopsString = "_".join(str(s) for s in stopOffsets)
-    surface.saveImage(
-        tmpOutputDir / f"colorStops_{extend.name}_{stopsString}_{backendName}{ext}"
-    )
+    fileName = f"colorStops_{extend.name}_{stopsString}_{backendName}{ext}"
+    expectedPath = expectedOutputDir / fileName
+    outputPath = tmpOutputDir / fileName
+    surface.saveImage(outputPath)
+    assert expectedPath.read_bytes() == outputPath.read_bytes()
 
 
 @pytest.mark.parametrize("extend", test_extendModes)
@@ -75,6 +78,8 @@ def test_sweepGradient(backendName, surfaceFactory, extend):
 
     ext = surface.fileExtension
     stopsString = "_".join(str(s) for s in stopOffsets)
-    surface.saveImage(
-        tmpOutputDir / f"sweepGradient_{extend.name}_{stopsString}_{backendName}{ext}"
-    )
+    fileName = f"sweepGradient_{extend.name}_{stopsString}_{backendName}{ext}"
+    expectedPath = expectedOutputDir / fileName
+    outputPath = tmpOutputDir / fileName
+    surface.saveImage(outputPath)
+    assert expectedPath.read_bytes() == outputPath.read_bytes()

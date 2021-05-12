@@ -6,6 +6,7 @@ from blackrenderer.backends import getSurface
 
 testDir = pathlib.Path(__file__).resolve().parent
 dataDir = testDir / "data"
+expectedOutputDir = testDir / "expectedOutput"
 tmpOutputDir = testDir / "tmpOutput"
 if not tmpOutputDir.exists():
     tmpOutputDir.mkdir()
@@ -47,4 +48,8 @@ def test_renderGlyph(backendName, surfaceFactory, fontName, glyphName, location)
     ext = surface.fileExtension
     font.drawGlyph(glyphName, surface.canvas)
 
-    surface.saveImage(tmpOutputDir / f"glyph_{fontName}_{glyphName}_{backendName}{ext}")
+    fileName = f"glyph_{fontName}_{glyphName}_{backendName}{ext}"
+    expectedPath = expectedOutputDir / fileName
+    outputPath = tmpOutputDir / fileName
+    surface.saveImage(outputPath)
+    assert expectedPath.read_bytes() == outputPath.read_bytes()

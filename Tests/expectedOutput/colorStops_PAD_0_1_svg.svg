@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='ASCII'?>
+<svg width="600" height="100" preserveAspectRatio="xMinYMin slice" viewBox="0 0 600 100" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient_0" spreadMethod="pad" gradientUnits="userSpaceOnUse" x1="200" y1="0" x2="400" y2="0">
+      <stop offset="0%" stop-color="#FF0000"/>
+      <stop offset="100%" stop-color="#0000FF"/>
+    </linearGradient>
+  </defs>
+  <path d="M0,0 v100 h600 v-100 Z" fill="url(#gradient_0)" transform="matrix(1,0,0,-1,0,100)"/>
+  <path d="M200,0 v100 h1 v-100 Z" fill="#000000" transform="matrix(1,0,0,-1,0,100)"/>
+  <path d="M400,0 v100 h1 v-100 Z" fill="#000000" transform="matrix(1,0,0,-1,0,100)"/>
+</svg>

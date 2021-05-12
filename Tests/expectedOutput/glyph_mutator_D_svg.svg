@@ -1,0 +1,4 @@
+<?xml version='1.0' encoding='ASCII'?>
+<svg width="1001" height="700" preserveAspectRatio="xMinYMin slice" viewBox="120 0 1001 700" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <path d="M120,0 v700 h40 v-700 h-40 Z M140,664 v36 h430 q169,0 293,-36 q123,-37 191,-113 q67,-77 67,-199 q0,-122 -67,-200 q-68,-78 -191,-115 q-124,-37 -293,-37 h-430 v36 h430 q157,0 272,32 q114,31 177,101 q62,69 62,183 q0,114 -62,183 q-63,68 -177,99 q-115,30 -272,30 h-430 Z" fill="#000000" transform="matrix(1,0,0,-1,0,700)"/>
+</svg>
