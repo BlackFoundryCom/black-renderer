@@ -151,8 +151,8 @@ class BlackRendererFont:
     def _drawPaintColrLayers(self, paint, canvas):
         n = paint.NumLayers
         s = paint.FirstLayerIndex
-        with self._ensureClipAndPushPath(canvas, None):
-            for i in range(s, s + n):
+        for i in range(s, s + n):
+            with self._ensureClipAndPushPath(canvas, None):
                 self._drawPaint(self.colrLayersV1.Paint[i], canvas)
 
     def _drawPaintSolid(self, paint, canvas):
@@ -301,23 +301,14 @@ class BlackRendererFont:
 
     @contextmanager
     def _ensureClipAndPushPath(self, canvas, path):
-        if self.currentPath is not None:
-            clipPath = self.currentPath
-            transform = self.currentTransform
-            with canvas.savedState(), self._pushPath(path), self._pushTransform(
-                Identity
-            ):
-                canvas.transform(transform)
+        clipPath = self.currentPath
+        transform = self.currentTransform
+        with canvas.savedState(), self._pushPath(path), self._pushTransform(
+            Identity
+        ):
+            canvas.transform(transform)
+            if clipPath is not None:
                 canvas.clipPath(clipPath)
-                yield
-        elif path is not None:
-            transform = self.currentTransform
-            with canvas.savedState(), self._pushPath(path), self._pushTransform(
-                Identity
-            ):
-                canvas.transform(transform)
-                yield
-        else:
             yield
 
     @contextmanager
