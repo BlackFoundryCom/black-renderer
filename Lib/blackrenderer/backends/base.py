@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
 
+
 class Canvas(ABC):
     @abstractmethod
     def __init__(self, context):
@@ -92,6 +93,7 @@ class Canvas(ABC):
         path.lineTo((x + w, y))
         path.closePath()
         return path
+
 
 class Surface(ABC):
     fileExtension = ".png"

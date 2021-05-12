@@ -10,22 +10,22 @@ def buildSweepGradientPatches(
     endAngle,
     useGouraudShading,
 ):
-    """Provides patches of colors to mimic a sweep gradient, for use, in
+    """Provides colorful patches that mimic a sweep gradient, for use, in
     particular, in the Cairo and CoreGraphics backends, since these libraries
     lack the sweep gradient feature."""
     patches = []
     # generate a fan of 'triangular' bezier patches, with center 'center' and radius 'radius'
-    degToRad = pi/180.0
+    degToRad = pi / 180.0
     if useGouraudShading:
-        maxAngle = pi/360.0
-        radius = 1.05 * radius # we will use straight-edged triangles
+        maxAngle = pi / 360.0
+        radius = 1.05 * radius  # we will use straight-edged triangles
     else:
-        maxAngle = pi/10.0
+        maxAngle = pi / 10.0
     n = len(colorLine)
     center = Vector(center)
-    for i in range(n-1):
-        a0, col0 = colorLine[i+0]
-        a1, col1 = colorLine[i+1]
+    for i in range(n - 1):
+        a0, col0 = colorLine[i + 0]
+        a1, col1 = colorLine[i + 1]
         col0 = Vector(col0)
         col1 = Vector(col1)
         a0 = degToRad * (startAngle + a0 * (endAngle - startAngle))
@@ -34,7 +34,7 @@ def buildSweepGradientPatches(
         p0 = Vector((cos(a0), sin(a0)))
         color0 = col0
         for a in range(numSplits):
-            k = ((a + 1.0) / numSplits)
+            k = (a + 1.0) / numSplits
             angle1 = a0 + k * (a1 - a0)
             color1 = col0 + k * (col1 - col0)
             p1 = Vector((cos(angle1), sin(angle1)))
@@ -46,7 +46,7 @@ def buildSweepGradientPatches(
             else:
                 # compute cubic Bezier antennas (control points) so as to approximate the circular arc p0-p1
                 A = (p0 + p1).normalized()
-                U = Vector((-A[1], A[0])) # tangent to circle at A
+                U = Vector((-A[1], A[0]))  # tangent to circle at A
                 C0 = A + ((p0 - A).dot(p0) / U.dot(p0)) * U
                 C1 = A + ((p1 - A).dot(p1) / U.dot(p1)) * U
                 C0 = center + radius * (C0 + 0.33333 * (C0 - p0))

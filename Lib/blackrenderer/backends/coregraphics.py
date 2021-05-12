@@ -6,6 +6,7 @@ import Quartz as CG
 from .base import Canvas, Surface
 from .sweepGradient import buildSweepGradientPatches
 
+
 class CoreGraphicsPathPen(BasePen):
     def __init__(self):
         super().__init__(None)
@@ -126,6 +127,7 @@ class CoreGraphicsCanvas(Canvas):
         gradientTransform,
     ):
         from math import sqrt
+
         if self.clipIsEmpty or CG.CGPathGetBoundingBox(path.path) == CG.CGRectNull:
             return
         with self.savedState():
@@ -141,7 +143,9 @@ class CoreGraphicsCanvas(Canvas):
             maxY = max(d * d for d in (y1 - center[1], y2 - center[1]))
             R = sqrt(maxX + maxY)
             # compute the triangle fan approximating the sweep gradient
-            patches = buildSweepGradientPatches(colorLine, center, R, startAngle, endAngle, useGouraudShading=True)
+            patches = buildSweepGradientPatches(
+                colorLine, center, R, startAngle, endAngle, useGouraudShading=True
+            )
             CG.CGContextSetAllowsAntialiasing(self.context, False)
             for (P0, color0), (P1, color1) in patches:
                 color = 0.5 * (color0 + color1)
