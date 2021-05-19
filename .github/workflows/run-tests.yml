@@ -42,3 +42,9 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
+    - name: Storing Test Data Artifacts
+      if: failure()
+      uses: actions/upload-artifact@master
+      with:
+        name: FailingImageOutput
+        path: ./Tests/tmpOutput
