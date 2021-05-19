@@ -107,6 +107,11 @@ class CairoCanvas(Canvas):
         extendMode,
         gradientTransform,
     ):
+        self.context.save()
+        self.context.new_path()
+        path.replay(self._pen)
+        self.context.clip()
+        self.transform(gradientTransform)
         # alloc the mesh pattern
         pat = cairo.MeshPattern()
         # find current path' extent
@@ -131,6 +136,7 @@ class CairoCanvas(Canvas):
             pat.end_patch()
         self.context.set_source(pat)
         self.context.paint()
+        self.context.restore()
 
     # TODO: blendMode for PaintComposite)
 
