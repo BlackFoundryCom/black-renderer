@@ -77,7 +77,7 @@ class SkiaCanvas(Canvas):
             mode=_extendModeMap[extendMode],
             localMatrix=matrix,
         )
-        self.canvas.drawPath(path.path, skia.Paint(Shader=shader))
+        self.canvas.drawPath(path.path, skia.Paint(AntiAlias=True, Shader=shader))
 
     def drawPathRadialGradient(
         self,
@@ -103,7 +103,7 @@ class SkiaCanvas(Canvas):
             mode=_extendModeMap[extendMode],
             localMatrix=matrix,
         )
-        self.canvas.drawPath(path.path, skia.Paint(Shader=shader))
+        self.canvas.drawPath(path.path, skia.Paint(AntiAlias=True, Shader=shader))
 
     def drawPathSweepGradient(
         self,
@@ -128,7 +128,7 @@ class SkiaCanvas(Canvas):
             endAngle=endAngle,
             localMatrix=matrix,
         )
-        self.canvas.drawPath(path.path, skia.Paint(Shader=shader))
+        self.canvas.drawPath(path.path, skia.Paint(AntiAlias=True, Shader=shader))
 
     # TODO: blendMode for PaintComposite
 
