@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='ASCII'?>
 <svg width="1142" height="1136" preserveAspectRatio="xMinYMin slice" viewBox="68 -218 1142 1136" version="1.1" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <radialGradient id="gradient_0" spreadMethod="pad" gradientUnits="userSpaceOnUse" fx="-862" fy="291" fr="0" cx="-862" cy="291" r="111" gradientTransform="matrix(-0.7071,0.7071,0.7071,0.7071,-607.7287,251.7388)">
+    <radialGradient id="gradient_0" spreadMethod="pad" gradientUnits="userSpaceOnUse" fx="-254" fy="39" fr="0" cx="-254" cy="39" r="111" gradientTransform="matrix(-0.7071,0.7071,0.7071,0.7071,0,0)">
       <stop offset="0%" stop-color="#CCCED4"/>
       <stop offset="100%" stop-color="#918F99"/>
     </radialGradient>
-    <radialGradient id="gradient_1" spreadMethod="pad" gradientUnits="userSpaceOnUse" fx="-810" fy="582" fr="0" cx="-810" cy="582" r="165" gradientTransform="matrix(-0.7071,0.7071,0.7071,0.7071,-607.7287,251.7388)">
+    <radialGradient id="gradient_1" spreadMethod="pad" gradientUnits="userSpaceOnUse" fx="-203" fy="330" fr="0" cx="-203" cy="330" r="165" gradientTransform="matrix(-0.7071,0.7071,0.7071,0.7071,0,0)">
       <stop offset="0%" stop-color="#CCCED4"/>
       <stop offset="100%" stop-color="#918F99"/>
     </radialGradient>
@@ -22,7 +22,7 @@
       <stop offset="95%" stop-color="#3CB525"/>
       <stop offset="100%" stop-color="#3EC21F"/>
     </linearGradient>
-    <radialGradient id="gradient_4" spreadMethod="pad" gradientUnits="userSpaceOnUse" fx="-10" fy="-561" fr="0" cx="-10" cy="-561" r="111" gradientTransform="matrix(0.7071,0.7071,-0.7071,0.7071,682.7287,251.7388)">
+    <radialGradient id="gradient_4" spreadMethod="pad" gradientUnits="userSpaceOnUse" fx="650" fy="-865" fr="0" cx="650" cy="-865" r="111" gradientTransform="matrix(0.7071,0.7071,-0.7071,0.7071,0,0)">
       <stop offset="0%" stop-color="#88898D"/>
       <stop offset="100%" stop-color="#504F54"/>
     </radialGradient>
