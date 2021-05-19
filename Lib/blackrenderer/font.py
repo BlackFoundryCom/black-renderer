@@ -221,7 +221,7 @@ class BlackRendererFont:
 
     def _drawPaintColrGlyph(self, paint, canvas):
         with self._ensureClipAndPushPath(canvas, None):
-            self._drawGlyphCOLRv1(paint.Glyph, canvas)
+            self._drawGlyphCOLRv1(self.colrV1Glyphs[paint.Glyph], canvas)
 
     def _drawPaintTransform(self, paint, canvas):
         t = paint.Transform

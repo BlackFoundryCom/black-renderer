@@ -22,6 +22,7 @@ testFonts = {
     "noto": dataDir / "noto-glyf_colr_1.ttf",
     "mutator": dataDir / "MutatorSans.ttf",
     "twemoji": dataDir / "TwemojiMozilla.subset.default.3299.ttf",
+    "more_samples": dataDir / "more_samples-glyf_colr_1.ttf",
 }
 
 
@@ -33,6 +34,13 @@ test_glyphs = [
     ("mutator", "B", None),
     ("mutator", "D", {"wdth": 1000}),
     ("twemoji", "uni3299", None),
+    ("more_samples", "sweep", None),
+    # ("more_samples", "composite_colr_glyph", None),
+    ("more_samples", "linear_repeat_0_1", None),
+    ("more_samples", "linear_repeat_0.2_0.8", None),
+    ("more_samples", "linear_repeat_0_1.5", None),
+    ("more_samples", "linear_repeat_0.5_1.5", None),
+    ("more_samples", "transformed_sweep", None),
 ]
 
 
