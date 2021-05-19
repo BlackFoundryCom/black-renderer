@@ -2,6 +2,7 @@ import pathlib
 import pytest
 from blackrenderer.font import BlackRendererFont
 from blackrenderer.backends import getSurface
+from compareImages import compareImages
 
 
 testDir = pathlib.Path(__file__).resolve().parent
@@ -60,4 +61,5 @@ def test_renderGlyph(backendName, surfaceFactory, fontName, glyphName, location)
     expectedPath = expectedOutputDir / fileName
     outputPath = tmpOutputDir / fileName
     surface.saveImage(outputPath)
-    assert expectedPath.read_bytes() == outputPath.read_bytes()
+    diff = compareImages(expectedPath, outputPath)
+    assert diff < 0.0001, diff
