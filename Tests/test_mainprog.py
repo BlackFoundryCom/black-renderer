@@ -19,8 +19,6 @@ testData = [
 def test_mainprog(tmpdir, testString, fontPath, outputFormat):
     outputPath = os.path.join(tmpdir, "test" + outputFormat)
     args = [
-        "python",
-        "-m",
         "blackrenderer",
         os.fspath(fontPath),
         testString,
