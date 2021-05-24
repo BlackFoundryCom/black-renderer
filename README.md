@@ -22,7 +22,7 @@ Developing a Python-based renderer for OpenType COLRv1 fonts, with multiple back
 
 BlackRenderer comes with an hb-view-like command line tool, that can be used like this:
 
-    $ python -m blackrenderer font.ttf ABC🤩 output.png --font-size=100
+    $ blackrenderer font.ttf ABC🤩 output.png --font-size=100
 
 ## Install / Setting up an environment
 
