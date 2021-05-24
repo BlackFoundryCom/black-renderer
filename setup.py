@@ -45,4 +45,9 @@ setup(
         "cg": ["pyobjc; sys_platform == 'darwin'"],
     },
     setup_requires=["setuptools_scm"],
+    entry_points={
+        "console_scripts": [
+            "blackrenderer=blackrenderer.__main__:main",
+        ],
+    },
 )
