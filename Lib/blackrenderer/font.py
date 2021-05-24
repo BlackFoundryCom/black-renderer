@@ -282,6 +282,9 @@ class BlackRendererFont:
     def _pushNormalizedLocation(self, location):
         orgAxisValues = self.hbFont.get_var_coords_normalized()
         tmpAxisValues = list(orgAxisValues)
+        if len(tmpAxisValues) < len(self.axisTags):
+            # pad with zeros
+            tmpAxisValues.extend([0] * (len(self.axisTags) - len(tmpAxisValues)))
         for axisIndex, axisTag in enumerate(self.axisTags):
             axisValue = location.get(axisTag)
             if axisValue is not None:
