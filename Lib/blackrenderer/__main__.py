@@ -1,6 +1,7 @@
 import argparse
 import os
 import pathlib
+import re
 from .render import renderText
 
 
@@ -16,6 +17,7 @@ def main():
         "or '-', to print SVG to stdout",
     )
     parser.add_argument("--font-size", type=float, default=250)
+    parser.add_argument("--features", type=parseFeatures)
     parser.add_argument("--variations", type=parseVariations)
     parser.add_argument("--margin", type=float, default=20)
     parser.add_argument(
@@ -31,6 +33,7 @@ def main():
         args.output,
         fontSize=args.font_size,
         margin=args.margin,
+        features=args.features,
         variations=args.variations,
         pngSurfaceName=args.backend,
     )
@@ -66,6 +69,26 @@ def parseVariations(string):
             axisTag += " " * (4 - len(axisTag))
         location[axisTag] = axisValue
     return location
+
+
+feaPat = re.compile(r"(\+|-)?(\w+)(\[(\d+)\])?$")  # kern,-calt,+liga,aalt[2]
+
+
+def parseFeatures(src):
+    features = {}
+    for part in src.split(","):
+        m = feaPat.match(part.strip())
+        if m is None:
+            raise ValueError(part)
+        sign, featureTag, _, altIndex = m.groups()
+        if sign == "-":
+            value = False
+        elif altIndex:
+            value = int(altIndex)  # catch ValueError
+        else:
+            value = True
+        features[featureTag] = value
+    return features
 
 
 if __name__ == "__main__":
