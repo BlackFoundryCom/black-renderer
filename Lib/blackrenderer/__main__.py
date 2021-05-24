@@ -71,7 +71,7 @@ def parseVariations(string):
     return location
 
 
-feaPat = re.compile(r"(\+|-)?(\w+)(\[(\d+)\])?$")  # kern,-calt,+liga,aalt[2]
+feaPat = re.compile(r"(\+|-)?(\w+)(=(\d+))?$")  # kern,-calt,+liga,aalt=2
 
 
 def parseFeatures(src):
