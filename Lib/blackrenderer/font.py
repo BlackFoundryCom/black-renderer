@@ -1,3 +1,4 @@
+from collections import UserList
 from contextlib import contextmanager
 from io import BytesIO
 import math
@@ -431,7 +432,7 @@ class PaintVarWrapper:
         self._instancer = instancer
 
     def __repr__(self):
-        return f"PaintVarWrapper({self.obj!r})"
+        return f"PaintVarWrapper({self._wrappedPaint!r})"
 
     def __getattr__(self, attrName):
         value = getattr(self._wrappedPaint, attrName)
@@ -445,6 +446,6 @@ class PaintVarWrapper:
                 value = value.value
         elif type(value).__name__.startswith("Var"):
             value = PaintVarWrapper(value, self._instancer)
-        elif isinstance(value, list):
+        elif isinstance(value, (list, UserList)):
             value = [PaintVarWrapper(item, self._instancer) for item in value]
         return value
