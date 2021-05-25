@@ -26,7 +26,7 @@ BlackRenderer comes with an hb-view-like command line tool, that can be used lik
 
 ## Install / Setting up an environment
 
-Have Python 3.7 or higher installed, preferably from [python.org](https://www.python.org)
+Have Python 3.7 or higher installed.
 
 Open Terminal.
 
