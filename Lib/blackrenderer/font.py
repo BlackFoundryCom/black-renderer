@@ -54,9 +54,10 @@ class BlackRendererFont:
 
         if "CPAL" in self.ttFont:
             self.palettes = _unpackPalettes(self.ttFont["CPAL"].palettes)
+            self.currentPalette = self.palettes[0]
         else:
             self.palettes = None
-        self.paletteIndex = 0
+            self.currentPalette = None
 
         if "fvar" in self.ttFont:
             self.axisTags = [a.axisTag for a in self.ttFont["fvar"].axes]
@@ -346,11 +347,14 @@ class BlackRendererFont:
         return x, y, w, h
 
     def _getColor(self, colorIndex, alpha):
-        if colorIndex == 0xFFFF:
-            # TODO: find text foreground color
+        if (
+            colorIndex == 0xFFFF
+            or self.currentPalette is None
+            or colorIndex >= len(self.currentPalette)
+        ):
             r, g, b, a = self.textColor
         else:
-            r, g, b, a = self.palettes[self.paletteIndex][colorIndex]
+            r, g, b, a = self.currentPalette[colorIndex]
         a *= alpha
         return r, g, b, a
 
