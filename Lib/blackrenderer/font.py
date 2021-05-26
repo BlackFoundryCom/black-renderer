@@ -81,6 +81,13 @@ class BlackRendererFont:
             )
             self.instancer.setLocation(normalizedLocation)
 
+    @contextmanager
+    def pushPalette(self, palette):
+        savedPalette = self.currentPalette
+        self.currentPalette = palette
+        yield
+        self.currentPalette = savedPalette
+
     @property
     def glyphNames(self):
         return self.ttFont.getGlyphOrder()
