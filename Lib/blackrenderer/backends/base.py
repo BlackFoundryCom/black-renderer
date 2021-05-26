@@ -3,9 +3,8 @@ from contextlib import contextmanager
 
 
 class Canvas(ABC):
-    @staticmethod
     @abstractmethod
-    def newPath():
+    def newPath(self):
         ...
 
     @abstractmethod
