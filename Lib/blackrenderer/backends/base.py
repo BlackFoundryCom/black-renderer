@@ -3,10 +3,6 @@ from contextlib import contextmanager
 
 
 class Canvas(ABC):
-    @abstractmethod
-    def __init__(self, context):
-        ...
-
     @staticmethod
     @abstractmethod
     def newPath():
