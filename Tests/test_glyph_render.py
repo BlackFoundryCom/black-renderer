@@ -78,7 +78,13 @@ def test_boundsCanvas():
     canvas = BoundsCanvas()
     font.drawGlyph("A", canvas)
     assert (20, 0, 376, 700) == canvas.bounds
+
     font.setLocation({"wdth": 1000})
     canvas = BoundsCanvas()
     font.drawGlyph("A", canvas)
     assert (50, 0, 1140, 700) == canvas.bounds
+
+    font = BlackRendererFont(testFonts["more_samples"])
+    canvas = BoundsCanvas()
+    font.drawGlyph("transformed_sweep", canvas)
+    assert (317, 154, 1183, 846) == tuple(round(v) for v in canvas.bounds)

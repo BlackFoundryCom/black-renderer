@@ -103,7 +103,6 @@ class BoundsCanvas(PathCollectorCanvas):
         points = path.points
         if self.currentTransform != Identity:
             points = self.currentTransform.transformPoints(points)
-            path = transformPath(path, self.currentTransform)
         self.points.extend(points)
 
     def newPath(self):
