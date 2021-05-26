@@ -281,8 +281,8 @@ class BlackRendererFont:
 
     @contextmanager
     def _pushNormalizedLocation(self, location):
-        orgAxisValues = self.hbFont.get_var_coords_normalized()
-        tmpAxisValues = list(orgAxisValues)
+        savedAxisValues = self.hbFont.get_var_coords_normalized()
+        tmpAxisValues = list(savedAxisValues)
         if len(tmpAxisValues) < len(self.axisTags):
             # pad with zeros
             tmpAxisValues.extend([0] * (len(self.axisTags) - len(tmpAxisValues)))
@@ -294,17 +294,17 @@ class BlackRendererFont:
 
         self.hbFont.set_var_coords_normalized(tmpAxisValues)
         if self.instancer is not None:
-            orgLocation = self.instancer.location
+            savedLocation = self.instancer.location
             # FIXME: calling setLocation loses the internal instancer._scalars cache;
             # perhaps a pushing a *new* instancer and reverting to the old one is
             # faster, but this is currently not possible due to PaintVarXxx referencing
             # self.instancer, too.
             self.instancer.setLocation(tmpLocation)
             yield
-            self.instancer.setLocation(orgLocation)
+            self.instancer.setLocation(savedLocation)
         else:
             yield
-        self.hbFont.set_var_coords_normalized(orgAxisValues)
+        self.hbFont.set_var_coords_normalized(savedAxisValues)
 
     @contextmanager
     def _ensureClipAndPushPath(self, canvas, path):
@@ -323,9 +323,9 @@ class BlackRendererFont:
 
     @contextmanager
     def _savedTransform(self):
-        currentTransform = self.currentTransform
+        savedTransform = self.currentTransform
         yield
-        self.currentTransform = currentTransform
+        self.currentTransform = savedTransform
 
     def _applyTransform(self, transform, paint, canvas):
         self.currentTransform = self.currentTransform.transform(transform)
