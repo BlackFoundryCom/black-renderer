@@ -2,6 +2,7 @@ import pathlib
 import pytest
 from blackrenderer.font import BlackRendererFont
 from blackrenderer.backends import getSurface
+from blackrenderer.backends.pathCollector import BoundsCanvas, PathCollectorCanvas
 from compareImages import compareImages
 
 
@@ -63,3 +64,22 @@ def test_renderGlyph(backendName, surfaceFactory, fontName, glyphName, location)
     surface.saveImage(outputPath)
     diff = compareImages(expectedPath, outputPath)
     assert diff < 0.0001, diff
+
+
+def test_pathCollector():
+    font = BlackRendererFont(testFonts["noto"])
+    canvas = PathCollectorCanvas()
+    font.drawGlyph("uni2693", canvas)
+    assert len(canvas.paths) == 1
+    assert 0, canvas.paths[0].value
+
+
+def test_boundsCanvas():
+    font = BlackRendererFont(testFonts["mutator"])
+    canvas = BoundsCanvas()
+    font.drawGlyph("A", canvas)
+    assert (20, 0, 376, 700) == canvas.bounds
+    font.setLocation({"wdth": 1000})
+    canvas = BoundsCanvas()
+    font.drawGlyph("A", canvas)
+    assert (50, 0, 1140, 700) == canvas.bounds
