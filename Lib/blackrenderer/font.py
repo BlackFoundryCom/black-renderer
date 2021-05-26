@@ -21,11 +21,11 @@ PAINT_VAR_MAPPING = {
 
 
 class BlackRendererFont:
-    def __init__(self, path):
+    def __init__(self, path, lazy=True):
         with open(path, "rb") as f:
             fontData = f.read()
         file = BytesIO(fontData)
-        self.ttFont = TTFont(file, lazy=True)
+        self.ttFont = TTFont(file, lazy=lazy)
 
         self.textColor = (0, 0, 0, 1)
         self.colrV0Glyphs = {}
