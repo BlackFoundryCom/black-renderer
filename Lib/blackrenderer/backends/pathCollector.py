@@ -8,6 +8,9 @@ from .base import Canvas
 
 class PathCollectorCanvas(Canvas):
     def __init__(self):
+        self.init()
+
+    def init(self):
         self.paths = []
         self.currentTransform = Identity
 
@@ -88,7 +91,7 @@ class PointCollector:
 
 
 class BoundsCanvas(PathCollectorCanvas):
-    def __init__(self):
+    def init(self):
         self.points = []
         self.currentTransform = Identity
 
