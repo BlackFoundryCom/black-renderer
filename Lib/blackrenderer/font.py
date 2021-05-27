@@ -1,6 +1,7 @@
 from collections import UserList
 from contextlib import contextmanager
 from io import BytesIO
+import logging
 import math
 from fontTools.misc.transform import Transform, Identity
 from fontTools.misc.arrayTools import unionRect
@@ -9,6 +10,9 @@ from fontTools.ttLib.tables.otTables import PaintFormat, VariableValue
 from fontTools.ttLib.tables.otConverters import VarF2Dot14, VarFixed
 from fontTools.varLib.varStore import VarStoreInstancer
 import uharfbuzz as hb
+
+
+logger = logging.getLogger(__name__)
 
 
 PAINT_NAMES = {v.value: k for k, v in PaintFormat.__members__.items()}
@@ -146,7 +150,10 @@ class BlackRendererFont:
         nonVarFormat = PAINT_VAR_MAPPING.get(paint.Format)
         if nonVarFormat is None:
             # "regular" Paint
-            paintName = PAINT_NAMES[paint.Format]
+            paintName = PAINT_NAMES.get(paint.Format)
+            if paintName is None:
+                logger.warning(f"Ignoring unknown COLRv1 Paint format: {paint.Format}")
+                return
         else:
             # PaintVar -- we map to its non-var counterpart and use a wrapper
             # that takes care of instantiating values
