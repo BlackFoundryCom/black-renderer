@@ -81,13 +81,6 @@ class BlackRendererFont:
             )
             self.instancer.setLocation(normalizedLocation)
 
-    @contextmanager
-    def pushPalette(self, palette):
-        savedPalette = self.currentPalette
-        self.currentPalette = palette
-        yield
-        self.currentPalette = savedPalette
-
     @property
     def glyphNames(self):
         return self.ttFont.getGlyphOrder()
@@ -114,7 +107,11 @@ class BlackRendererFont:
                     bounds = unionRect(layerBounds, bounds)
         return bounds
 
-    def drawGlyph(self, glyphName, canvas):
+    def drawGlyph(self, glyphName, canvas, palette=None, textColor=(0, 0, 0, 1)):
+        if palette is None and self.palettes:
+            self.currentPalette = self.palettes[0]
+        self.textColor = textColor
+
         glyph = self.colrV1Glyphs.get(glyphName)
         if glyph is not None:
             self.currentTransform = Identity
