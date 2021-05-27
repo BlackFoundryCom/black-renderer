@@ -1,4 +1,4 @@
-[![Python package](https://github.com/BlackFoundryCom/black-renderer/actions/workflows/run-tests.yml/badge.svg)](https://github.com/BlackFoundryCom/black-renderer/actions/workflows/run-tests.yml)
+[![Python package](https://github.com/BlackFoundryCom/black-renderer/actions/workflows/ci.yml/badge.svg)](https://github.com/BlackFoundryCom/black-renderer/actions/workflows/ci.yml)
 
 # BlackRenderer
 
