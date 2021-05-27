@@ -107,9 +107,10 @@ class BlackRendererFont:
                     bounds = unionRect(layerBounds, bounds)
         return bounds
 
-    def drawGlyph(self, glyphName, canvas, palette=None, textColor=(0, 0, 0, 1)):
+    def drawGlyph(self, glyphName, canvas, *, palette=None, textColor=(0, 0, 0, 1)):
         if palette is None and self.palettes:
-            self.currentPalette = self.palettes[0]
+            palette = self.palettes[0]
+        self.currentPalette = palette
         self.textColor = textColor
 
         glyph = self.colrV1Glyphs.get(glyphName)
