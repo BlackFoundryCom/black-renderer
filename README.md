@@ -4,7 +4,7 @@
 
 Developing a Python-based renderer for OpenType COLRv1 fonts, with multiple backends.
 
-![Big Smiley Face Icon](smile.png)
+![Big Smiley Face Icon](https://github.com/BlackFoundryCom/black-renderer/blob/master/image.jpg?raw=true)
 
 ## Goals
 
