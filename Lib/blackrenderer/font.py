@@ -6,7 +6,7 @@ import math
 from fontTools.misc.transform import Transform, Identity
 from fontTools.misc.arrayTools import unionRect
 from fontTools.ttLib import TTFont
-from fontTools.ttLib.tables.otTables import PaintFormat, VariableValue
+from fontTools.ttLib.tables.otTables import CompositeMode, PaintFormat, VariableValue
 from fontTools.ttLib.tables.otConverters import VarF2Dot14, VarFixed
 from fontTools.varLib.varStore import VarStoreInstancer
 import uharfbuzz as hb
@@ -271,13 +271,12 @@ class BlackRendererFont:
         self._applyTransform(transform, paint.Paint, canvas)
 
     def _drawPaintComposite(self, paint, canvas):
-        with self._ensureClipAndPushPath(canvas, None):
-            print("_drawPaintComposite")
-        # print("Composite with CompositeMode=", paint.CompositeMode)
-        # print("Composite source:")
-        # ppPaint(paint.SourcePaint, tab+1)
-        # print("Composite backdrop:")
-        # ppPaint(paint.BackdropPaint, tab+1)
+        with canvas.compositeMode(CompositeMode.SRC_OVER):
+            with self._ensureClipAndPushPath(canvas, None):
+                self._drawPaint(paint.BackdropPaint, canvas)
+            with canvas.compositeMode(paint.CompositeMode):
+                with self._ensureClipAndPushPath(canvas, None):
+                    self._drawPaint(paint.SourcePaint, canvas)
 
     def _drawPaintLocation(self, paint, canvas):
         # https://github.com/googlefonts/colr-gradients-spec/issues/277

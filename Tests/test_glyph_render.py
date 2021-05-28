@@ -37,7 +37,7 @@ test_glyphs = [
     ("mutator", "D", {"wdth": 1000}),
     ("twemoji", "uni3299", None),
     ("more_samples", "sweep", None),
-    # ("more_samples", "composite_colr_glyph", None),
+    ("more_samples", "composite_colr_glyph", None),
     ("more_samples", "linear_repeat_0_1", None),
     ("more_samples", "linear_repeat_0.2_0.8", None),
     ("more_samples", "linear_repeat_0_1.5", None),
