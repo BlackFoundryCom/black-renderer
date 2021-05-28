@@ -146,6 +146,7 @@ class CoreGraphicsCanvas(Canvas):
             patches = buildSweepGradientPatches(
                 colorLine, center, R, startAngle, endAngle, useGouraudShading=True
             )
+            CG.CGContextBeginTransparencyLayer(self.context, None)
             CG.CGContextSetAllowsAntialiasing(self.context, False)
             for (P0, color0), (P1, color1) in patches:
                 color = 0.5 * (color0 + color1)
@@ -155,6 +156,7 @@ class CoreGraphicsCanvas(Canvas):
                 CG.CGContextSetRGBFillColor(self.context, *color)
                 CG.CGContextFillPath(self.context)
             CG.CGContextSetAllowsAntialiasing(self.context, True)
+            CG.CGContextEndTransparencyLayer(self.context)
 
     # TODO: blendMode for PaintComposite
 
