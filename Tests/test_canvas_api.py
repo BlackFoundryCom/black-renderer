@@ -3,6 +3,7 @@ import pytest
 from fontTools.misc.transform import Identity
 from fontTools.ttLib.tables.otTables import CompositeMode, ExtendMode
 from blackrenderer.backends import getSurface
+from compareImages import compareImages
 
 
 testDir = pathlib.Path(__file__).resolve().parent
@@ -131,4 +132,5 @@ def test_compositeMode(backendName, surfaceFactory, compositeMode):
     expectedPath = expectedOutputDir / fileName
     outputPath = tmpOutputDir / fileName
     surface.saveImage(outputPath)
-    assert expectedPath.read_bytes() == outputPath.read_bytes()
+    diff = compareImages(expectedPath, outputPath)
+    assert diff < 0.0001, diff
