@@ -10,7 +10,7 @@ from .sweepGradient import buildSweepGradientPatches
 _compositeModeMap = {
     CompositeMode.CLEAR: CG.kCGBlendModeClear,
     CompositeMode.SRC: CG.kCGBlendModeCopy,
-    CompositeMode.DEST: CG.kCGBlendModeNormal,  # FIXME: this is wrong, but I can't find the appropriate CG blend mode
+    CompositeMode.DEST: CG.kCGBlendModeNormal,  # This is wrong, but is worked around in canvas.compositeMode()
     CompositeMode.SRC_OVER: CG.kCGBlendModeNormal,
     CompositeMode.DEST_OVER: CG.kCGBlendModeDestinationOver,
     CompositeMode.SRC_IN: CG.kCGBlendModeSourceIn,
@@ -79,7 +79,13 @@ class CoreGraphicsCanvas(Canvas):
     @contextmanager
     def compositeMode(self, compositeMode):
         CG.CGContextSaveGState(self.context)
-        CG.CGContextSetBlendMode(self.context, _compositeModeMap[compositeMode])
+        if compositeMode == CompositeMode.DEST:
+            # Workaround for CG not having a blend mode corresponding
+            # with CompositeMode.DEST. Setting alpha to 0 should be
+            # equivalent.
+            CG.CGContextSetAlpha(self.context, 0.0)
+        else:
+            CG.CGContextSetBlendMode(self.context, _compositeModeMap[compositeMode])
         CG.CGContextBeginTransparencyLayer(self.context, None)
         yield
         CG.CGContextEndTransparencyLayer(self.context)
