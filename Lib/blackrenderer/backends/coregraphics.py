@@ -1,10 +1,41 @@
 from contextlib import contextmanager
 import os
 from fontTools.pens.basePen import BasePen
-from fontTools.ttLib.tables.otTables import ExtendMode
+from fontTools.ttLib.tables.otTables import CompositeMode, ExtendMode
 import Quartz as CG
 from .base import Canvas, Surface
 from .sweepGradient import buildSweepGradientPatches
+
+
+_compositeModeMap = {
+    CompositeMode.CLEAR: CG.kCGBlendModeClear,
+    CompositeMode.SRC: CG.kCGBlendModeCopy,
+    CompositeMode.DEST: CG.kCGBlendModeNormal,  # This is wrong, but is worked around in canvas.compositeMode()
+    CompositeMode.SRC_OVER: CG.kCGBlendModeNormal,
+    CompositeMode.DEST_OVER: CG.kCGBlendModeDestinationOver,
+    CompositeMode.SRC_IN: CG.kCGBlendModeSourceIn,
+    CompositeMode.DEST_IN: CG.kCGBlendModeDestinationIn,
+    CompositeMode.SRC_OUT: CG.kCGBlendModeSourceOut,
+    CompositeMode.DEST_OUT: CG.kCGBlendModeDestinationOut,
+    CompositeMode.SRC_ATOP: CG.kCGBlendModeSourceAtop,
+    CompositeMode.DEST_ATOP: CG.kCGBlendModeDestinationAtop,
+    CompositeMode.XOR: CG.kCGBlendModeXOR,
+    CompositeMode.SCREEN: CG.kCGBlendModeScreen,
+    CompositeMode.OVERLAY: CG.kCGBlendModeOverlay,
+    CompositeMode.DARKEN: CG.kCGBlendModeDarken,
+    CompositeMode.LIGHTEN: CG.kCGBlendModeLighten,
+    CompositeMode.COLOR_DODGE: CG.kCGBlendModeColorDodge,
+    CompositeMode.COLOR_BURN: CG.kCGBlendModeColorBurn,
+    CompositeMode.HARD_LIGHT: CG.kCGBlendModeHardLight,
+    CompositeMode.SOFT_LIGHT: CG.kCGBlendModeSoftLight,
+    CompositeMode.DIFFERENCE: CG.kCGBlendModeDifference,
+    CompositeMode.EXCLUSION: CG.kCGBlendModeExclusion,
+    CompositeMode.MULTIPLY: CG.kCGBlendModeMultiply,
+    CompositeMode.HSL_HUE: CG.kCGBlendModeHue,
+    CompositeMode.HSL_SATURATION: CG.kCGBlendModeSaturation,
+    CompositeMode.HSL_COLOR: CG.kCGBlendModeColor,
+    CompositeMode.HSL_LUMINOSITY: CG.kCGBlendModeLuminosity,
+}
 
 
 class CoreGraphicsPathPen(BasePen):
@@ -44,6 +75,21 @@ class CoreGraphicsCanvas(Canvas):
         yield
         CG.CGContextRestoreGState(self.context)
         self.clipIsEmpty = clipIsEmpty
+
+    @contextmanager
+    def compositeMode(self, compositeMode):
+        CG.CGContextSaveGState(self.context)
+        if compositeMode == CompositeMode.DEST:
+            # Workaround for CG not having a blend mode corresponding
+            # with CompositeMode.DEST. Setting alpha to 0 should be
+            # equivalent.
+            CG.CGContextSetAlpha(self.context, 0.0)
+        else:
+            CG.CGContextSetBlendMode(self.context, _compositeModeMap[compositeMode])
+        CG.CGContextBeginTransparencyLayer(self.context, None)
+        yield
+        CG.CGContextEndTransparencyLayer(self.context)
+        CG.CGContextRestoreGState(self.context)
 
     def transform(self, transform):
         CG.CGContextConcatCTM(self.context, transform)

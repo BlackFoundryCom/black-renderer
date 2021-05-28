@@ -1,8 +1,9 @@
 import pathlib
 import pytest
 from fontTools.misc.transform import Identity
-from fontTools.ttLib.tables.otTables import ExtendMode
+from fontTools.ttLib.tables.otTables import CompositeMode, ExtendMode
 from blackrenderer.backends import getSurface
+from compareImages import compareImages
 
 
 testDir = pathlib.Path(__file__).resolve().parent
@@ -83,3 +84,53 @@ def test_sweepGradient(backendName, surfaceFactory, extend):
     outputPath = tmpOutputDir / fileName
     surface.saveImage(outputPath)
     assert expectedPath.read_bytes() == outputPath.read_bytes()
+
+
+test_compositeModes = [
+    CompositeMode.CLEAR,
+    CompositeMode.SRC,
+    CompositeMode.DEST,
+    CompositeMode.SRC_OVER,
+    CompositeMode.DEST_OVER,
+    CompositeMode.SRC_IN,
+    CompositeMode.DEST_IN,
+    CompositeMode.SRC_OUT,
+    CompositeMode.DEST_OUT,
+    CompositeMode.SRC_ATOP,
+    CompositeMode.DEST_ATOP,
+    CompositeMode.XOR,
+    CompositeMode.SCREEN,
+    CompositeMode.OVERLAY,
+    CompositeMode.DARKEN,
+    CompositeMode.LIGHTEN,
+    CompositeMode.COLOR_DODGE,
+    CompositeMode.COLOR_BURN,
+    CompositeMode.HARD_LIGHT,
+    CompositeMode.SOFT_LIGHT,
+    CompositeMode.DIFFERENCE,
+    CompositeMode.EXCLUSION,
+    CompositeMode.MULTIPLY,
+    CompositeMode.HSL_HUE,
+    CompositeMode.HSL_SATURATION,
+    CompositeMode.HSL_COLOR,
+    CompositeMode.HSL_LUMINOSITY,
+]
+
+
+@pytest.mark.parametrize("compositeMode", test_compositeModes)
+@pytest.mark.parametrize("backendName, surfaceFactory", backends)
+def test_compositeMode(backendName, surfaceFactory, compositeMode):
+    H, W = 400, 400
+    surface = surfaceFactory(0, 0, H, W)
+    canvas = surface.canvas
+    canvas.drawRectSolid((50, 50, 200, 200), (1, 0.2, 0, 1))
+    with canvas.compositeMode(compositeMode):
+        canvas.drawRectSolid((150, 150, 200, 200), (0, 0.2, 1, 1))
+    ext = surface.fileExtension
+    compositeModeName = compositeMode.name.replace("_", "")  # nicer file sorting
+    fileName = f"compositeMode_{compositeModeName}_{backendName}{ext}"
+    expectedPath = expectedOutputDir / fileName
+    outputPath = tmpOutputDir / fileName
+    surface.saveImage(outputPath)
+    diff = compareImages(expectedPath, outputPath)
+    assert diff < 0.00013, diff

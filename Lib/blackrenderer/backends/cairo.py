@@ -3,10 +3,42 @@ import os
 from math import sqrt
 from fontTools.pens.basePen import BasePen
 from fontTools.pens.recordingPen import RecordingPen
-from fontTools.ttLib.tables.otTables import ExtendMode
+from fontTools.ttLib.tables.otTables import CompositeMode, ExtendMode
 import cairo
 from .base import Canvas, Surface
 from .sweepGradient import buildSweepGradientPatches
+
+
+_compositeModeMap = {
+    CompositeMode.CLEAR: cairo.OPERATOR_CLEAR,
+    CompositeMode.SRC: cairo.OPERATOR_SOURCE,
+    CompositeMode.DEST: cairo.OPERATOR_DEST,
+    CompositeMode.SRC_OVER: cairo.OPERATOR_OVER,
+    CompositeMode.DEST_OVER: cairo.OPERATOR_DEST_OVER,
+    CompositeMode.SRC_IN: cairo.OPERATOR_IN,
+    CompositeMode.DEST_IN: cairo.OPERATOR_DEST_IN,
+    CompositeMode.SRC_OUT: cairo.OPERATOR_OUT,
+    CompositeMode.DEST_OUT: cairo.OPERATOR_DEST_OUT,
+    CompositeMode.SRC_ATOP: cairo.OPERATOR_ATOP,
+    CompositeMode.DEST_ATOP: cairo.OPERATOR_DEST_ATOP,
+    CompositeMode.XOR: cairo.OPERATOR_XOR,
+    CompositeMode.SCREEN: cairo.OPERATOR_SCREEN,
+    CompositeMode.OVERLAY: cairo.OPERATOR_OVERLAY,
+    CompositeMode.DARKEN: cairo.OPERATOR_DARKEN,
+    CompositeMode.LIGHTEN: cairo.OPERATOR_LIGHTEN,
+    CompositeMode.COLOR_DODGE: cairo.OPERATOR_COLOR_DODGE,
+    CompositeMode.COLOR_BURN: cairo.OPERATOR_COLOR_BURN,
+    CompositeMode.HARD_LIGHT: cairo.OPERATOR_HARD_LIGHT,
+    CompositeMode.SOFT_LIGHT: cairo.OPERATOR_SOFT_LIGHT,
+    CompositeMode.DIFFERENCE: cairo.OPERATOR_DIFFERENCE,
+    CompositeMode.EXCLUSION: cairo.OPERATOR_EXCLUSION,
+    CompositeMode.MULTIPLY: cairo.OPERATOR_MULTIPLY,
+    CompositeMode.HSL_HUE: cairo.OPERATOR_HSL_HUE,
+    CompositeMode.HSL_SATURATION: cairo.OPERATOR_HSL_SATURATION,
+    CompositeMode.HSL_COLOR: cairo.OPERATOR_HSL_COLOR,
+    CompositeMode.HSL_LUMINOSITY: cairo.OPERATOR_HSL_LUMINOSITY,
+}
+
 
 _extendModeMap = {
     ExtendMode.PAD: cairo.Extend.PAD,
@@ -47,6 +79,14 @@ class CairoCanvas(Canvas):
         self.context.save()
         yield
         self.context.restore()
+
+    @contextmanager
+    def compositeMode(self, compositeMode):
+        self.context.push_group()
+        yield
+        self.context.pop_group_to_source()
+        self.context.set_operator(_compositeModeMap[compositeMode])
+        self.context.paint()
 
     def transform(self, transform):
         m = cairo.Matrix()

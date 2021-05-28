@@ -1,9 +1,40 @@
 from contextlib import contextmanager
 import os
 from fontTools.pens.basePen import BasePen
-from fontTools.ttLib.tables.otTables import ExtendMode
+from fontTools.ttLib.tables.otTables import CompositeMode, ExtendMode
 import skia
 from .base import Canvas, Surface
+
+
+_compositeModeMap = {
+    CompositeMode.CLEAR: skia.BlendMode.kClear,
+    CompositeMode.SRC: skia.BlendMode.kSrc,
+    CompositeMode.DEST: skia.BlendMode.kDst,
+    CompositeMode.SRC_OVER: skia.BlendMode.kSrcOver,
+    CompositeMode.DEST_OVER: skia.BlendMode.kDstOver,
+    CompositeMode.SRC_IN: skia.BlendMode.kSrcIn,
+    CompositeMode.DEST_IN: skia.BlendMode.kDstIn,
+    CompositeMode.SRC_OUT: skia.BlendMode.kSrcOut,
+    CompositeMode.DEST_OUT: skia.BlendMode.kDstOut,
+    CompositeMode.SRC_ATOP: skia.BlendMode.kSrcATop,
+    CompositeMode.DEST_ATOP: skia.BlendMode.kDstATop,
+    CompositeMode.XOR: skia.BlendMode.kXor,
+    CompositeMode.SCREEN: skia.BlendMode.kScreen,
+    CompositeMode.OVERLAY: skia.BlendMode.kOverlay,
+    CompositeMode.DARKEN: skia.BlendMode.kDarken,
+    CompositeMode.LIGHTEN: skia.BlendMode.kLighten,
+    CompositeMode.COLOR_DODGE: skia.BlendMode.kColorDodge,
+    CompositeMode.COLOR_BURN: skia.BlendMode.kColorBurn,
+    CompositeMode.HARD_LIGHT: skia.BlendMode.kHardLight,
+    CompositeMode.SOFT_LIGHT: skia.BlendMode.kSoftLight,
+    CompositeMode.DIFFERENCE: skia.BlendMode.kDifference,
+    CompositeMode.EXCLUSION: skia.BlendMode.kExclusion,
+    CompositeMode.MULTIPLY: skia.BlendMode.kMultiply,
+    CompositeMode.HSL_HUE: skia.BlendMode.kHue,
+    CompositeMode.HSL_SATURATION: skia.BlendMode.kSaturation,
+    CompositeMode.HSL_COLOR: skia.BlendMode.kColor,
+    CompositeMode.HSL_LUMINOSITY: skia.BlendMode.kLuminosity,
+}
 
 
 _extendModeMap = {
@@ -45,6 +76,13 @@ class SkiaCanvas(Canvas):
     @contextmanager
     def savedState(self):
         self.canvas.save()
+        yield
+        self.canvas.restore()
+
+    @contextmanager
+    def compositeMode(self, compositeMode):
+        paint = skia.Paint(BlendMode=_compositeModeMap[compositeMode])
+        self.canvas.saveLayer(paint=paint)
         yield
         self.canvas.restore()
 
