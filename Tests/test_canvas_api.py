@@ -133,4 +133,4 @@ def test_compositeMode(backendName, surfaceFactory, compositeMode):
     outputPath = tmpOutputDir / fileName
     surface.saveImage(outputPath)
     diff = compareImages(expectedPath, outputPath)
-    assert diff < 0.0001, diff
+    assert diff < 0.00013, diff
