@@ -10,7 +10,7 @@ from .sweepGradient import buildSweepGradientPatches
 _compositeModeMap = {
     CompositeMode.CLEAR: CG.kCGBlendModeClear,
     CompositeMode.SRC: CG.kCGBlendModeCopy,
-    CompositeMode.DEST: CG.kCGBlendModeNormal,  # XXX this is wrong
+    CompositeMode.DEST: CG.kCGBlendModeNormal,  # FIXME: this is wrong, but I can't find the appropriate CG blend mode
     CompositeMode.SRC_OVER: CG.kCGBlendModeNormal,
     CompositeMode.DEST_OVER: CG.kCGBlendModeDestinationOver,
     CompositeMode.SRC_IN: CG.kCGBlendModeSourceIn,
