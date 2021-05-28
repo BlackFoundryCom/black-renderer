@@ -181,10 +181,9 @@ class CoreGraphicsCanvas(Canvas):
             CG.CGContextClip(self.context)
             self.transform(gradientTransform)
             # find current path' extent
-            bb = CG.CGContextGetClipBoundingBox(self.context)
-            x1, y1 = bb.origin.x, bb.origin.y
-            x2 = x1 + bb.size.width
-            y2 = y1 + bb.size.height
+            (x1, y1), (w, h) = CG.CGContextGetClipBoundingBox(self.context)
+            x2 = x1 + w
+            y2 = y1 + h
             maxX = max(d * d for d in (x1 - center[0], x2 - center[0]))
             maxY = max(d * d for d in (y1 - center[1], y2 - center[1]))
             R = sqrt(maxX + maxY)
