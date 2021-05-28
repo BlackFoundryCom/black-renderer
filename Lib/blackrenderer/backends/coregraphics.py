@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from math import sqrt
 import os
 from fontTools.pens.basePen import BasePen
 from fontTools.ttLib.tables.otTables import CompositeMode, ExtendMode
@@ -172,8 +173,6 @@ class CoreGraphicsCanvas(Canvas):
         extendMode,
         gradientTransform,
     ):
-        from math import sqrt
-
         if self.clipIsEmpty or CG.CGPathGetBoundingBox(path.path) == CG.CGRectNull:
             return
         with self.savedState():
