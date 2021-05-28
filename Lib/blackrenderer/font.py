@@ -271,12 +271,13 @@ class BlackRendererFont:
         self._applyTransform(transform, paint.Paint, canvas)
 
     def _drawPaintComposite(self, paint, canvas):
-        with canvas.compositeMode(CompositeMode.SRC_OVER):
-            with self._ensureClipAndPushPath(canvas, None):
-                self._drawPaint(paint.BackdropPaint, canvas)
-            with canvas.compositeMode(paint.CompositeMode):
-                with self._ensureClipAndPushPath(canvas, None):
-                    self._drawPaint(paint.SourcePaint, canvas)
+        with self._ensureClipAndPushPath(canvas, None):
+            with canvas.compositeMode(CompositeMode.SRC_OVER):
+                with self._savedTransform():
+                    self._drawPaint(paint.BackdropPaint, canvas)
+                with canvas.compositeMode(paint.CompositeMode):
+                    with self._savedTransform():
+                        self._drawPaint(paint.SourcePaint, canvas)
 
     def _drawPaintLocation(self, paint, canvas):
         # https://github.com/googlefonts/colr-gradients-spec/issues/277
