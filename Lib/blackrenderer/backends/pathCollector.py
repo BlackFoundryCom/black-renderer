@@ -28,6 +28,10 @@ class PathCollectorCanvas(Canvas):
         yield
         self.currentTransform = savedTransform
 
+    @contextmanager
+    def compositeMode(self, compositeMode):
+        yield
+
     def transform(self, transform):
         self.currentTransform = self.currentTransform.transform(transform)
 

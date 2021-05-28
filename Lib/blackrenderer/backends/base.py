@@ -13,6 +13,11 @@ class Canvas(ABC):
         ...
 
     @abstractmethod
+    @contextmanager
+    def compositeMode(self, compositeMode):
+        ...
+
+    @abstractmethod
     def transform(self, transform):
         ...
 

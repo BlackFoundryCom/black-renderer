@@ -72,6 +72,10 @@ class SVGCanvas(Canvas):
         self.currentTransform = prevTransform
         self.clipStack = prevClipStack
 
+    @contextmanager
+    def compositeMode(self, compositeMode):
+        yield
+
     def transform(self, transform):
         self.currentTransform = self.currentTransform.transform(transform)
 
