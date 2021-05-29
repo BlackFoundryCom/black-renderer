@@ -35,7 +35,7 @@ The "blackrenderer" library has two main parts: the BlackRendererFont class,
 and various backend classes. The main part of a backend is a Canvas class,
 which is passed to a BlackRendererFont instance when drawing a glyph. Most
 backends also have a Surface class, which is a generalized convenience class
-to produce a canvas for a bitmap (or SVG) area for a specific box.
+to produce a canvas for a bitmap (or SVG document) for a specific box.
 
 	from blackrenderer.font import BlackRendererFont
 	from blackrenderer.backends import getSurfaceClass
