@@ -1,5 +1,6 @@
 import io
 from typing import NamedTuple
+import os
 from fontTools.misc.arrayTools import (
     scaleRect,
     offsetRect,
@@ -44,7 +45,7 @@ def renderText(
     bounds = scaleRect(bounds, scaleFactor, scaleFactor)
     bounds = insetRect(bounds, -margin, -margin)
     bounds = intRect(bounds)
-    if outputPath is None or outputPath.suffix == ".svg":
+    if outputPath is None or os.path.splitext(outputPath)[1] == ".svg":
         surfaceClass = getSurfaceClass("svg")
     else:
         surfaceClass = getSurfaceClass(pngSurfaceName)
