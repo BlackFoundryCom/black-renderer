@@ -31,11 +31,35 @@ BlackRenderer comes with an hb-view-like command line tool, that can be used lik
 
 ## Library usage example
 
-The "blackrenderer" library has two main parts: the BlackRendererFont class,
-and various backend classes. The main part of a backend is a Canvas class,
-which is passed to a BlackRendererFont instance when drawing a glyph. Most
-backends also have a Surface class, which is a generalized convenience class
-to produce a canvas for a bitmap (or SVG document) for a specific box.
+There is a high level function to render a text string:
+
+```python
+from blackrenderer.render import renderText
+
+renderText("myfont.ttf", "ABC", "output.png")  # or "output.svg"
+```
+
+The full `renderText()` signature is:
+
+```python
+def renderText(
+    fontPath,
+    textString,
+    outputPath,
+    *,
+    fontSize=250,
+    margin=20,
+    features=None,
+    variations=None,
+    pngSurfaceName="skia",
+)
+```
+
+For more control, the library exposes two main parts: the BlackRendererFont
+class, and various backend classes. The main part of a backend is a Canvas
+class, which is passed to a BlackRendererFont instance when drawing a glyph.
+Most backends also have a Surface class, which is a generalized convenience
+class to produce a canvas for a bitmap (or SVG document) for a specific box.
 
 ```python
 from blackrenderer.font import BlackRendererFont
