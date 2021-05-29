@@ -2,27 +2,57 @@
 
 # BlackRenderer
 
-Developing a Python-based renderer for OpenType COLRv1 fonts, with multiple backends.
+BlackRenderer is a Python-based renderer for OpenType COLR fonts, with multiple backends.
+It supports the new COLRv1 format as well as the old COLR format.
 
 ![Big Smiley Face Icon](https://github.com/BlackFoundryCom/black-renderer/blob/master/smile.png?raw=true)
 
-## Goals
+## Features
 
-- Use fonttools to parse COLRv1 data
-- Adapter classes for various 2D rendering back-ends:
-  1. Debugging/printing (text dump of scene graph / 2D API calls)
-  2. skia-python
-  3. pycairo
-  4. SVG
-  6. CoreGraphics (macOS)
-  7. ...
-- hb-view-like command line app with switchable backend
+- It's a Python library called "blackrenderer"
+- It's a command line tool called "blackrenderer"
+- Renders individual glyphs or text strings
+- Supports multiple backends:
+  - Skia
+  - Cairo
+  - CoreGraphics (macOS)
+  - SVG
+  - outline extractor
+  - bounding box calculator
+- It uses fonttools to parse COLRv1 data
+- The "blackrenderer" tool is an "hb-view"-like command line app with switchable
+  backend, using HarfBuzz for shaping
 
-## Usage
+## Tool usage example
 
 BlackRenderer comes with an hb-view-like command line tool, that can be used like this:
 
     $ blackrenderer font.ttf ABC🤩 output.png --font-size=100
+
+## Library usage example
+
+The "blackrenderer" library has two main parts: the BlackRendererFont class,
+and various backend classes. The main part of a backend is a Canvas class,
+which is passed to a BlackRendererFont instance when drawing a glyph. Most
+backends also have a Surface class, which is a generalized convenience class
+to produce a canvas for a bitmap (or SVG) area for a specific box.
+
+	from blackrenderer.font import BlackRendererFont
+	from blackrenderer.backends import getSurfaceClass
+
+	brFont = BlackRendererFont("my_colr_font.ttf")
+	surfaceClass = getSurfaceClass("skia")
+	glyphName = "A"
+	boundingBox = brFont.getGlyphBounds(glyphName)
+	surface = surfaceClass(boundingBox)
+	brFont.drawGlyph(glyphName, surface.canvas)
+	surface.saveImage("image.png")
+
+Canvas objects support the following transformation methods:
+
+- `canvas.translate(dx, dy)`
+- `canvas.scale(sx, sy)`
+- `canvas.transform((1, 0, 0, 1, 0, 0))`
 
 ## Install
 
