@@ -37,16 +37,18 @@ which is passed to a BlackRendererFont instance when drawing a glyph. Most
 backends also have a Surface class, which is a generalized convenience class
 to produce a canvas for a bitmap (or SVG document) for a specific box.
 
-	from blackrenderer.font import BlackRendererFont
-	from blackrenderer.backends import getSurfaceClass
+```python
+from blackrenderer.font import BlackRendererFont
+from blackrenderer.backends import getSurfaceClass
 
-	brFont = BlackRendererFont("my_colr_font.ttf")
-	surfaceClass = getSurfaceClass("skia")
-	glyphName = "A"
-	boundingBox = brFont.getGlyphBounds(glyphName)
-	surface = surfaceClass(boundingBox)
-	brFont.drawGlyph(glyphName, surface.canvas)
-	surface.saveImage("image.png")
+brFont = BlackRendererFont("my_colr_font.ttf")
+surfaceClass = getSurfaceClass("skia")
+glyphName = "A"
+boundingBox = brFont.getGlyphBounds(glyphName)
+surface = surfaceClass(boundingBox)
+brFont.drawGlyph(glyphName, surface.canvas)
+surface.saveImage("image.png")
+```
 
 Canvas objects support the following transformation methods:
 
