@@ -99,7 +99,8 @@ class Surface(ABC):
     fileExtension = ".png"
 
     @abstractmethod
-    def __init__(self, x, y, width, height):
+    def __init__(self, boundingBox):
+        # boundingBox = (xMin, yMin, xMax, yMax)
         ...
 
     @property

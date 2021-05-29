@@ -48,8 +48,7 @@ def renderText(
         surfaceFactory = getSurface("svg")
     else:
         surfaceFactory = getSurface(pngSurfaceName)
-    xMin, yMin, xMax, yMax = bounds
-    surface = surfaceFactory(xMin, yMin, xMax - xMin, yMax - yMin)
+    surface = surfaceFactory(bounds)
     canvas = surface.canvas
     canvas.scale(scaleFactor)
     for glyph in glyphLine:

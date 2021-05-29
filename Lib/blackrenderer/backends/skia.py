@@ -183,7 +183,10 @@ def _unpackColorLine(colorLine):
 class SkiaPixelSurface(Surface):
     fileExtension = ".png"
 
-    def __init__(self, x, y, width, height):
+    def __init__(self, boundingBox):
+        x, y, xMax, yMax = boundingBox
+        width = xMax - x
+        height = yMax - y
         self.surface = skia.Surface(width, height)
         self.skCanvas = self.surface.getCanvas()
         self.skCanvas.translate(-x, height + y)

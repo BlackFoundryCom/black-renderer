@@ -193,7 +193,10 @@ class CairoCanvas(Canvas):
 class CairoPixelSurface(Surface):
     fileExtension = ".png"
 
-    def __init__(self, x, y, width, height):
+    def __init__(self, boundingBox):
+        x, y, xMax, yMax = boundingBox
+        width = xMax - x
+        height = yMax - y
         self.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
         self.context = cairo.Context(self.surface)
         self.context.translate(-x, height + y)

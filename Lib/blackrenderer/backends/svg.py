@@ -219,7 +219,10 @@ def _gradientToSVG(
 class SVGSurface(Surface):
     fileExtension = ".svg"
 
-    def __init__(self, x, y, width, height):
+    def __init__(self, boundingBox):
+        x, y, xMax, yMax = boundingBox
+        width = xMax - x
+        height = yMax - y
         self.viewBox = x, y, width, height
         transform = Transform(1, 0, 0, -1, 0, height + 2 * y)
         self._canvas = SVGCanvas(transform)

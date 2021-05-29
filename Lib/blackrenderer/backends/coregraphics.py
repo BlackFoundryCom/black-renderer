@@ -217,7 +217,10 @@ def _unpackColorLine(colorLine):
 class CoreGraphicsPixelSurface(Surface):
     fileExtension = ".png"
 
-    def __init__(self, x, y, width, height):
+    def __init__(self, boundingBox):
+        x, y, xMax, yMax = boundingBox
+        width = xMax - x
+        height = yMax - y
         rgbColorSpace = CG.CGColorSpaceCreateDeviceRGB()
         # rgbColorSpace = CG.CGColorSpaceCreateWithName(CG.kCGColorSpaceSRGB)
         self.context = CG.CGBitmapContextCreate(
