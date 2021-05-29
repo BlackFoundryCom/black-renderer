@@ -29,7 +29,7 @@ BlackRenderer comes with an hb-view-like command line tool, that can be used lik
 
     $ blackrenderer font.ttf ABC🤩 output.png --font-size=100
 
-## Library usage example
+## Library usage examples
 
 There is a high level function to render a text string:
 
