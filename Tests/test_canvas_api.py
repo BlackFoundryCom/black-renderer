@@ -31,7 +31,7 @@ test_extendModes = [ExtendMode.PAD, ExtendMode.REPEAT, ExtendMode.REFLECT]
 @pytest.mark.parametrize("extend", test_extendModes)
 @pytest.mark.parametrize("backendName, surfaceFactory", backends)
 def test_colorStops(backendName, surfaceFactory, stopOffsets, extend):
-    surface = surfaceFactory(0, 0, 600, 100)
+    surface = surfaceFactory((0, 0, 600, 100))
     canvas = surface.canvas
     point1 = (200, 0)
     point2 = (400, 0)
@@ -59,7 +59,7 @@ def test_colorStops(backendName, surfaceFactory, stopOffsets, extend):
 @pytest.mark.parametrize("backendName, surfaceFactory", backends)
 def test_sweepGradient(backendName, surfaceFactory, extend):
     H, W = 400, 400
-    surface = surfaceFactory(0, 0, H, W)
+    surface = surfaceFactory((0, 0, H, W))
     canvas = surface.canvas
     center = (H / 2, W / 2)
     startAngle = 45
@@ -121,7 +121,7 @@ test_compositeModes = [
 @pytest.mark.parametrize("backendName, surfaceFactory", backends)
 def test_compositeMode(backendName, surfaceFactory, compositeMode):
     H, W = 400, 400
-    surface = surfaceFactory(0, 0, H, W)
+    surface = surfaceFactory((0, 0, H, W))
     canvas = surface.canvas
     canvas.drawRectSolid((50, 50, 200, 200), (1, 0.2, 0, 1))
     with canvas.compositeMode(compositeMode):

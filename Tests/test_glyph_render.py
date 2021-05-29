@@ -52,9 +52,9 @@ def test_renderGlyph(backendName, surfaceFactory, fontName, glyphName, location)
     font = BlackRendererFont(testFonts[fontName])
     font.setLocation(location)
 
-    minX, minY, maxX, maxY = font.getGlyphBounds(glyphName)
+    boundingBox = font.getGlyphBounds(glyphName)
 
-    surface = surfaceFactory(minX, minY, maxX - minX, maxY - minY)
+    surface = surfaceFactory(boundingBox)
     ext = surface.fileExtension
     font.drawGlyph(glyphName, surface.canvas)
 
