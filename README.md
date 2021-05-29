@@ -81,6 +81,14 @@ Canvas objects support the following transformation methods:
 - `canvas.scale(sx, sy)`
 - `canvas.transform((xx, yx, xy, yy, dx, dy))`
 
+Save/restore is done with a context manager:
+
+```python
+with canvas.savedState():
+	canvas.scale(0.3)
+	...draw stuff...
+```
+
 ## Install
 
 If you have a Python 3 environment set up, then all you need to do is:
