@@ -1,7 +1,7 @@
 import pathlib
 import pytest
 from blackrenderer.font import BlackRendererFont
-from blackrenderer.backends import getSurface
+from blackrenderer.backends import getSurfaceFactory
 from blackrenderer.backends.pathCollector import BoundsCanvas, PathCollectorCanvas
 from compareImages import compareImages
 
@@ -15,7 +15,7 @@ if not tmpOutputDir.exists():
 
 
 backends = [
-    (name, getSurface(name)) for name in ["cairo", "coregraphics", "skia", "svg"]
+    (name, getSurfaceFactory(name)) for name in ["cairo", "coregraphics", "skia", "svg"]
 ]
 backends = [(name, surface) for name, surface in backends if surface is not None]
 
