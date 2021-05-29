@@ -1,7 +1,7 @@
 import pathlib
 import pytest
 from blackrenderer.font import BlackRendererFont
-from blackrenderer.backends import getSurfaceFactory
+from blackrenderer.backends import getSurfaceClass
 from blackrenderer.backends.pathCollector import BoundsCanvas, PathCollectorCanvas
 from compareImages import compareImages
 
@@ -15,7 +15,7 @@ if not tmpOutputDir.exists():
 
 
 backends = [
-    (name, getSurfaceFactory(name)) for name in ["cairo", "coregraphics", "skia", "svg"]
+    (name, getSurfaceClass(name)) for name in ["cairo", "coregraphics", "skia", "svg"]
 ]
 backends = [(name, surface) for name, surface in backends if surface is not None]
 
@@ -47,14 +47,14 @@ test_glyphs = [
 
 
 @pytest.mark.parametrize("fontName, glyphName, location", test_glyphs)
-@pytest.mark.parametrize("backendName, surfaceFactory", backends)
-def test_renderGlyph(backendName, surfaceFactory, fontName, glyphName, location):
+@pytest.mark.parametrize("backendName, surfaceClass", backends)
+def test_renderGlyph(backendName, surfaceClass, fontName, glyphName, location):
     font = BlackRendererFont(testFonts[fontName])
     font.setLocation(location)
 
     boundingBox = font.getGlyphBounds(glyphName)
 
-    surface = surfaceFactory(boundingBox)
+    surface = surfaceClass(boundingBox)
     ext = surface.fileExtension
     font.drawGlyph(glyphName, surface.canvas)
 

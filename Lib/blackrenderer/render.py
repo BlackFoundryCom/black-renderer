@@ -9,7 +9,7 @@ from fontTools.misc.arrayTools import (
 )
 import uharfbuzz as hb
 from .font import BlackRendererFont
-from .backends import getSurfaceFactory
+from .backends import getSurfaceClass
 
 
 def renderText(
@@ -45,10 +45,10 @@ def renderText(
     bounds = insetRect(bounds, -margin, -margin)
     bounds = intRect(bounds)
     if outputPath is None or outputPath.suffix == ".svg":
-        surfaceFactory = getSurfaceFactory("svg")
+        surfaceClass = getSurfaceClass("svg")
     else:
-        surfaceFactory = getSurfaceFactory(pngSurfaceName)
-    surface = surfaceFactory(bounds)
+        surfaceClass = getSurfaceClass(pngSurfaceName)
+    surface = surfaceClass(bounds)
     canvas = surface.canvas
     canvas.scale(scaleFactor)
     for glyph in glyphLine:

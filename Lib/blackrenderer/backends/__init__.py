@@ -9,7 +9,7 @@ _surfaces = {
 }
 
 
-def getSurfaceFactory(name):
+def getSurfaceClass(name):
     fqName = _surfaces[name]
     moduleName, className = fqName.rsplit(".", 1)
     try:

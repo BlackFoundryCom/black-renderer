@@ -2,7 +2,7 @@ import pathlib
 import pytest
 from fontTools.misc.transform import Identity
 from fontTools.ttLib.tables.otTables import CompositeMode, ExtendMode
-from blackrenderer.backends import getSurfaceFactory
+from blackrenderer.backends import getSurfaceClass
 from compareImages import compareImages
 
 
@@ -15,7 +15,7 @@ if not tmpOutputDir.exists():
 
 
 backends = [
-    (name, getSurfaceFactory(name)) for name in ["cairo", "coregraphics", "skia", "svg"]
+    (name, getSurfaceClass(name)) for name in ["cairo", "coregraphics", "skia", "svg"]
 ]
 backends = [(name, surface) for name, surface in backends if surface is not None]
 
@@ -29,9 +29,9 @@ test_extendModes = [ExtendMode.PAD, ExtendMode.REPEAT, ExtendMode.REFLECT]
 
 @pytest.mark.parametrize("stopOffsets", test_colorStops)
 @pytest.mark.parametrize("extend", test_extendModes)
-@pytest.mark.parametrize("backendName, surfaceFactory", backends)
-def test_colorStops(backendName, surfaceFactory, stopOffsets, extend):
-    surface = surfaceFactory((0, 0, 600, 100))
+@pytest.mark.parametrize("backendName, surfaceClass", backends)
+def test_colorStops(backendName, surfaceClass, stopOffsets, extend):
+    surface = surfaceClass((0, 0, 600, 100))
     canvas = surface.canvas
     point1 = (200, 0)
     point2 = (400, 0)
@@ -56,10 +56,10 @@ def test_colorStops(backendName, surfaceFactory, stopOffsets, extend):
 
 
 @pytest.mark.parametrize("extend", test_extendModes)
-@pytest.mark.parametrize("backendName, surfaceFactory", backends)
-def test_sweepGradient(backendName, surfaceFactory, extend):
+@pytest.mark.parametrize("backendName, surfaceClass", backends)
+def test_sweepGradient(backendName, surfaceClass, extend):
     H, W = 400, 400
-    surface = surfaceFactory((0, 0, H, W))
+    surface = surfaceClass((0, 0, H, W))
     canvas = surface.canvas
     center = (H / 2, W / 2)
     startAngle = 45
@@ -118,10 +118,10 @@ test_compositeModes = [
 
 
 @pytest.mark.parametrize("compositeMode", test_compositeModes)
-@pytest.mark.parametrize("backendName, surfaceFactory", backends)
-def test_compositeMode(backendName, surfaceFactory, compositeMode):
+@pytest.mark.parametrize("backendName, surfaceClass", backends)
+def test_compositeMode(backendName, surfaceClass, compositeMode):
     H, W = 400, 400
-    surface = surfaceFactory((0, 0, H, W))
+    surface = surfaceClass((0, 0, H, W))
     canvas = surface.canvas
     canvas.drawRectSolid((50, 50, 200, 200), (1, 0.2, 0, 1))
     with canvas.compositeMode(compositeMode):
