@@ -79,7 +79,7 @@ Canvas objects support the following transformation methods:
 
 - `canvas.translate(dx, dy)`
 - `canvas.scale(sx, sy)`
-- `canvas.transform((1, 0, 0, 1, 0, 0))`
+- `canvas.transform((xx, yx, xy, yy, dx, dy))`
 
 ## Install
 
