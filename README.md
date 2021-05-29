@@ -85,15 +85,15 @@ Save/restore is done with a context manager:
 
 ```python
 with canvas.savedState():
-	canvas.scale(0.3)
-	...draw stuff...
+    canvas.scale(0.3)
+    ...draw stuff...
 ```
 
 ## Install
 
 If you have a Python 3 environment set up, then all you need to do is:
 
-	$ pip install blackrenderer
+    $ pip install blackrenderer
 
 ## Install for contributing / setting up an environment
 
