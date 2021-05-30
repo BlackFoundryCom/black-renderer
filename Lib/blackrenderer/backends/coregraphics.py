@@ -222,13 +222,16 @@ class CoreGraphicsPixelSurface(Surface):
         x, y, xMax, yMax = boundingBox
         width = xMax - x
         height = yMax - y
+        self.context = self._setupCGContext(x, y, width, height)
+        self._canvas = CoreGraphicsCanvas(self.context)
+
+    def _setupCGContext(self, x, y, width, height):
         rgbColorSpace = CG.CGColorSpaceCreateDeviceRGB()
-        # rgbColorSpace = CG.CGColorSpaceCreateWithName(CG.kCGColorSpaceSRGB)
-        self.context = CG.CGBitmapContextCreate(
+        context = CG.CGBitmapContextCreate(
             None, width, height, 8, 0, rgbColorSpace, CG.kCGImageAlphaPremultipliedFirst
         )
-        CG.CGContextTranslateCTM(self.context, -x, -y)
-        self._canvas = CoreGraphicsCanvas(self.context)
+        CG.CGContextTranslateCTM(context, -x, -y)
+        return context
 
     @property
     def canvas(self):
@@ -239,21 +242,16 @@ class CoreGraphicsPixelSurface(Surface):
         saveImageAsPNG(image, path)
 
 
-class CoreGraphicsPDFSurface(Surface):
+class CoreGraphicsPDFSurface(CoreGraphicsPixelSurface):
     fileExtension = ".pdf"
 
-    def __init__(self, boundingBox):
-        x, y, xMax, yMax = boundingBox
-        self.mediaBox = ((x, y), (xMax - x, yMax - y))
+    def _setupCGContext(self, x, y, width, height):
+        mediaBox = ((x, y), (width, height))
         self.data = CFDataCreateMutable(None, 0)
         consumer = CG.CGDataConsumerCreateWithCFData(self.data)
-        self.context = CG.CGPDFContextCreate(consumer, self.mediaBox, None)
-        self._canvas = CoreGraphicsCanvas(self.context)
-        CG.CGContextBeginPage(self.context, self.mediaBox)
-
-    @property
-    def canvas(self):
-        return self._canvas
+        context = CG.CGPDFContextCreate(consumer, mediaBox, None)
+        CG.CGContextBeginPage(context, mediaBox)
+        return context
 
     def saveImage(self, path):
         CG.CGContextEndPage(self.context)
