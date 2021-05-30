@@ -215,9 +215,22 @@ class SkiaPDFSurface(SkiaPixelSurface):
     def saveImage(self, path):
         stream = skia.FILEWStream(os.fspath(path))
         picture = self.recorder.finishRecordingAsPicture()
+        self._drawPictureToStream(picture, stream)
+
+    def _drawPictureToStream(self, picture, stream):
         with skia.PDF.MakeDocument(stream) as document:
             x, y, width, height = picture.cullRect()
             assert x == 0 and y == 0
             with document.page(width, height) as canvas:
                 canvas.drawPicture(picture)
+        stream.flush()
+
+
+class SkiaSVGSurface(SkiaPDFSurface):
+    fileExtension = ".svg"
+
+    def _drawPictureToStream(self, picture, stream):
+        canvas = skia.SVGCanvas.Make(picture.cullRect(), stream)
+        canvas.drawPicture(picture)
+        del canvas
         stream.flush()
