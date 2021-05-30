@@ -218,6 +218,7 @@ class CairoPixelSurface(Surface):
 
 class CairoPDFSurface(CairoPixelSurface):
     fileExtension = ".pdf"
+    _cairoVectorSurfaceClass = cairo.PDFSurface
 
     def _setupCairoSurface(self, width, height):
         self.width = width
@@ -225,8 +226,13 @@ class CairoPDFSurface(CairoPixelSurface):
         return cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, (0, 0, width, height))
 
     def saveImage(self, path):
-        pdfSurface = cairo.PDFSurface(path, self.width, self.height)
+        pdfSurface = self._cairoVectorSurfaceClass(path, self.width, self.height)
         pdfContext = cairo.Context(pdfSurface)
         pdfContext.set_source_surface(self.surface, 0.0, 0.0)
         pdfContext.paint()
         pdfSurface.flush()
+
+
+class CairoSVGSurface(CairoPDFSurface):
+    fileExtension = ".svg"
+    _cairoVectorSurfaceClass = cairo.SVGSurface
