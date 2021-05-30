@@ -26,8 +26,8 @@ _surfaces = {
 }
 
 
-def getSurfaceClass(name, imageExtension=None):
-    fqName = _surfaces[imageExtension][name]
+def getSurfaceClass(backendName, imageExtension=None):
+    fqName = _surfaces[imageExtension][backendName]
     moduleName, className = fqName.rsplit(".", 1)
     try:
         module = importlib.import_module(moduleName)
