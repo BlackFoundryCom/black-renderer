@@ -26,7 +26,7 @@ fully supports variable fonts, including variable COLRv1 data.
   - .svg
 - It uses fonttools to parse COLRv1 data
 - The "blackrenderer" tool is an "hb-view"-like command line app with switchable
-  backend, using HarfBuzz for shaping
+  backend. It uses HarfBuzz for shaping
 
 ## Tool usage example
 
