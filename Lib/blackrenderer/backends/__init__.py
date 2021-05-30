@@ -31,6 +31,6 @@ def getSurfaceClass(name, imageExtension=None):
     moduleName, className = fqName.rsplit(".", 1)
     try:
         module = importlib.import_module(moduleName)
-    except ImportError:
+    except ModuleNotFoundError:
         return None
     return getattr(module, className)
