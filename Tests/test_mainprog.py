@@ -37,6 +37,7 @@ expectedSVGOutput = """\
 </svg>
 """
 
+
 def test_mainprog_svg_stdout():
     args = [
         "blackrenderer",

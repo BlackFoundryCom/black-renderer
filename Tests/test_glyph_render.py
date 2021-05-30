@@ -98,6 +98,7 @@ vectorBackends = [
     ("coregraphics", ".pdf"),
 ]
 
+
 @pytest.mark.parametrize("backendName, imageSuffix", vectorBackends)
 def test_vectorBackends(backendName, imageSuffix):
     fontName = "noto"
