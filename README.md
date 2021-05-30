@@ -51,7 +51,7 @@ def renderText(
     margin=20,
     features=None,
     variations=None,
-    pngSurfaceName="skia",
+    backendName=None,
 )
 ```
 
