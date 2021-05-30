@@ -2,8 +2,9 @@
 
 # BlackRenderer
 
-BlackRenderer is a Python-based renderer for OpenType COLR fonts, with multiple backends.
-It supports the new COLRv1 format as well as the old COLR format.
+BlackRenderer is a Python-based renderer for OpenType COLR fonts, with multiple
+backends. It supports the new COLRv1 format as well as the old COLR format. It
+fully supports variable fonts, including variable COLRv1 data.
 
 ![Big Smiley Face Icon](https://github.com/BlackFoundryCom/black-renderer/blob/master/smile.png?raw=true)
 
@@ -12,13 +13,17 @@ It supports the new COLRv1 format as well as the old COLR format.
 - It's a Python library called "blackrenderer"
 - It's a command line tool called "blackrenderer"
 - Renders individual glyphs or text strings
-- Supports multiple backends:
+- Supports multiple graphics backends:
   - Skia
   - Cairo
   - CoreGraphics (macOS)
   - SVG
   - outline extractor
   - bounding box calculator
+- Support multiple output formats:
+  - .png
+  - .pdf
+  - .svg
 - It uses fonttools to parse COLRv1 data
 - The "blackrenderer" tool is an "hb-view"-like command line app with switchable
   backend, using HarfBuzz for shaping
