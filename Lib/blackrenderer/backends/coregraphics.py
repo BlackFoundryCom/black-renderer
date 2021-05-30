@@ -3,6 +3,7 @@ from math import sqrt
 import os
 from fontTools.pens.basePen import BasePen
 from fontTools.ttLib.tables.otTables import CompositeMode, ExtendMode
+from CoreFoundation import CFDataCreateMutable
 import Quartz as CG
 from .base import Canvas, Surface
 from .sweepGradient import buildSweepGradientPatches
@@ -236,6 +237,29 @@ class CoreGraphicsPixelSurface(Surface):
     def saveImage(self, path):
         image = CG.CGBitmapContextCreateImage(self.context)
         saveImageAsPNG(image, path)
+
+
+class CoreGraphicsPDFSurface(Surface):
+    fileExtension = ".pdf"
+
+    def __init__(self, boundingBox):
+        x, y, xMax, yMax = boundingBox
+        self.mediaBox = ((x, y), (xMax - x, yMax - y))
+        self.data = CFDataCreateMutable(None, 0)
+        consumer = CG.CGDataConsumerCreateWithCFData(self.data)
+        self.context = CG.CGPDFContextCreate(consumer, self.mediaBox, None)
+        self._canvas = CoreGraphicsCanvas(self.context)
+        CG.CGContextBeginPage(self.context, self.mediaBox)
+
+    @property
+    def canvas(self):
+        return self._canvas
+
+    def saveImage(self, path):
+        CG.CGContextEndPage(self.context)
+        CG.CGPDFContextClose(self.context)
+        with open(path, "wb") as f:
+            f.write(self.data)
 
 
 def saveImageAsPNG(image, path):
