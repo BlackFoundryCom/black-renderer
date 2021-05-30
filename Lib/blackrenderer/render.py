@@ -46,15 +46,15 @@ def renderText(
     bounds = insetRect(bounds, -margin, -margin)
     bounds = intRect(bounds)
     if outputPath is None:
-        ext = ".svg"
+        suffix = ".svg"
     else:
-        ext = os.path.splitext(outputPath)[1].lower()
+        suffix = os.path.splitext(outputPath)[1].lower()
     if backend is None:
-        if ext == ".svg":
+        if suffix == ".svg":
             backend = "svg"
         else:
             backend = "skia"
-    surfaceClass = getSurfaceClass(backend, ext)
+    surfaceClass = getSurfaceClass(backend, suffix)
     surface = surfaceClass(bounds)
     canvas = surface.canvas
     canvas.scale(scaleFactor)
