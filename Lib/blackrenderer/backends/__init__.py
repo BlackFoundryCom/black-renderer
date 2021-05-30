@@ -1,3 +1,4 @@
+from collections import defaultdict
 import importlib
 
 
@@ -34,3 +35,15 @@ def getSurfaceClass(backendName, imageExtension=None):
     except ModuleNotFoundError:
         return None
     return getattr(module, className)
+
+
+def listBackends():
+    backends = defaultdict(list)
+    for suffix in _surfaces:
+        if suffix is None:
+            continue
+        for backendName in _surfaces[suffix]:
+            backends[backendName].append(suffix)
+    return [
+        (backendName, sorted(suffixes)) for backendName, suffixes in backends.items()
+    ]

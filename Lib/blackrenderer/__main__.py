@@ -16,6 +16,7 @@ def main():
         help="an output file name, with .png, .pdf or .svg extension, "
         "or '-', to print SVG to stdout",
     )
+    parser.add_argument("--list-backends", action="store_true")
     parser.add_argument("--font-size", type=float, default=250)
     parser.add_argument("--features", type=parseFeatures)
     parser.add_argument("--variations", type=parseVariations)
@@ -28,16 +29,22 @@ def main():
         ".svg, in which case the svg backend will be used.",
     )
     args = parser.parse_args()
-    renderText(
-        args.font,
-        args.text,
-        args.output,
-        fontSize=args.font_size,
-        margin=args.margin,
-        features=args.features,
-        variations=args.variations,
-        backend=args.backend,
-    )
+    if args.list_backends:
+        from .backends import listBackends
+
+        for backendName, suffixes in listBackends():
+            print(f"{backendName}: {', '.join(suffixes)}")
+    else:
+        renderText(
+            args.font,
+            args.text,
+            args.output,
+            fontSize=args.font_size,
+            margin=args.margin,
+            features=args.features,
+            variations=args.variations,
+            backend=args.backend,
+        )
 
 
 def existingFilePath(path):
