@@ -13,6 +13,10 @@ from .font import BlackRendererFont
 from .backends import getSurfaceClass
 
 
+class BackendUnavailableError(Exception):
+    pass
+
+
 def renderText(
     fontPath,
     textString,
@@ -22,7 +26,7 @@ def renderText(
     margin=20,
     features=None,
     variations=None,
-    backend=None,
+    backendName=None,
 ):
     font = BlackRendererFont(fontPath)
     glyphNames = font.glyphNames
@@ -49,12 +53,15 @@ def renderText(
         suffix = ".svg"
     else:
         suffix = os.path.splitext(outputPath)[1].lower()
-    if backend is None:
+    if backendName is None:
         if suffix == ".svg":
-            backend = "svg"
+            backendName = "svg"
         else:
-            backend = "skia"
-    surfaceClass = getSurfaceClass(backend, suffix)
+            backendName = "skia"
+    surfaceClass = getSurfaceClass(backendName, suffix)
+    if surfaceClass is None:
+        raise BackendUnavailableError(backendName)
+
     surface = surfaceClass(bounds)
     canvas = surface.canvas
     canvas.scale(scaleFactor)

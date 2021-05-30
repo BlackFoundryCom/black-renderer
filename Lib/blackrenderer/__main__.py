@@ -47,7 +47,7 @@ def main():
         margin=args.margin,
         features=args.features,
         variations=args.variations,
-        backend=args.backend,
+        backendName=args.backend,
     )
 
 
