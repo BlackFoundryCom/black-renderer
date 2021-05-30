@@ -3,6 +3,7 @@ from math import sqrt
 import os
 from fontTools.pens.basePen import BasePen
 from fontTools.ttLib.tables.otTables import CompositeMode, ExtendMode
+from CoreFoundation import CFDataCreateMutable
 import Quartz as CG
 from .base import Canvas, Surface
 from .sweepGradient import buildSweepGradientPatches
@@ -221,13 +222,16 @@ class CoreGraphicsPixelSurface(Surface):
         x, y, xMax, yMax = boundingBox
         width = xMax - x
         height = yMax - y
+        self.context = self._setupCGContext(x, y, width, height)
+        self._canvas = CoreGraphicsCanvas(self.context)
+
+    def _setupCGContext(self, x, y, width, height):
         rgbColorSpace = CG.CGColorSpaceCreateDeviceRGB()
-        # rgbColorSpace = CG.CGColorSpaceCreateWithName(CG.kCGColorSpaceSRGB)
-        self.context = CG.CGBitmapContextCreate(
+        context = CG.CGBitmapContextCreate(
             None, width, height, 8, 0, rgbColorSpace, CG.kCGImageAlphaPremultipliedFirst
         )
-        CG.CGContextTranslateCTM(self.context, -x, -y)
-        self._canvas = CoreGraphicsCanvas(self.context)
+        CG.CGContextTranslateCTM(context, -x, -y)
+        return context
 
     @property
     def canvas(self):
@@ -236,6 +240,24 @@ class CoreGraphicsPixelSurface(Surface):
     def saveImage(self, path):
         image = CG.CGBitmapContextCreateImage(self.context)
         saveImageAsPNG(image, path)
+
+
+class CoreGraphicsPDFSurface(CoreGraphicsPixelSurface):
+    fileExtension = ".pdf"
+
+    def _setupCGContext(self, x, y, width, height):
+        mediaBox = ((x, y), (width, height))
+        self.data = CFDataCreateMutable(None, 0)
+        consumer = CG.CGDataConsumerCreateWithCFData(self.data)
+        context = CG.CGPDFContextCreate(consumer, mediaBox, None)
+        CG.CGContextBeginPage(context, mediaBox)
+        return context
+
+    def saveImage(self, path):
+        CG.CGContextEndPage(self.context)
+        CG.CGPDFContextClose(self.context)
+        with open(path, "wb") as f:
+            f.write(self.data)
 
 
 def saveImageAsPNG(image, path):

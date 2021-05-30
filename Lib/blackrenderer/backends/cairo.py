@@ -197,11 +197,14 @@ class CairoPixelSurface(Surface):
         x, y, xMax, yMax = boundingBox
         width = xMax - x
         height = yMax - y
-        self.surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
+        self.surface = self._setupCairoSurface(width, height)
         self.context = cairo.Context(self.surface)
         self.context.translate(-x, height + y)
         self.context.scale(1, -1)
         self._canvas = CairoCanvas(self.context)
+
+    def _setupCairoSurface(self, width, height):
+        return cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
 
     @property
     def canvas(self):
@@ -211,3 +214,25 @@ class CairoPixelSurface(Surface):
         self.surface.flush()
         self.surface.write_to_png(os.fspath(path))
         self.surface.finish()
+
+
+class CairoPDFSurface(CairoPixelSurface):
+    fileExtension = ".pdf"
+    _cairoVectorSurfaceClass = cairo.PDFSurface
+
+    def _setupCairoSurface(self, width, height):
+        self.width = width
+        self.height = height
+        return cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, (0, 0, width, height))
+
+    def saveImage(self, path):
+        pdfSurface = self._cairoVectorSurfaceClass(path, self.width, self.height)
+        pdfContext = cairo.Context(pdfSurface)
+        pdfContext.set_source_surface(self.surface, 0.0, 0.0)
+        pdfContext.paint()
+        pdfSurface.flush()
+
+
+class CairoSVGSurface(CairoPDFSurface):
+    fileExtension = ".svg"
+    _cairoVectorSurfaceClass = cairo.SVGSurface

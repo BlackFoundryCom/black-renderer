@@ -187,11 +187,14 @@ class SkiaPixelSurface(Surface):
         x, y, xMax, yMax = boundingBox
         width = xMax - x
         height = yMax - y
+        skCanvas = self._setupSkCanvas(x, y, width, height)
+        skCanvas.translate(-x, height + y)
+        skCanvas.scale(1, -1)
+        self._canvas = SkiaCanvas(skCanvas)
+
+    def _setupSkCanvas(self, x, y, width, height):
         self.surface = skia.Surface(width, height)
-        self.skCanvas = self.surface.getCanvas()
-        self.skCanvas.translate(-x, height + y)
-        self.skCanvas.scale(1, -1)
-        self._canvas = SkiaCanvas(self.skCanvas)
+        return self.surface.getCanvas()
 
     @property
     def canvas(self):
@@ -200,3 +203,34 @@ class SkiaPixelSurface(Surface):
     def saveImage(self, path, format=skia.kPNG):
         image = self.surface.makeImageSnapshot()
         image.save(os.fspath(path), format)
+
+
+class SkiaPDFSurface(SkiaPixelSurface):
+    fileExtension = ".pdf"
+
+    def _setupSkCanvas(self, x, y, width, height):
+        self.recorder = skia.PictureRecorder()
+        return self.recorder.beginRecording(width, height)
+
+    def saveImage(self, path):
+        stream = skia.FILEWStream(os.fspath(path))
+        picture = self.recorder.finishRecordingAsPicture()
+        self._drawPictureToStream(picture, stream)
+
+    def _drawPictureToStream(self, picture, stream):
+        with skia.PDF.MakeDocument(stream) as document:
+            x, y, width, height = picture.cullRect()
+            assert x == 0 and y == 0
+            with document.page(width, height) as canvas:
+                canvas.drawPicture(picture)
+        stream.flush()
+
+
+class SkiaSVGSurface(SkiaPDFSurface):
+    fileExtension = ".svg"
+
+    def _drawPictureToStream(self, picture, stream):
+        canvas = skia.SVGCanvas.Make(picture.cullRect(), stream)
+        canvas.drawPicture(picture)
+        del canvas
+        stream.flush()

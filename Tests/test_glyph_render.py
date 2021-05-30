@@ -88,3 +88,36 @@ def test_boundsCanvas():
     canvas = BoundsCanvas()
     font.drawGlyph("transformed_sweep", canvas)
     assert (317, 154, 1183, 846) == tuple(round(v) for v in canvas.bounds)
+
+
+vectorBackends = [
+    ("cairo", ".pdf"),
+    ("cairo", ".svg"),
+    ("skia", ".pdf"),
+    ("skia", ".svg"),
+    ("coregraphics", ".pdf"),
+]
+
+
+@pytest.mark.parametrize("backendName, imageSuffix", vectorBackends)
+def test_vectorBackends(backendName, imageSuffix):
+    fontName = "noto"
+    glyphName = "u1F943"
+    surfaceClass = getSurfaceClass(backendName, imageSuffix)
+    if surfaceClass is None:
+        pytest.skip(f"{backendName} not available")
+    assert surfaceClass.fileExtension == imageSuffix
+
+    font = BlackRendererFont(testFonts[fontName])
+    boundingBox = font.getGlyphBounds(glyphName)
+
+    surface = surfaceClass(boundingBox)
+    font.drawGlyph(glyphName, surface.canvas)
+    fileName = f"vector_{fontName}_{glyphName}_{backendName}{imageSuffix}"
+    expectedPath = expectedOutputDir / fileName
+    outputPath = tmpOutputDir / fileName
+    surface.saveImage(outputPath)
+    # For now, just be happy the code works.
+    # - Cairo PDFs contain the creation date
+    # - CoreGraphics PDFs are weirdly different while looking the same
+    # assert expectedPath.read_bytes() == outputPath.read_bytes()

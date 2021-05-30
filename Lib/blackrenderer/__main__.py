@@ -3,17 +3,28 @@ import os
 import pathlib
 import re
 from .render import renderText
+from .backends import listBackends
+
+
+backendsAndSuffixes = listBackends()
+backendNames = [backendName for backendName, _ in backendsAndSuffixes]
+
+description = f"""\
+Render a text string to an image file. Available backends:
+"""
+for backendName, suffixes in backendsAndSuffixes:
+    description += f" {backendName} ({', '.join(suffixes)})"
 
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=description)
     parser.add_argument("font", metavar="FONT", type=existingFilePath, help="a font")
     parser.add_argument("text", metavar="TEXT", help="a string")
     parser.add_argument(
         "output",
         metavar="OUTPUT",
         type=outputFilePath,
-        help="an output file name, with .png or .svg extension, "
+        help="an output file name, with .png, .pdf or .svg extension, "
         "or '-', to print SVG to stdout",
     )
     parser.add_argument("--font-size", type=float, default=250)
@@ -22,9 +33,10 @@ def main():
     parser.add_argument("--margin", type=float, default=20)
     parser.add_argument(
         "--backend",
-        default="skia",
-        choices=["skia", "cairo", "coregraphics"],
-        help="The backend to use when rendering to .png",
+        default=None,
+        choices=backendNames,
+        help="The backend to use -- defaults to skia, except when rendering to "
+        ".svg, in which case the svg backend will be used.",
     )
     args = parser.parse_args()
     renderText(
@@ -35,7 +47,7 @@ def main():
         margin=args.margin,
         features=args.features,
         variations=args.variations,
-        pngSurfaceName=args.backend,
+        backendName=args.backend,
     )
 
 
@@ -51,7 +63,7 @@ def outputFilePath(path):
     if path == "-":
         return None
     path = pathlib.Path(path).resolve()
-    if path.suffix not in {".png", ".svg"}:
+    if path.suffix not in {".png", ".pdf", ".svg"}:
         raise argparse.ArgumentTypeError(
             f"path does not have the right extension; should be .png or .svg: "
             f"'{path}'"
