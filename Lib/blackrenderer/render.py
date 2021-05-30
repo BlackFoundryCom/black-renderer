@@ -22,7 +22,7 @@ def renderText(
     margin=20,
     features=None,
     variations=None,
-    pngSurfaceName="skia",
+    backend=None,
 ):
     font = BlackRendererFont(fontPath)
     glyphNames = font.glyphNames
@@ -45,10 +45,16 @@ def renderText(
     bounds = scaleRect(bounds, scaleFactor, scaleFactor)
     bounds = insetRect(bounds, -margin, -margin)
     bounds = intRect(bounds)
-    if outputPath is None or os.path.splitext(outputPath)[1] == ".svg":
-        surfaceClass = getSurfaceClass("svg")
+    if outputPath is None:
+        ext = ".svg"
     else:
-        surfaceClass = getSurfaceClass(pngSurfaceName)
+        ext = os.path.splitext(outputPath)[1].lower()
+    if backend is None:
+        if ext == ".svg":
+            backend = "svg"
+        else:
+            backend = "skia"
+    surfaceClass = getSurfaceClass(backend, ext)
     surface = surfaceClass(bounds)
     canvas = surface.canvas
     canvas.scale(scaleFactor)
@@ -60,9 +66,13 @@ def renderText(
     if outputPath is not None:
         surface.saveImage(outputPath)
     else:
-        stream = io.BytesIO()
-        surface.saveImage(stream)
-        print(stream.getvalue().decode("utf-8").rstrip())
+        import tempfile
+
+        with tempfile.NamedTemporaryFile(suffix=".svg") as tmp:
+            surface.saveImage(tmp.name)
+            with open(tmp.name, "rb") as f:
+                svgData = f.read().decode("utf-8").rstrip()
+        print(svgData)
 
 
 def buildGlyphLine(infos, positions, glyphNames):

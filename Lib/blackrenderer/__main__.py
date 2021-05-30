@@ -13,7 +13,7 @@ def main():
         "output",
         metavar="OUTPUT",
         type=outputFilePath,
-        help="an output file name, with .png or .svg extension, "
+        help="an output file name, with .png, .pdf or .svg extension, "
         "or '-', to print SVG to stdout",
     )
     parser.add_argument("--font-size", type=float, default=250)
@@ -22,9 +22,10 @@ def main():
     parser.add_argument("--margin", type=float, default=20)
     parser.add_argument(
         "--backend",
-        default="skia",
-        choices=["skia", "cairo", "coregraphics"],
-        help="The backend to use when rendering to .png",
+        default=None,
+        choices=["skia", "cairo", "coregraphics", "svg"],
+        help="The backend to use -- defaults to skia, except when rendering to "
+        ".svg, in which case the svg backend will be used.",
     )
     args = parser.parse_args()
     renderText(
@@ -35,7 +36,7 @@ def main():
         margin=args.margin,
         features=args.features,
         variations=args.variations,
-        pngSurfaceName=args.backend,
+        backend=args.backend,
     )
 
 
