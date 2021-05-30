@@ -104,9 +104,9 @@ def test_vectorBackends(backendName, imageSuffix):
     fontName = "noto"
     glyphName = "u1F943"
     surfaceClass = getSurfaceClass(backendName, imageSuffix)
-    assert surfaceClass.fileExtension == imageSuffix
     if surfaceClass is None:
         pytest.skip(f"{backendName} not available")
+    assert surfaceClass.fileExtension == imageSuffix
 
     font = BlackRendererFont(testFonts[fontName])
     boundingBox = font.getGlyphBounds(glyphName)
