@@ -52,7 +52,7 @@ def outputFilePath(path):
     if path == "-":
         return None
     path = pathlib.Path(path).resolve()
-    if path.suffix not in {".png", ".svg"}:
+    if path.suffix not in {".png", ".pdf", ".svg"}:
         raise argparse.ArgumentTypeError(
             f"path does not have the right extension; should be .png or .svg: "
             f"'{path}'"
