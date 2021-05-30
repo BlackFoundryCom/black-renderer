@@ -20,7 +20,7 @@ fully supports variable fonts, including variable COLRv1 data.
   - SVG
   - outline extractor
   - bounding box calculator
-- Support multiple output formats:
+- Supports multiple output formats:
   - .png
   - .pdf
   - .svg
