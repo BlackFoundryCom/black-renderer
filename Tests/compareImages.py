@@ -1,3 +1,6 @@
+import io
+import re
+import sys
 from PIL import Image, ImageChops
 
 
@@ -7,14 +10,21 @@ def compareImages(path1, path2):
     different or not comparable (for example, when their dimensions differ).
     """
     assert path1.suffix == path2.suffix
-    if path1.suffix.lower() == ".svg":
+    suffix = path1.suffix.lower()
+    if suffix == ".svg":
         if compareFiles(path1, path2):
             return 1
         else:
             return 0
-
-    im1 = Image.open(path1)
-    im2 = Image.open(path2)
+    elif suffix == ".pdf":
+        pdfEqual, im1, im2 = comparePDF(path1, path2)
+        if pdfEqual:
+            return 0
+        if im1 is None or im2 is None:
+            return 1
+    else:
+        im1 = Image.open(path1)
+        im2 = Image.open(path2)
 
     if im1.size != im2.size:
         # Dimensions differ, can't compare further
@@ -52,3 +62,38 @@ def compareImages(path1, path2):
 
 def compareFiles(path1, path2):
     return path1.read_bytes() != path2.read_bytes()
+
+
+def comparePDF(path1, path2):
+    data1 = path1.read_bytes()
+    data2 = path2.read_bytes()
+    if _filterPDF(data1) == _filterPDF(data2):
+        return True, None, None
+    if sys.platform == "darwin":
+        im1 = macRenderPDF(data1)
+        im2 = macRenderPDF(data2)
+        return None, im1, im2
+    else:
+        return False, None, None
+
+
+_pdfIgnorePatterns = [
+    (rb"/CreationDate \([^)]+\)", b"/CreationDate (00000000)"),
+]
+
+
+def _filterPDF(data):
+    for pat, repl in _pdfIgnorePatterns:
+        data = re.sub(pat, repl, data)
+    return data
+
+
+def macRenderPDF(data):
+    import AppKit
+
+    pdf = AppKit.PDFDocument.alloc().initWithData_(data)
+    if pdf.pageCount() != 1:
+        return None
+    page = pdf.pageAtIndex_(0)
+    image = AppKit.NSImage.alloc().initWithData_(page.dataRepresentation())
+    return Image.open(io.BytesIO(image.TIFFRepresentation()))

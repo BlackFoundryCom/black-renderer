@@ -128,3 +128,5 @@ def test_vectorBackends(backendName, imageSuffix):
     # - Cairo PDFs contain the creation date
     # - CoreGraphics PDFs are weirdly different while looking the same
     # assert expectedPath.read_bytes() == outputPath.read_bytes()
+    diff = compareImages(expectedPath, outputPath)
+    assert diff < 0.0001, diff
