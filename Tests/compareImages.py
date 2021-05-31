@@ -79,6 +79,8 @@ def compareSVG(path1, path2):
 
 _pdfIgnore = [
     (rb"/CreationDate \([^)]+\)", b"/CreationDate (00000000)"),
+    (rb"0000000000 65535 f[^t]+trailer", b"******"),
+    (rb"startxref[^%]+%%EOF", b"******"),
 ]
 
 
