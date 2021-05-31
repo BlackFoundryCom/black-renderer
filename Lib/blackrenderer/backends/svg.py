@@ -227,7 +227,7 @@ class SVGSurface(Surface):
         x, y, xMax, yMax = boundingBox
         width = xMax - x
         height = yMax - y
-        self.viewBox = x, y, width, height
+        self._viewBox = x, y, width, height
         transform = Transform(1, 0, 0, -1, 0, height + 2 * y)
         canvas = SVGCanvas(transform)
         yield canvas
@@ -235,57 +235,57 @@ class SVGSurface(Surface):
 
     def saveImage(self, path):
         with open(path, "wb") as f:
-            self.writeSVG(f)
+            writeSVGElements(self._svgElements, self._viewBox, f)
 
-    def writeSVG(self, stream):
-        elements = self._svgElements
-        clipPaths = {}
-        gradients = {}
-        for fillPath, fillT, clipPath, clipT, paint, paintT in elements:
-            clipKey = clipPath, clipT
-            if clipPath is not None and clipKey not in clipPaths:
-                clipPaths[clipKey] = f"clip_{len(clipPaths)}"
-            gradientKey = paint, paintT
-            if not isinstance(paint, RGBAPaint) and gradientKey not in gradients:
-                gradients[gradientKey] = f"gradient_{len(gradients)}"
 
-        root = ET.Element(
-            "svg",
-            width=formatNumber(self.viewBox[2]),
-            height=formatNumber(self.viewBox[3]),
-            preserveAspectRatio="xMinYMin slice",
-            viewBox=" ".join(formatNumber(n) for n in self.viewBox),
-            version="1.1",
-            xmlns="http://www.w3.org/2000/svg",
+def writeSVGElements(elements, viewBox, stream):
+    clipPaths = {}
+    gradients = {}
+    for fillPath, fillT, clipPath, clipT, paint, paintT in elements:
+        clipKey = clipPath, clipT
+        if clipPath is not None and clipKey not in clipPaths:
+            clipPaths[clipKey] = f"clip_{len(clipPaths)}"
+        gradientKey = paint, paintT
+        if not isinstance(paint, RGBAPaint) and gradientKey not in gradients:
+            gradients[gradientKey] = f"gradient_{len(gradients)}"
+
+    root = ET.Element(
+        "svg",
+        width=formatNumber(viewBox[2]),
+        height=formatNumber(viewBox[3]),
+        preserveAspectRatio="xMinYMin slice",
+        viewBox=" ".join(formatNumber(n) for n in viewBox),
+        version="1.1",
+        xmlns="http://www.w3.org/2000/svg",
+    )
+
+    # root.attrib["xmlns:link"] = "http://www.w3.org/1999/xlink"
+
+    if gradients:
+        defs = ET.SubElement(root, "defs")
+        for (gradient, gradientTransform), gradientID in gradients.items():
+            defs.append(gradient.toSVG(gradientID, gradientTransform))
+
+    for (clipPath, clipTransform), clipID in clipPaths.items():
+        clipElement = ET.SubElement(root, "clipPath", id=clipID)
+        ET.SubElement(
+            clipElement, "path", d=clipPath, transform=formatMatrix(clipTransform)
         )
 
-        # root.attrib["xmlns:link"] = "http://www.w3.org/1999/xlink"
+    for fillPath, fillT, clipPath, clipT, paint, paintT in elements:
+        attrs = [("d", fillPath)]
+        if isinstance(paint, RGBAPaint):
+            attrs += colorToSVGAttrs(paint)
+        else:
+            attrs.append(("fill", f"url(#{gradients[paint, paintT]})"))
+        attrs.append(("transform", formatMatrix(fillT)))
+        if clipPath is not None:
+            clipKey = clipPath, clipTransform
+            attrs.append(("clip-path", f"url(#{clipPaths[clipKey]})"))
+        ET.SubElement(root, "path", dict(attrs))
 
-        if gradients:
-            defs = ET.SubElement(root, "defs")
-            for (gradient, gradientTransform), gradientID in gradients.items():
-                defs.append(gradient.toSVG(gradientID, gradientTransform))
-
-        for (clipPath, clipTransform), clipID in clipPaths.items():
-            clipElement = ET.SubElement(root, "clipPath", id=clipID)
-            ET.SubElement(
-                clipElement, "path", d=clipPath, transform=formatMatrix(clipTransform)
-            )
-
-        for fillPath, fillT, clipPath, clipT, paint, paintT in elements:
-            attrs = [("d", fillPath)]
-            if isinstance(paint, RGBAPaint):
-                attrs += colorToSVGAttrs(paint)
-            else:
-                attrs.append(("fill", f"url(#{gradients[paint, paintT]})"))
-            attrs.append(("transform", formatMatrix(fillT)))
-            if clipPath is not None:
-                clipKey = clipPath, clipTransform
-                attrs.append(("clip-path", f"url(#{clipPaths[clipKey]})"))
-            ET.SubElement(root, "path", dict(attrs))
-
-        tree = ET.ElementTree(root)
-        tree.write(stream, pretty_print=True, xml_declaration=True)
+    tree = ET.ElementTree(root)
+    tree.write(stream, pretty_print=True, xml_declaration=True)
 
 
 def formatCoord(pt):
