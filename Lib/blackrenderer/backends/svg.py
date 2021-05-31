@@ -233,12 +233,9 @@ class SVGSurface(Surface):
         yield canvas
         self._svgElements = canvas.elements
 
-    def saveImage(self, pathOrFile):
-        if hasattr(pathOrFile, "write"):
-            self.writeSVG(pathOrFile)
-        else:
-            with open(pathOrFile, "wb") as f:
-                self.writeSVG(f)
+    def saveImage(self, path):
+        with open(path, "wb") as f:
+            self.writeSVG(f)
 
     def writeSVG(self, stream):
         elements = self._svgElements
