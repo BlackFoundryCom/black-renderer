@@ -1,5 +1,6 @@
 import pathlib
 import pytest
+from fontTools.misc.arrayTools import scaleRect, intRect
 from blackrenderer.font import BlackRendererFont
 from blackrenderer.backends import getSurfaceClass
 from blackrenderer.backends.pathCollector import BoundsCanvas, PathCollectorCanvas
@@ -52,10 +53,14 @@ def test_renderGlyph(backendName, surfaceClass, fontName, glyphName, location):
     font = BlackRendererFont(testFonts[fontName])
     font.setLocation(location)
 
+    scaleFactor = 1 / 4
     boundingBox = font.getGlyphBounds(glyphName)
+    boundingBox = scaleRect(boundingBox, scaleFactor, scaleFactor)
+    boundingBox = intRect(boundingBox)
 
     surface = surfaceClass(boundingBox)
     ext = surface.fileExtension
+    surface.canvas.scale(scaleFactor)
     font.drawGlyph(glyphName, surface.canvas)
 
     fileName = f"glyph_{fontName}_{glyphName}_{backendName}{ext}"
