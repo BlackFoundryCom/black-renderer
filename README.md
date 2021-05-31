@@ -72,11 +72,12 @@ from blackrenderer.font import BlackRendererFont
 from blackrenderer.backends import getSurfaceClass
 
 brFont = BlackRendererFont("my_colr_font.ttf")
-surfaceClass = getSurfaceClass("skia")
 glyphName = "A"
 boundingBox = brFont.getGlyphBounds(glyphName)
-surface = surfaceClass(boundingBox)
-brFont.drawGlyph(glyphName, surface.canvas)
+surfaceClass = getSurfaceClass("skia")
+surface = surfaceClass()
+with surface.canvas(boundingBox)
+    brFont.drawGlyph(glyphName, canvas)
 surface.saveImage("image.png")
 ```
 
