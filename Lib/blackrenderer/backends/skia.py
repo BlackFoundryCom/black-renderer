@@ -232,5 +232,5 @@ class SkiaSVGSurface(SkiaPDFSurface):
     def _drawPictureToStream(self, picture, stream):
         canvas = skia.SVGCanvas.Make(picture.cullRect(), stream)
         canvas.drawPicture(picture)
-        del canvas
+        del canvas  # hand holding skia-python with GC: it needs to go before stream
         stream.flush()
