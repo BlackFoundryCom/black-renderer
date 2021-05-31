@@ -194,15 +194,16 @@ class CairoPixelSurface(Surface):
     fileExtension = ".png"
 
     def __init__(self):
-        self.surface = None
+        self._surfaces = []
 
     @contextmanager
     def canvas(self, boundingBox):
         x, y, xMax, yMax = boundingBox
         width = xMax - x
         height = yMax - y
-        self.surface = self._setupCairoSurface(width, height)
-        context = cairo.Context(self.surface)
+        surface = self._setupCairoSurface(width, height)
+        self._surfaces.append((surface, (width, height)))
+        context = cairo.Context(surface)
         context.translate(-x, height + y)
         context.scale(1, -1)
         yield CairoCanvas(context)
@@ -211,28 +212,37 @@ class CairoPixelSurface(Surface):
         return cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
 
     def saveImage(self, path):
-        self.surface.flush()
-        self.surface.write_to_png(os.fspath(path))
-        self.surface.finish()
+        surface, _ = self._surfaces[-1]
+        surface.flush()
+        surface.write_to_png(os.fspath(path))
+        surface.finish()
 
 
 class CairoPDFSurface(CairoPixelSurface):
     fileExtension = ".pdf"
-    _cairoVectorSurfaceClass = cairo.PDFSurface
 
     def _setupCairoSurface(self, width, height):
-        self.width = width
-        self.height = height
         return cairo.RecordingSurface(cairo.CONTENT_COLOR_ALPHA, (0, 0, width, height))
 
     def saveImage(self, path):
-        pdfSurface = self._cairoVectorSurfaceClass(path, self.width, self.height)
+        _, (width, height) = self._surfaces[0]
+        pdfSurface = cairo.PDFSurface(path, width, height)
         pdfContext = cairo.Context(pdfSurface)
-        pdfContext.set_source_surface(self.surface, 0.0, 0.0)
-        pdfContext.paint()
+        for surface, (width, height) in self._surfaces:
+            pdfSurface.set_size(width, height)
+            pdfContext.set_source_surface(surface, 0.0, 0.0)
+            pdfContext.show_page()
+            pdfContext.paint()
         pdfSurface.flush()
 
 
 class CairoSVGSurface(CairoPDFSurface):
     fileExtension = ".svg"
-    _cairoVectorSurfaceClass = cairo.SVGSurface
+
+    def saveImage(self, path):
+        surface, (width, height) = self._surfaces[-1]
+        svgSurface = cairo.SVGSurface(path, width, height)
+        pdfContext = cairo.Context(svgSurface)
+        pdfContext.set_source_surface(surface, 0.0, 0.0)
+        pdfContext.paint()
+        svgSurface.flush()
