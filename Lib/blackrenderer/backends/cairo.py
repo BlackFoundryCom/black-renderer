@@ -227,12 +227,17 @@ class CairoPDFSurface(CairoPixelSurface):
     def saveImage(self, path):
         _, (width, height) = self._surfaces[0]
         pdfSurface = cairo.PDFSurface(path, width, height)
-        pdfContext = cairo.Context(pdfSurface)
+        pdfContext = None
         for surface, (width, height) in self._surfaces:
             pdfSurface.set_size(width, height)
+            if pdfContext is None:
+                # It's important to call the first set_size() *before*
+                # the context is created, or we'll get an additional
+                # empty page
+                pdfContext = cairo.Context(pdfSurface)
             pdfContext.set_source_surface(surface, 0.0, 0.0)
-            pdfContext.show_page()
             pdfContext.paint()
+            pdfContext.show_page()
         pdfSurface.flush()
 
 
