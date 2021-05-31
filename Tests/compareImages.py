@@ -12,10 +12,11 @@ def compareImages(path1, path2):
     assert path1.suffix == path2.suffix
     suffix = path1.suffix.lower()
     if suffix == ".svg":
-        if compareFiles(path1, path2):
-            return 1
-        else:
+        svgEqual = compareSVG(path1, path2)
+        if svgEqual:
             return 0
+        else:
+            return 1
     elif suffix == ".pdf":
         pdfEqual, im1, im2 = comparePDF(path1, path2)
         if pdfEqual:
@@ -64,10 +65,27 @@ def compareFiles(path1, path2):
     return path1.read_bytes() != path2.read_bytes()
 
 
+_svgIgnore = [
+    (rb'"surface\d+"', b'"surface***"'),
+    (rb'"#surface\d+"', b'"#surface***"'),
+]
+
+
+def compareSVG(path1, path2):
+    data1 = path1.read_bytes()
+    data2 = path2.read_bytes()
+    return _filterData(data1, _svgIgnore) == _filterData(data2, _svgIgnore)
+
+
+_pdfIgnore = [
+    (rb"/CreationDate \([^)]+\)", b"/CreationDate (00000000)"),
+]
+
+
 def comparePDF(path1, path2):
     data1 = path1.read_bytes()
     data2 = path2.read_bytes()
-    if _filterPDF(data1) == _filterPDF(data2):
+    if _filterData(data1, _pdfIgnore) == _filterData(data2, _pdfIgnore):
         return True, None, None
     if sys.platform == "darwin":
         im1 = macRenderPDF(data1)
@@ -77,13 +95,8 @@ def comparePDF(path1, path2):
         return False, None, None
 
 
-_pdfIgnorePatterns = [
-    (rb"/CreationDate \([^)]+\)", b"/CreationDate (00000000)"),
-]
-
-
-def _filterPDF(data):
-    for pat, repl in _pdfIgnorePatterns:
+def _filterData(data, ignorePatterns):
+    for pat, repl in ignorePatterns:
         data = re.sub(pat, repl, data)
     return data
 
