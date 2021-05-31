@@ -1,4 +1,3 @@
-import io
 from typing import NamedTuple
 import os
 from fontTools.misc.arrayTools import (
