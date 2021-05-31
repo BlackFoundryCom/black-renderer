@@ -20,31 +20,31 @@ backends = [
 backends = [(name, surface) for name, surface in backends if surface is not None]
 
 
-test_colorStops = [
+test_colorStopValues = [
     (0, 1),
 ]
 
 test_extendModes = [ExtendMode.PAD, ExtendMode.REPEAT, ExtendMode.REFLECT]
 
 
-@pytest.mark.parametrize("stopOffsets", test_colorStops)
+@pytest.mark.parametrize("stopOffsets", test_colorStopValues)
 @pytest.mark.parametrize("extend", test_extendModes)
 @pytest.mark.parametrize("backendName, surfaceClass", backends)
 def test_colorStops(backendName, surfaceClass, stopOffsets, extend):
-    surface = surfaceClass((0, 0, 600, 100))
-    canvas = surface.canvas
     point1 = (200, 0)
     point2 = (400, 0)
     color1 = (1, 0, 0, 1)
     color2 = (0, 0, 1, 1)
     stop1, stop2 = stopOffsets
     colorLine = [(stop1, color1), (stop2, color2)]
-    canvas.drawRectLinearGradient(
-        (0, 0, 600, 100), colorLine, point1, point2, extend, Identity
-    )
 
-    for pos in [200, 400]:
-        canvas.drawRectSolid((pos, 0, 1, 100), (0, 0, 0, 1))
+    surface = surfaceClass()
+    with surface.canvas((0, 0, 600, 100)) as canvas:
+        canvas.drawRectLinearGradient(
+            (0, 0, 600, 100), colorLine, point1, point2, extend, Identity
+        )
+        for pos in [200, 400]:
+            canvas.drawRectSolid((pos, 0, 1, 100), (0, 0, 0, 1))
 
     ext = surface.fileExtension
     stopsString = "_".join(str(s) for s in stopOffsets)
@@ -59,8 +59,6 @@ def test_colorStops(backendName, surfaceClass, stopOffsets, extend):
 @pytest.mark.parametrize("backendName, surfaceClass", backends)
 def test_sweepGradient(backendName, surfaceClass, extend):
     H, W = 400, 400
-    surface = surfaceClass((0, 0, H, W))
-    canvas = surface.canvas
     center = (H / 2, W / 2)
     startAngle = 45
     endAngle = 315
@@ -73,9 +71,12 @@ def test_sweepGradient(backendName, surfaceClass, extend):
     ]
     stopOffsets = [0, 0.5, 0.5, 0.6, 1]
     colorLine = list(zip(stopOffsets, colors))
-    canvas.drawRectSweepGradient(
-        (0, 0, H, W), colorLine, center, startAngle, endAngle, extend, Identity
-    )
+
+    surface = surfaceClass()
+    with surface.canvas((0, 0, H, W)) as canvas:
+        canvas.drawRectSweepGradient(
+            (0, 0, H, W), colorLine, center, startAngle, endAngle, extend, Identity
+        )
 
     ext = surface.fileExtension
     stopsString = "_".join(str(s) for s in stopOffsets)
@@ -121,11 +122,11 @@ test_compositeModes = [
 @pytest.mark.parametrize("backendName, surfaceClass", backends)
 def test_compositeMode(backendName, surfaceClass, compositeMode):
     H, W = 400, 400
-    surface = surfaceClass((0, 0, H, W))
-    canvas = surface.canvas
-    canvas.drawRectSolid((50, 50, 200, 200), (1, 0.2, 0, 1))
-    with canvas.compositeMode(compositeMode):
-        canvas.drawRectSolid((150, 150, 200, 200), (0, 0.2, 1, 1))
+    surface = surfaceClass()
+    with surface.canvas((0, 0, H, W)) as canvas:
+        canvas.drawRectSolid((50, 50, 200, 200), (1, 0.2, 0, 1))
+        with canvas.compositeMode(compositeMode):
+            canvas.drawRectSolid((150, 150, 200, 200), (0, 0.2, 1, 1))
     ext = surface.fileExtension
     compositeModeName = compositeMode.name.replace("_", "")  # nicer file sorting
     fileName = f"compositeMode_{compositeModeName}_{backendName}{ext}"

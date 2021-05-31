@@ -183,22 +183,22 @@ def _unpackColorLine(colorLine):
 class SkiaPixelSurface(Surface):
     fileExtension = ".png"
 
-    def __init__(self, boundingBox):
+    def __init__(self):
+        self.surface = None
+
+    @contextmanager
+    def canvas(self, boundingBox):
         x, y, xMax, yMax = boundingBox
         width = xMax - x
         height = yMax - y
         skCanvas = self._setupSkCanvas(x, y, width, height)
         skCanvas.translate(-x, height + y)
         skCanvas.scale(1, -1)
-        self._canvas = SkiaCanvas(skCanvas)
+        yield SkiaCanvas(skCanvas)
 
     def _setupSkCanvas(self, x, y, width, height):
         self.surface = skia.Surface(width, height)
         return self.surface.getCanvas()
-
-    @property
-    def canvas(self):
-        return self._canvas
 
     def saveImage(self, path, format=skia.kPNG):
         image = self.surface.makeImageSnapshot()
@@ -207,6 +207,9 @@ class SkiaPixelSurface(Surface):
 
 class SkiaPDFSurface(SkiaPixelSurface):
     fileExtension = ".pdf"
+
+    def __init__(self):
+        self.recorder = None
 
     def _setupSkCanvas(self, x, y, width, height):
         self.recorder = skia.PictureRecorder()

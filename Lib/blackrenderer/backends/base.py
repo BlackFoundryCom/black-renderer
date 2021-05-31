@@ -99,13 +99,13 @@ class Surface(ABC):
     fileExtension = ".png"
 
     @abstractmethod
-    def __init__(self, boundingBox):
-        # boundingBox = (xMin, yMin, xMax, yMax)
+    def __init__(self):
         ...
 
-    @property
     @abstractmethod
-    def canvas(self):
+    @contextmanager
+    def canvas(self, boundingBox):
+        # boundingBox = (xMin, yMin, xMax, yMax)
         ...
 
     @abstractmethod

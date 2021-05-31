@@ -219,17 +219,19 @@ def _gradientToSVG(
 class SVGSurface(Surface):
     fileExtension = ".svg"
 
-    def __init__(self, boundingBox):
+    def __init__(self):
+        self._svgElements = None
+
+    @contextmanager
+    def canvas(self, boundingBox):
         x, y, xMax, yMax = boundingBox
         width = xMax - x
         height = yMax - y
         self.viewBox = x, y, width, height
         transform = Transform(1, 0, 0, -1, 0, height + 2 * y)
-        self._canvas = SVGCanvas(transform)
-
-    @property
-    def canvas(self):
-        return self._canvas
+        canvas = SVGCanvas(transform)
+        yield canvas
+        self._svgElements = canvas.elements
 
     def saveImage(self, pathOrFile):
         if hasattr(pathOrFile, "write"):
@@ -239,7 +241,7 @@ class SVGSurface(Surface):
                 self.writeSVG(f)
 
     def writeSVG(self, stream):
-        elements = self.canvas.elements
+        elements = self._svgElements
         clipPaths = {}
         gradients = {}
         for fillPath, fillT, clipPath, clipT, paint, paintT in elements:

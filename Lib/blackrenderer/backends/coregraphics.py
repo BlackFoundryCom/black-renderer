@@ -218,12 +218,16 @@ def _unpackColorLine(colorLine):
 class CoreGraphicsPixelSurface(Surface):
     fileExtension = ".png"
 
-    def __init__(self, boundingBox):
+    def __init__(self):
+        self.context = None
+
+    @contextmanager
+    def canvas(self, boundingBox):
         x, y, xMax, yMax = boundingBox
         width = xMax - x
         height = yMax - y
         self.context = self._setupCGContext(x, y, width, height)
-        self._canvas = CoreGraphicsCanvas(self.context)
+        yield CoreGraphicsCanvas(self.context)
 
     def _setupCGContext(self, x, y, width, height):
         rgbColorSpace = CG.CGColorSpaceCreateDeviceRGB()
@@ -233,10 +237,6 @@ class CoreGraphicsPixelSurface(Surface):
         CG.CGContextTranslateCTM(context, -x, -y)
         return context
 
-    @property
-    def canvas(self):
-        return self._canvas
-
     def saveImage(self, path):
         image = CG.CGBitmapContextCreateImage(self.context)
         saveImageAsPNG(image, path)
@@ -245,19 +245,26 @@ class CoreGraphicsPixelSurface(Surface):
 class CoreGraphicsPDFSurface(CoreGraphicsPixelSurface):
     fileExtension = ".pdf"
 
+    @contextmanager
+    def canvas(self, boundingBox):
+        with super().canvas(boundingBox) as canvas:
+            CG.CGContextBeginPage(self.context, self._mediaBox)
+            yield canvas
+            CG.CGContextEndPage(self.context)
+
     def _setupCGContext(self, x, y, width, height):
-        mediaBox = ((x, y), (width, height))
-        self.data = CFDataCreateMutable(None, 0)
-        consumer = CG.CGDataConsumerCreateWithCFData(self.data)
-        context = CG.CGPDFContextCreate(consumer, mediaBox, None)
-        CG.CGContextBeginPage(context, mediaBox)
+        if self.context is not None:
+            return self.context
+        self._mediaBox = ((x, y), (width, height))
+        self._data = CFDataCreateMutable(None, 0)
+        consumer = CG.CGDataConsumerCreateWithCFData(self._data)
+        context = CG.CGPDFContextCreate(consumer, self._mediaBox, None)
         return context
 
     def saveImage(self, path):
-        CG.CGContextEndPage(self.context)
         CG.CGPDFContextClose(self.context)
         with open(path, "wb") as f:
-            f.write(self.data)
+            f.write(self._data)
 
 
 def saveImageAsPNG(image, path):

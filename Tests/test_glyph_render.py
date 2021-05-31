@@ -58,10 +58,11 @@ def test_renderGlyph(backendName, surfaceClass, fontName, glyphName, location):
     boundingBox = scaleRect(boundingBox, scaleFactor, scaleFactor)
     boundingBox = intRect(boundingBox)
 
-    surface = surfaceClass(boundingBox)
+    surface = surfaceClass()
     ext = surface.fileExtension
-    surface.canvas.scale(scaleFactor)
-    font.drawGlyph(glyphName, surface.canvas)
+    with surface.canvas(boundingBox) as canvas:
+        canvas.scale(scaleFactor)
+        font.drawGlyph(glyphName, canvas)
 
     fileName = f"glyph_{fontName}_{glyphName}_{backendName}{ext}"
     expectedPath = expectedOutputDir / fileName
@@ -116,8 +117,9 @@ def test_vectorBackends(backendName, imageSuffix):
     font = BlackRendererFont(testFonts[fontName])
     boundingBox = font.getGlyphBounds(glyphName)
 
-    surface = surfaceClass(boundingBox)
-    font.drawGlyph(glyphName, surface.canvas)
+    surface = surfaceClass()
+    with surface.canvas(boundingBox) as canvas:
+        font.drawGlyph(glyphName, canvas)
     fileName = f"vector_{fontName}_{glyphName}_{backendName}{imageSuffix}"
     expectedPath = expectedOutputDir / fileName
     outputPath = tmpOutputDir / fileName

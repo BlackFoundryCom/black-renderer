@@ -193,22 +193,22 @@ class CairoCanvas(Canvas):
 class CairoPixelSurface(Surface):
     fileExtension = ".png"
 
-    def __init__(self, boundingBox):
+    def __init__(self):
+        self.surface = None
+
+    @contextmanager
+    def canvas(self, boundingBox):
         x, y, xMax, yMax = boundingBox
         width = xMax - x
         height = yMax - y
         self.surface = self._setupCairoSurface(width, height)
-        self.context = cairo.Context(self.surface)
-        self.context.translate(-x, height + y)
-        self.context.scale(1, -1)
-        self._canvas = CairoCanvas(self.context)
+        context = cairo.Context(self.surface)
+        context.translate(-x, height + y)
+        context.scale(1, -1)
+        yield CairoCanvas(context)
 
     def _setupCairoSurface(self, width, height):
         return cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
-
-    @property
-    def canvas(self):
-        return self._canvas
 
     def saveImage(self, path):
         self.surface.flush()

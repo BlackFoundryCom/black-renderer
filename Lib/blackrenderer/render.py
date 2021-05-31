@@ -62,14 +62,15 @@ def renderText(
     if surfaceClass is None:
         raise BackendUnavailableError(backendName)
 
-    surface = surfaceClass(bounds)
-    canvas = surface.canvas
-    canvas.scale(scaleFactor)
-    for glyph in glyphLine:
-        with canvas.savedState():
-            canvas.translate(glyph.xOffset, glyph.yOffset)
-            font.drawGlyph(glyph.name, canvas)
-        canvas.translate(glyph.xAdvance, glyph.yAdvance)
+    surface = surfaceClass()
+    with surface.canvas(bounds) as canvas:
+        canvas.scale(scaleFactor)
+        for glyph in glyphLine:
+            with canvas.savedState():
+                canvas.translate(glyph.xOffset, glyph.yOffset)
+                font.drawGlyph(glyph.name, canvas)
+            canvas.translate(glyph.xAdvance, glyph.yAdvance)
+
     if outputPath is not None:
         surface.saveImage(outputPath)
     else:
