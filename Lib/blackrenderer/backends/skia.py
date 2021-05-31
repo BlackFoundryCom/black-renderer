@@ -180,56 +180,66 @@ def _unpackColorLine(colorLine):
     return colors, stops
 
 
-class SkiaPixelSurface(Surface):
-    fileExtension = ".png"
-
-    def __init__(self, boundingBox):
+class _SkiaBaseSurface(Surface):
+    @contextmanager
+    def canvas(self, boundingBox):
         x, y, xMax, yMax = boundingBox
         width = xMax - x
         height = yMax - y
-        skCanvas = self._setupSkCanvas(x, y, width, height)
+        skCanvas, surfaceData = self._setupSkCanvas(x, y, width, height)
         skCanvas.translate(-x, height + y)
         skCanvas.scale(1, -1)
-        self._canvas = SkiaCanvas(skCanvas)
+        yield SkiaCanvas(skCanvas)
+        self._finalizeCanvas(surfaceData)
+
+
+class SkiaPixelSurface(_SkiaBaseSurface):
+    fileExtension = ".png"
+
+    def __init__(self):
+        self._image = None
 
     def _setupSkCanvas(self, x, y, width, height):
-        self.surface = skia.Surface(width, height)
-        return self.surface.getCanvas()
+        surface = skia.Surface(width, height)
+        return surface.getCanvas(), surface
 
-    @property
-    def canvas(self):
-        return self._canvas
+    def _finalizeCanvas(self, surface):
+        self._image = surface.makeImageSnapshot()
 
     def saveImage(self, path, format=skia.kPNG):
-        image = self.surface.makeImageSnapshot()
-        image.save(os.fspath(path), format)
+        self._image.save(os.fspath(path), format)
 
 
-class SkiaPDFSurface(SkiaPixelSurface):
+class SkiaPDFSurface(_SkiaBaseSurface):
     fileExtension = ".pdf"
 
+    def __init__(self):
+        self._pictures = []
+
     def _setupSkCanvas(self, x, y, width, height):
-        self.recorder = skia.PictureRecorder()
-        return self.recorder.beginRecording(width, height)
+        recorder = skia.PictureRecorder()
+        return recorder.beginRecording(width, height), recorder
+
+    def _finalizeCanvas(self, recorder):
+        self._pictures.append(recorder.finishRecordingAsPicture())
 
     def saveImage(self, path):
         stream = skia.FILEWStream(os.fspath(path))
-        picture = self.recorder.finishRecordingAsPicture()
-        self._drawPictureToStream(picture, stream)
-
-    def _drawPictureToStream(self, picture, stream):
         with skia.PDF.MakeDocument(stream) as document:
-            x, y, width, height = picture.cullRect()
-            assert x == 0 and y == 0
-            with document.page(width, height) as canvas:
-                canvas.drawPicture(picture)
+            for picture in self._pictures:
+                x, y, width, height = picture.cullRect()
+                assert x == 0 and y == 0
+                with document.page(width, height) as canvas:
+                    canvas.drawPicture(picture)
         stream.flush()
 
 
 class SkiaSVGSurface(SkiaPDFSurface):
     fileExtension = ".svg"
 
-    def _drawPictureToStream(self, picture, stream):
+    def saveImage(self, path):
+        stream = skia.FILEWStream(os.fspath(path))
+        picture = self._pictures[-1]
         canvas = skia.SVGCanvas.Make(picture.cullRect(), stream)
         canvas.drawPicture(picture)
         del canvas  # hand holding skia-python with GC: it needs to go before stream
