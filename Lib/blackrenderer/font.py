@@ -408,6 +408,13 @@ def _normalizeColorLine(colorLine):
         # interpolation. By setting minStop and maxStop to 0 and 1,
         # we at least won't mess up the parameters.
         # FIXME: should the gradient simply not be drawn in this case?
+        # 1. If there's only one color stop, we can just draw a solid
+        # color.
+        # 2. If there are > 1 color stops all at the same color stop
+        # offset, things get interesting: everything "to the left"
+        # should get color[0], everything "to the right" should get
+        # color[-1]. If there are more than 2 color stops, all but the
+        # first and last should be ignored.
         minStop, maxStop = 0, 1
     return minStop, maxStop, colorLine
 
