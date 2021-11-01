@@ -1,5 +1,5 @@
 from functools import singledispatch
-from fontTools.ttLib.tables.otTables import ColorIndex, ColorLine, Paint
+from fontTools.ttLib.tables.otTables import ColorLine, Paint
 from .font import PAINT_NAMES
 
 
@@ -40,11 +40,6 @@ def unpackPaint(paint: Paint, font):
                 v = unpackObject(v, font)
             d[n] = v
     return d
-
-
-@unpackObject.register
-def unpackColorIndex(color: ColorIndex, font):
-    return color255(font._getColor(color.PaletteIndex, color.Alpha))
 
 
 @unpackObject.register

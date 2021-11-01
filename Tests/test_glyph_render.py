@@ -76,7 +76,7 @@ def test_pathCollector():
     font = BlackRendererFont(testFonts["noto"])
     canvas = PathCollectorCanvas()
     font.drawGlyph("uni2693", canvas)
-    assert len(canvas.paths) == 2
+    assert len(canvas.paths) == 6
 
 
 def test_boundsCanvas():

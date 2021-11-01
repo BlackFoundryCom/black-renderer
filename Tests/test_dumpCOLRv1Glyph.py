@@ -14,28 +14,51 @@ uni2693
     - # PaintGlyph
       Format 10
       Paint
-          # PaintLinearGradient
-          Format 4
-          ColorLine
-            - (0.014, (117, 117, 117, 255))
-            - (0.172, (129, 129, 129, 255))
-            - (0.459, (162, 162, 162, 255))
-            - (0.84, (214, 214, 214, 255))
-            - (1.0, (238, 238, 238, 255))
-          x0 638
-          y0 -212
-          x1 638
-          y1 909
-          x2 1758
-          y2 -212
-      Glyph glyph44642
+          # PaintSolid
+          Format 2
+          PaletteIndex 2148
+          Alpha 1.0
+      Glyph glyph39143
     - # PaintGlyph
       Format 10
       Paint
           # PaintSolid
           Format 2
-          Color (13, 71, 161, 51)
-      Glyph glyph44643
+          PaletteIndex 871
+          Alpha 1.0
+      Glyph glyph39144
+    - # PaintGlyph
+      Format 10
+      Paint
+          # PaintSolid
+          Format 2
+          PaletteIndex 2491
+          Alpha 1.0
+      Glyph glyph39145
+    - # PaintGlyph
+      Format 10
+      Paint
+          # PaintSolid
+          Format 2
+          PaletteIndex 871
+          Alpha 0.89
+      Glyph glyph39146
+    - # PaintGlyph
+      Format 10
+      Paint
+          # PaintSolid
+          Format 2
+          PaletteIndex 2491
+          Alpha 1.0
+      Glyph glyph39147
+    - # PaintGlyph
+      Format 10
+      Paint
+          # PaintSolid
+          Format 2
+          PaletteIndex 871
+          Alpha 1.0
+      Glyph glyph39148
 """
 
 
