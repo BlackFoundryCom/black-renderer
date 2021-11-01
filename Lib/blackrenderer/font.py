@@ -255,6 +255,11 @@ class BlackRendererFont:
         transform = (1, 0, 0, 1, paint.dx, paint.dy)
         self._applyTransform(transform, paint.Paint, canvas)
 
+    def _drawPaintRotate(self, paint, canvas):
+        transform = Transform()
+        transform = transform.rotate(math.radians(paint.angle))
+        self._applyTransform(transform, paint.Paint, canvas)
+
     def _drawPaintRotateAroundCenter(self, paint, canvas):
         transform = Transform()
         transform = transform.translate(paint.centerX, paint.centerY)
@@ -264,6 +269,13 @@ class BlackRendererFont:
 
     def _drawPaintSkew(self, paint, canvas):
         transform = Transform()
+        transform = transform.skew(
+            math.radians(paint.xSkewAngle), math.radians(paint.ySkewAngle)
+        )
+        self._applyTransform(transform, paint.Paint, canvas)
+
+    def _drawPaintSkewAroundCenter(self, paint, canvas):
+        transform = Transform()
         transform = transform.translate(paint.centerX, paint.centerY)
         transform = transform.skew(
             math.radians(paint.xSkewAngle), math.radians(paint.ySkewAngle)
@@ -272,10 +284,26 @@ class BlackRendererFont:
         self._applyTransform(transform, paint.Paint, canvas)
 
     def _drawPaintScale(self, paint, canvas):
-        # https://github.com/googlefonts/colr-gradients-spec/issues/279
+        transform = Transform()
+        transform = transform.scale(paint.scaleX, paint.scaleY)
+        self._applyTransform(transform, paint.Paint, canvas)
+
+    def _drawPaintScaleAroundCenter(self, paint, canvas):
         transform = Transform()
         transform = transform.translate(paint.centerX, paint.centerY)
-        transform = transform.scale(paint.xScale, paint.yScale)
+        transform = transform.scale(paint.scaleX, paint.scaleY)
+        transform = transform.translate(-paint.centerX, -paint.centerY)
+        self._applyTransform(transform, paint.Paint, canvas)
+
+    def _drawPaintScaleUniform(self, paint, canvas):
+        transform = Transform()
+        transform = transform.scale(paint.scale, paint.scale)
+        self._applyTransform(transform, paint.Paint, canvas)
+
+    def _drawPaintScaleUniformAroundCenter(self, paint, canvas):
+        transform = Transform()
+        transform = transform.translate(paint.centerX, paint.centerY)
+        transform = transform.scale(paint.scale, paint.scale)
         transform = transform.translate(-paint.centerX, -paint.centerY)
         self._applyTransform(transform, paint.Paint, canvas)
 
