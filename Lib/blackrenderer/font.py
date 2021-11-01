@@ -468,16 +468,17 @@ class PaintVarWrapper:
 
     def __getattr__(self, attrName):
         value = getattr(self._wrappedPaint, attrName)
-        if isinstance(value, VariableValue):
-            if value.varIdx != 0xFFFFFFFF:
-                factor = _conversionFactors.get(
-                    type(self._wrappedPaint.getConverterByName(attrName)), 1
-                )
-                value = value.value + self._instancer[value.varIdx] * factor
-            else:
-                value = value.value
-        elif type(value).__name__.startswith("Var"):
-            value = PaintVarWrapper(value, self._instancer)
-        elif isinstance(value, (list, UserList)):
-            value = [PaintVarWrapper(item, self._instancer) for item in value]
+        raise NotImplementedError("This code is currently not working")
+        # if isinstance(value, VariableValue):
+        #     if value.varIdx != 0xFFFFFFFF:
+        #         factor = _conversionFactors.get(
+        #             type(self._wrappedPaint.getConverterByName(attrName)), 1
+        #         )
+        #         value = value.value + self._instancer[value.varIdx] * factor
+        #     else:
+        #         value = value.value
+        # elif type(value).__name__.startswith("Var"):
+        #     value = PaintVarWrapper(value, self._instancer)
+        # elif isinstance(value, (list, UserList)):
+        #     value = [PaintVarWrapper(item, self._instancer) for item in value]
         return value
