@@ -7,7 +7,6 @@ from fontTools.misc.transform import Transform, Identity
 from fontTools.misc.arrayTools import unionRect
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables.otTables import CompositeMode, PaintFormat
-# from fontTools.ttLib.tables.otConverters import VarF2Dot14, VarFixed
 from fontTools.varLib.varStore import VarStoreInstancer
 import uharfbuzz as hb
 
