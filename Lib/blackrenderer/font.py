@@ -6,8 +6,8 @@ import math
 from fontTools.misc.transform import Transform, Identity
 from fontTools.misc.arrayTools import unionRect
 from fontTools.ttLib import TTFont
-from fontTools.ttLib.tables.otTables import CompositeMode, PaintFormat, VariableValue
-from fontTools.ttLib.tables.otConverters import VarF2Dot14, VarFixed
+from fontTools.ttLib.tables.otTables import CompositeMode, PaintFormat
+# from fontTools.ttLib.tables.otConverters import VarF2Dot14, VarFixed
 from fontTools.varLib.varStore import VarStoreInstancer
 import uharfbuzz as hb
 
@@ -46,9 +46,13 @@ class BlackRendererFont:
                 colrTable = colrTable.table
                 self.colrV1Glyphs = {
                     glyph.BaseGlyph: glyph
-                    for glyph in colrTable.BaseGlyphV1List.BaseGlyphV1Record
+                    for glyph in colrTable.BaseGlyphList.BaseGlyphPaintRecord
                 }
-                self.colrLayersV1 = colrTable.LayerV1List
+                if colrTable.ClipList is None:
+                    self.clipBoxes = None
+                else:
+                    self.clipBoxes = colrTable.ClipList.clips
+                self.colrLayersV1 = colrTable.LayerList
                 if colrTable.VarStore is not None:
                     self.instancer = VarStoreInstancer(
                         colrTable.VarStore, self.ttFont["fvar"].axes
@@ -98,9 +102,13 @@ class BlackRendererFont:
         return self.colrV1Glyphs.keys()
 
     def getGlyphBounds(self, glyphName):
-        if glyphName in self.colrV1Glyphs or glyphName not in self.colrV0Glyphs:
+        if glyphName in self.colrV1Glyphs:
             bounds = self._getGlyphBounds(glyphName)
-        else:
+            if self.clipBoxes is not None:
+                box = self.clipBoxes.get(glyphName)
+                if box is not None:
+                    bounds = box.xMin, box.yMin, box.xMax, box.yMax
+        elif glyphName in self.colrV0Glyphs:
             # For COLRv0, we take the union of all layer bounds
             bounds = None
             for layer in self.colrV0Glyphs[glyphName]:
@@ -109,6 +117,8 @@ class BlackRendererFont:
                     bounds = layerBounds
                 else:
                     bounds = unionRect(layerBounds, bounds)
+        else:
+            bounds = self._getGlyphBounds(glyphName)
         return bounds
 
     def drawGlyph(self, glyphName, canvas, *, palette=None, textColor=(0, 0, 0, 1)):
@@ -171,7 +181,7 @@ class BlackRendererFont:
                     self._drawPaint(self.colrLayersV1.Paint[i], canvas)
 
     def _drawPaintSolid(self, paint, canvas):
-        color = self._getColor(paint.Color.PaletteIndex, paint.Color.Alpha)
+        color = self._getColor(paint.PaletteIndex, paint.Alpha)
         canvas.drawPathSolid(self.currentPath, color)
 
     def _drawPaintLinearGradient(self, paint, canvas):
@@ -246,7 +256,7 @@ class BlackRendererFont:
         transform = (1, 0, 0, 1, paint.dx, paint.dy)
         self._applyTransform(transform, paint.Paint, canvas)
 
-    def _drawPaintRotate(self, paint, canvas):
+    def _drawPaintRotateAroundCenter(self, paint, canvas):
         transform = Transform()
         transform = transform.translate(paint.centerX, paint.centerY)
         transform = transform.rotate(math.radians(paint.angle))
@@ -373,7 +383,7 @@ class BlackRendererFont:
     def _readColorLine(self, colorLineTable):
         return _normalizeColorLine(
             [
-                (cs.StopOffset, self._getColor(cs.Color.PaletteIndex, cs.Color.Alpha))
+                (cs.StopOffset, self._getColor(cs.PaletteIndex, cs.Alpha))
                 for cs in colorLineTable.ColorStop
             ]
         )
@@ -442,10 +452,10 @@ def axisValuesToLocation(normalizedAxisValues, axisTags):
     }
 
 
-_conversionFactors = {
-    VarF2Dot14: 1 / (1 << 14),
-    VarFixed: 1 / (1 << 16),
-}
+# _conversionFactors = {
+#     VarF2Dot14: 1 / (1 << 14),
+#     VarFixed: 1 / (1 << 16),
+# }
 
 
 class PaintVarWrapper:
