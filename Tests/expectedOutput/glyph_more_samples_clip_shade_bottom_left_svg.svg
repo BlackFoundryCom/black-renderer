@@ -1,0 +1,4 @@
+<?xml version='1.0' encoding='ASCII'?>
+<svg width="125" height="125" preserveAspectRatio="xMinYMin slice" viewBox="0 0 125 125" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <path d="M0,0 v500 h500 v-500 h-500 Z" fill="#000000" transform="matrix(0.25,0,0,-0.25,0,125)"/>
+</svg>
