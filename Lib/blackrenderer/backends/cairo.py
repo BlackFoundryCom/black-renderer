@@ -22,6 +22,7 @@ _compositeModeMap = {
     CompositeMode.SRC_ATOP: cairo.OPERATOR_ATOP,
     CompositeMode.DEST_ATOP: cairo.OPERATOR_DEST_ATOP,
     CompositeMode.XOR: cairo.OPERATOR_XOR,
+    CompositeMode.PLUS: cairo.OPERATOR_ADD,
     CompositeMode.SCREEN: cairo.OPERATOR_SCREEN,
     CompositeMode.OVERLAY: cairo.OPERATOR_OVERLAY,
     CompositeMode.DARKEN: cairo.OPERATOR_DARKEN,

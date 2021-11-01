@@ -19,6 +19,7 @@ _compositeModeMap = {
     CompositeMode.SRC_ATOP: skia.BlendMode.kSrcATop,
     CompositeMode.DEST_ATOP: skia.BlendMode.kDstATop,
     CompositeMode.XOR: skia.BlendMode.kXor,
+    CompositeMode.PLUS: skia.BlendMode.kPlus,
     CompositeMode.SCREEN: skia.BlendMode.kScreen,
     CompositeMode.OVERLAY: skia.BlendMode.kOverlay,
     CompositeMode.DARKEN: skia.BlendMode.kDarken,
