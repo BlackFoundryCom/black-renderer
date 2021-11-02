@@ -22,6 +22,7 @@ _compositeModeMap = {
     CompositeMode.SRC_ATOP: CG.kCGBlendModeSourceAtop,
     CompositeMode.DEST_ATOP: CG.kCGBlendModeDestinationAtop,
     CompositeMode.XOR: CG.kCGBlendModeXOR,
+    CompositeMode.PLUS: CG.kCGBlendModePlusLighter,
     CompositeMode.SCREEN: CG.kCGBlendModeScreen,
     CompositeMode.OVERLAY: CG.kCGBlendModeOverlay,
     CompositeMode.DARKEN: CG.kCGBlendModeDarken,

@@ -19,6 +19,7 @@ _compositeModeMap = {
     CompositeMode.SRC_ATOP: skia.BlendMode.kSrcATop,
     CompositeMode.DEST_ATOP: skia.BlendMode.kDstATop,
     CompositeMode.XOR: skia.BlendMode.kXor,
+    CompositeMode.PLUS: skia.BlendMode.kPlus,
     CompositeMode.SCREEN: skia.BlendMode.kScreen,
     CompositeMode.OVERLAY: skia.BlendMode.kOverlay,
     CompositeMode.DARKEN: skia.BlendMode.kDarken,
@@ -153,6 +154,13 @@ class SkiaCanvas(Canvas):
         extendMode,
         gradientTransform,
     ):
+        # The following is needed to please the Skia shader, but it's a bit fuzzy
+        # to me how this affects the spec. Translated from:
+        # https://source.chromium.org/chromium/chromium/src/+/master:third_party/skia/src/ports/SkFontHost_FreeType_common.cpp;l=673-686
+        startAngle %= 360
+        endAngle %= 360
+        if startAngle >= endAngle:
+            endAngle += 360
         matrix = skia.Matrix()
         matrix.setAffine(gradientTransform)
         colors, stops = _unpackColorLine(colorLine)

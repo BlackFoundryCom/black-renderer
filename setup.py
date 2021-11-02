@@ -36,7 +36,7 @@ setup(
     package_dir={"": "Lib"},
     packages=find_packages("Lib"),
     install_requires=[
-        "fonttools >= 4.17.0",
+        "fonttools >= 4.27.0",
         "uharfbuzz >= 0.16.0",
     ],
     extras_require={

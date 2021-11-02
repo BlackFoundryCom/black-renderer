@@ -37,13 +37,59 @@ test_glyphs = [
     ("mutator", "B", None),
     ("mutator", "D", {"wdth": 1000}),
     ("twemoji", "uni3299", None),
+    ("more_samples", "cross_glyph", None),
+    ("more_samples", "skew_0_15_center_500.0_500.0", None),
+    ("more_samples", "skew_-10_20_center_500.0_500.0", None),
+    ("more_samples", "skew_-10_20_center_1000_1000", None),
+    ("more_samples", "transform_matrix_1_0_0_1_125_125", None),
+    ("more_samples", "transform_matrix_1.5_0_0_1.5_0_0", None),
+    ("more_samples", "transform_matrix_0.9659_0.2588_-0.2588_0.9659_0_0", None),
+    ("more_samples", "transform_matrix_1.0_0.0_0.6_1.0_-300.0_0.0", None),
+    ("more_samples", "clip_box_top_left", None),
+    ("more_samples", "clip_box_bottom_left", None),
+    ("more_samples", "clip_box_bottom_right", None),
+    ("more_samples", "clip_box_top_right", None),
+    ("more_samples", "clip_box_center", None),
+    ("more_samples", "composite_DEST_OVER", None),
+    ("more_samples", "composite_XOR", None),
+    ("more_samples", "composite_OVERLAY", None),
+    ("more_samples", "composite_SRC_IN", None),
+    ("more_samples", "composite_PLUS", None),
+    ("more_samples", "composite_LIGHTEN", None),
+    ("more_samples", "composite_MULTIPLY", None),
+    ("more_samples", "clip_shade_center", None),
+    ("more_samples", "clip_shade_top_left", None),
+    ("more_samples", "clip_shade_bottom_left", None),
+    ("more_samples", "clip_shade_bottom_right", None),
+    ("more_samples", "clip_shade_top_right", None),
+    ("more_samples", "inset_clipped_radial_reflect", None),
     ("more_samples", "sweep", None),
+    ("more_samples", "transformed_sweep", None),
     ("more_samples", "composite_colr_glyph", None),
     ("more_samples", "linear_repeat_0_1", None),
     ("more_samples", "linear_repeat_0.2_0.8", None),
     ("more_samples", "linear_repeat_0_1.5", None),
     ("more_samples", "linear_repeat_0.5_1.5", None),
-    ("more_samples", "transformed_sweep", None),
+    ("more_samples", "scale_0.5_1.5_center_500.0_500.0", None),
+    ("more_samples", "scale_1.5_1.5_center_500.0_500.0", None),
+    ("more_samples", "scale_0.5_1.5_center_0_0", None),
+    ("more_samples", "scale_1.5_1.5_center_0_0", None),
+    ("more_samples", "scale_0.5_1.5_center_1000_1000", None),
+    ("more_samples", "scale_1.5_1.5_center_1000_1000", None),
+    ("more_samples", "linear_gradient_extend_mode_pad", None),
+    ("more_samples", "linear_gradient_extend_mode_repeat", None),
+    ("more_samples", "linear_gradient_extend_mode_reflect", None),
+    ("more_samples", "radial_gradient_extend_mode_pad", None),
+    ("more_samples", "radial_gradient_extend_mode_repeat", None),
+    ("more_samples", "radial_gradient_extend_mode_reflect", None),
+    ("more_samples", "rotate_10_center_0_0", None),
+    ("more_samples", "rotate_-10_center_1000_1000", None),
+    ("more_samples", "rotate_25_center_500.0_500.0", None),
+    ("more_samples", "rotate_-15_center_500.0_500.0", None),
+    ("more_samples", "skew_25_0_center_0_0", None),
+    ("more_samples", "skew_25_0_center_500.0_500.0", None),
+    ("more_samples", "skew_0_15_center_0_0", None),
+    ("more_samples", "upem_box_glyph", None),
 ]
 
 
@@ -69,14 +115,14 @@ def test_renderGlyph(backendName, surfaceClass, fontName, glyphName, location):
     outputPath = tmpOutputDir / fileName
     surface.saveImage(outputPath)
     diff = compareImages(expectedPath, outputPath)
-    assert diff < 0.0001, diff
+    assert diff < 0.00012, diff
 
 
 def test_pathCollector():
     font = BlackRendererFont(testFonts["noto"])
     canvas = PathCollectorCanvas()
     font.drawGlyph("uni2693", canvas)
-    assert len(canvas.paths) == 2
+    assert len(canvas.paths) == 6
 
 
 def test_boundsCanvas():
@@ -129,4 +175,4 @@ def test_vectorBackends(backendName, imageSuffix):
     # - CoreGraphics PDFs are weirdly different while looking the same
     # assert expectedPath.read_bytes() == outputPath.read_bytes()
     diff = compareImages(expectedPath, outputPath)
-    assert diff < 0.0001, diff
+    assert diff < 0.00012, diff

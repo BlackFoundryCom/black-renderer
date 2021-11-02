@@ -100,6 +100,7 @@ test_compositeModes = [
     CompositeMode.SRC_ATOP,
     CompositeMode.DEST_ATOP,
     CompositeMode.XOR,
+    CompositeMode.PLUS,
     CompositeMode.SCREEN,
     CompositeMode.OVERLAY,
     CompositeMode.DARKEN,
