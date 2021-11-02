@@ -154,7 +154,7 @@ class SkiaCanvas(Canvas):
         extendMode,
         gradientTransform,
     ):
-        # The following is needed to please the Skia shader, but it's a but fuzzy
+        # The following is needed to please the Skia shader, but it's a bit fuzzy
         # to me how this affects the spec. Translated from:
         # https://source.chromium.org/chromium/chromium/src/+/master:third_party/skia/src/ports/SkFontHost_FreeType_common.cpp;l=673-686
         startAngle %= 360
