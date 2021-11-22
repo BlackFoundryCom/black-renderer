@@ -2,5 +2,5 @@ pytest==6.2.5
 skia-python==87.3
 numpy==1.21.4  # undeclared dependency of skia-python
 pycairo==1.20.1; sys_platform != 'darwin'  # there are currently no Mac wheels for pycairo
-pyobjc==7.3; sys_platform == 'darwin'
+pyobjc==8.0; sys_platform == 'darwin'
 pillow==8.4.0
