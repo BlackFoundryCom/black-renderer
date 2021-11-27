@@ -26,6 +26,7 @@ testFonts = {
     "mutator": dataDir / "MutatorSans.ttf",
     "twemoji": dataDir / "TwemojiMozilla.subset.default.3299.ttf",
     "more_samples": dataDir / "more_samples-glyf_colr_1.ttf",
+    "crash": dataDir / "crash.subset.otf",
 }
 
 
@@ -176,3 +177,16 @@ def test_vectorBackends(backendName, imageSuffix):
     # assert expectedPath.read_bytes() == outputPath.read_bytes()
     diff = compareImages(expectedPath, outputPath)
     assert diff < 0.00012, diff
+
+
+def test_recursive():
+    # https://github.com/BlackFoundryCom/black-renderer/issues/56
+    # https://github.com/justvanrossum/fontgoggles/issues/213
+    glyphName = "hah-ar"
+    font = BlackRendererFont(testFonts["crash"])
+    boundingBox = font.getGlyphBounds(glyphName)
+    surfaceClass = getSurfaceClass("svg", ".svg")
+    surface = surfaceClass()
+    with surface.canvas(boundingBox) as canvas:
+        with pytest.raises(RecursionError):
+            font.drawGlyph(glyphName, canvas)
