@@ -125,6 +125,7 @@ class BlackRendererFont:
             palette = self.palettes[0]
         self.currentPalette = palette
         self.textColor = textColor
+        self._recursionCheck = set()
 
         glyph = self.colrV1Glyphs.get(glyphName)
         if glyph is not None:
@@ -151,7 +152,13 @@ class BlackRendererFont:
             canvas.drawPathSolid(path, self._getColor(layer.colorID, 1))
 
     def _drawGlyphCOLRv1(self, glyph, canvas):
-        self._drawPaint(glyph.Paint, canvas)
+        if glyph.BaseGlyph in self._recursionCheck:
+            raise RecursionError(f"Glyph '{glyph.BaseGlyph}' references itself")
+        self._recursionCheck.add(glyph.BaseGlyph)
+        try:
+            self._drawPaint(glyph.Paint, canvas)
+        finally:
+            self._recursionCheck.remove(glyph.BaseGlyph)
 
     # COLRv1 Paint dispatch
 

@@ -188,4 +188,5 @@ def test_recursive():
     surfaceClass = getSurfaceClass("svg", ".svg")
     surface = surfaceClass()
     with surface.canvas(boundingBox) as canvas:
-        font.drawGlyph(glyphName, canvas)
+        with pytest.raises(RecursionError):
+            font.drawGlyph(glyphName, canvas)
