@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from contextlib import contextmanager
 import logging
 from typing import NamedTuple
@@ -58,6 +59,7 @@ class SVGCanvas(Canvas):
     def __init__(self, transform):
         self.clipStack = ()
         self.currentTransform = transform
+        self.solidStacks = OrderedDict()
         self.elements = []
 
     @staticmethod
@@ -85,7 +87,12 @@ class SVGCanvas(Canvas):
         )
 
     def drawPathSolid(self, path, color):
-        self._addElement(path.svgPath(), self.currentTransform, RGBAPaint(color), None)
+        if getattr(self, "drawingLayer") is not None:
+            if not self.drawingLayer in self.solidStacks:
+                self.solidStacks[self.drawingLayer] = list()
+            self.solidStacks[self.drawingLayer].append((path.svgPath(), self.currentTransform, RGBAPaint(color), None))
+        else:
+            self._addElement(path.svgPath(), self.currentTransform, RGBAPaint(color), None)
 
     def drawPathLinearGradient(
         self, path, colorLine, pt1, pt2, extendMode, gradientTransform
@@ -139,6 +146,11 @@ class SVGCanvas(Canvas):
         self.elements.append(
             (fillPath, fillTransform, clipPath, clipTransform, paint, gradientTransform)
         )
+
+    def drawStacks(self):
+        for i, stack in self.solidStacks.items():
+            for el in stack:
+                self._addElement(*el)
 
 
 class RGBAPaint(tuple):
@@ -231,6 +243,7 @@ class SVGSurface(Surface):
         transform = Transform(1, 0, 0, -1, 0, height + 2 * y)
         canvas = SVGCanvas(transform)
         yield canvas
+        canvas.drawStacks()
         self._svgElements = canvas.elements
 
     def saveImage(self, path):

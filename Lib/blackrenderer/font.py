@@ -146,7 +146,8 @@ class BlackRendererFont:
         canvas.drawPathSolid(path, self.textColor)
 
     def _drawGlyphCOLRv0(self, layers, canvas):
-        for layer in layers:
+        for i, layer in enumerate(layers):
+            canvas.drawingLayer = i
             path = canvas.newPath()
             self._drawGlyphOutline(layer.name, path)
             canvas.drawPathSolid(path, self._getColor(layer.colorID, 1))
