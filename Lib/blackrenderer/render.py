@@ -1,3 +1,4 @@
+from functools import reduce
 from typing import NamedTuple
 import os
 from fontTools.misc.arrayTools import (
@@ -10,7 +11,7 @@ from fontTools.misc.arrayTools import (
 import uharfbuzz as hb
 from .font import BlackRendererFont
 from .backends import getSurfaceClass
-
+from .settings import BlackRendererSettings
 
 class BackendUnavailableError(Exception):
     pass
@@ -21,16 +22,17 @@ def renderText(
     textString,
     outputPath,
     *,
-    fontSize=250,
-    margin=20,
+    settings=None,
     features=None,
     variations=None,
     backendName=None,
 ):
+    if settings is None:
+        settings = BlackRendererSettings()
     font = BlackRendererFont(fontPath)
     glyphNames = font.glyphNames
 
-    scaleFactor = fontSize / font.unitsPerEm
+    scaleFactor = settings.fontSize / font.unitsPerEm
 
     buf = hb.Buffer()
     buf.add_str(textString)
@@ -44,10 +46,11 @@ def renderText(
     infos = buf.glyph_infos
     positions = buf.glyph_positions
     glyphLine = buildGlyphLine(infos, positions, glyphNames)
-    bounds = calcGlyphLineBounds(glyphLine, font)
+    bounds = calcGlyphLineBounds(glyphLine, font, settings.useFontMetrics)
     bounds = scaleRect(bounds, scaleFactor, scaleFactor)
-    bounds = insetRect(bounds, -margin, -margin)
-    bounds = intRect(bounds)
+    bounds = insetRect(bounds, -settings.margin, -settings.margin)
+    if not settings.floatBbox:
+        bounds = intRect(bounds)
     if outputPath is None:
         suffix = ".svg"
     else:
@@ -97,11 +100,11 @@ def buildGlyphLine(infos, positions, glyphNames):
     return glyphLine
 
 
-def calcGlyphLineBounds(glyphLine, font):
+def calcGlyphLineBounds(glyphLine, font, useFontMetrics):
     bounds = None
+    glyphLineBounds = [font.getGlyphBounds(glyph.name) for glyph in glyphLine]
     x, y = 0, 0
-    for glyph in glyphLine:
-        glyphBounds = font.getGlyphBounds(glyph.name)
+    for (glyphBounds, glyph) in zip(glyphLineBounds, glyphLine):
         if glyphBounds is None:
             continue
         glyphBounds = offsetRect(glyphBounds, x + glyph.xOffset, y + glyph.yOffset)
@@ -111,6 +114,13 @@ def calcGlyphLineBounds(glyphLine, font):
             bounds = glyphBounds
         else:
             bounds = unionRect(bounds, glyphBounds)
+    if useFontMetrics:
+        ttf = font.ttFont
+        gs = ttf.getGlyphSet()
+        x = 0
+        for glyph in glyphLine:
+            x += gs[glyph.name].width
+        bounds = (0, ttf["hhea"].descender, x, ttf["hhea"].ascender)
     return bounds
 
 
