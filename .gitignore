@@ -19,6 +19,10 @@ htmlcov/
 # emacs backup files
 *~
 
+# Development tools
+## ctags
+tags
+
 # OSX Finder
 .DS_Store
 
