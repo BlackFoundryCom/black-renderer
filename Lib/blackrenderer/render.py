@@ -11,7 +11,6 @@ from fontTools.misc.arrayTools import (
 import uharfbuzz as hb
 from .font import BlackRendererFont
 from .backends import getSurfaceClass
-from .settings import BlackRendererSettings
 
 
 class BackendUnavailableError(Exception):
