@@ -65,7 +65,11 @@ def main():
     settings.fontSize = args.font_size
     settings.margin = args.margin
     settings.useFontMetrics = args.use_font_metrics
-    settings.floatBbox = args.float_bbox
+    settings.floatBbox = args.backend == "svg" and args.float_bbox
+    if args.float_bbox and not settings.floatBbox:
+        raise argparse.ArgumentTypeError(
+            "--float-bbox option only makes sense with `svg` backend"
+        )
     renderText(
         args.font,
         args.text,
