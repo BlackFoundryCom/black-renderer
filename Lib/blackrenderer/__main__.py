@@ -30,9 +30,22 @@ def main():
     parser.add_argument("--font-size", type=float, default=250)
     parser.add_argument("--features", type=parseFeatures)
     parser.add_argument("--variations", type=parseVariations)
-    parser.add_argument("--margin", type=float, default=20, help="Note: If you provide --use-font-metrics, it probably makes sense to also provide --margin 0.")
-    parser.add_argument("--use-font-metrics", action='store_true', help="Whether to use the font's metrics (hhea, hmtx…) to decide the bounding box. If not provided, the default is to fit the bounding box to the contours.")
-    parser.add_argument("--float-bbox", action='store_true', help="Whether to use allow floats in the bounding box—you may not want this if using a small --font-size and SVG output, especially if using --use-font-metrics and --margin 0.")
+    parser.add_argument(
+        "--margin",
+        type=float,
+        default=20,
+        help="Note: If you provide --use-font-metrics, it probably makes sense to also provide --margin 0.",
+    )
+    parser.add_argument(
+        "--use-font-metrics",
+        action="store_true",
+        help="Whether to use the font's metrics (hhea, hmtx…) to decide the bounding box. If not provided, the default is to fit the bounding box to the contours.",
+    )
+    parser.add_argument(
+        "--float-bbox",
+        action="store_true",
+        help="Whether to use allow floats in the bounding box—you may not want this if using a small --font-size and SVG output, especially if using --use-font-metrics and --margin 0.",
+    )
     parser.add_argument(
         "--backend",
         default=None,

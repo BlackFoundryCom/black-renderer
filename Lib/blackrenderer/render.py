@@ -13,6 +13,7 @@ from .font import BlackRendererFont
 from .backends import getSurfaceClass
 from .settings import BlackRendererSettings
 
+
 class BackendUnavailableError(Exception):
     pass
 
