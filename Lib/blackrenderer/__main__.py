@@ -2,16 +2,9 @@ import argparse
 import os
 import pathlib
 import re
+from . import BlackRendererSettings
 from .render import renderText
 from .backends import listBackends
-
-# Optional command line arguments.
-class BlackRendererSettings:
-    fontSize = 250.0
-    margin = 20.0
-    useFontMetrics = False
-    floatBbox = False
-
 
 backendsAndSuffixes = listBackends()
 backendNames = [backendName for backendName, _ in backendsAndSuffixes]

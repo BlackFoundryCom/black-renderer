@@ -9,6 +9,7 @@ from fontTools.misc.arrayTools import (
     insetRect,
 )
 import uharfbuzz as hb
+from . import BlackRendererSettings
 from .font import BlackRendererFont
 from .backends import getSurfaceClass
 
