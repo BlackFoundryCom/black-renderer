@@ -116,10 +116,9 @@ def calcGlyphLineBounds(glyphLine, font, useFontMetrics):
             bounds = unionRect(bounds, glyphBounds)
     if useFontMetrics:
         ttf = font.ttFont
-        gs = ttf.getGlyphSet()
         x = 0
         for glyph in glyphLine:
-            x += gs[glyph.name].width
+            x += glyph.xAdvance
         bounds = (0, ttf["hhea"].descender, x, ttf["hhea"].ascender)
     return bounds
 
