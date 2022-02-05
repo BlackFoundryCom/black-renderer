@@ -103,9 +103,9 @@ def buildGlyphLine(infos, positions, glyphNames):
 
 def calcGlyphLineBounds(glyphLine, font, useFontMetrics):
     bounds = None
-    glyphLineBounds = [font.getGlyphBounds(glyph.name) for glyph in glyphLine]
     x, y = 0, 0
-    for (glyphBounds, glyph) in zip(glyphLineBounds, glyphLine):
+    for glyph in glyphLine:
+        glyphBounds = font.getGlyphBounds(glyph.name)
         if glyphBounds is None:
             continue
         glyphBounds = offsetRect(glyphBounds, x + glyph.xOffset, y + glyph.yOffset)
