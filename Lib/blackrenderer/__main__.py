@@ -3,8 +3,7 @@ import os
 import pathlib
 import re
 import warnings
-from . import BlackRendererSettings
-from .render import renderText
+from .render import BlackRendererSettings, renderText
 from .backends import listBackends
 
 backendsAndSuffixes = listBackends()
