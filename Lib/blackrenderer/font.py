@@ -1,4 +1,3 @@
-from collections import UserList
 from contextlib import contextmanager
 from io import BytesIO
 import logging

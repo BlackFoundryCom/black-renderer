@@ -1,6 +1,4 @@
-from functools import reduce
 from typing import NamedTuple
-import os
 from fontTools.misc.arrayTools import (
     scaleRect,
     offsetRect,
@@ -22,7 +20,6 @@ def renderText(
     fontPath,
     textString,
     outputPath,
-    *,
     settings=None,
     features=None,
     variations=None,
@@ -52,18 +49,10 @@ def renderText(
     bounds = insetRect(bounds, -settings.margin, -settings.margin)
     if not settings.floatBbox:
         bounds = intRect(bounds)
-    if outputPath is None:
-        suffix = ".svg"
-    else:
-        suffix = os.path.splitext(outputPath)[1].lower()
-    if backendName is None:
-        if suffix == ".svg":
-            backendName = "svg"
-        else:
-            backendName = "skia"
-    surfaceClass = getSurfaceClass(backendName, suffix)
+
+    surfaceClass = getSurfaceClass(settings.backend, settings.fileType)
     if surfaceClass is None:
-        raise BackendUnavailableError(backendName)
+        raise BackendUnavailableError(settings.backend.value)
 
     surface = surfaceClass()
     with surface.canvas(bounds) as canvas:

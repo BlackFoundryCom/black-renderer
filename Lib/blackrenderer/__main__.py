@@ -2,6 +2,7 @@ import argparse
 import os
 import pathlib
 import re
+import warnings
 from . import BlackRendererSettings
 from .render import renderText
 from .backends import listBackends
@@ -9,7 +10,7 @@ from .backends import listBackends
 backendsAndSuffixes = listBackends()
 backendNames = [backendName for backendName, _ in backendsAndSuffixes]
 
-description = f"""\
+description = """\
 Render a text string to an image file. Available backends:
 """
 for backendName, suffixes in backendsAndSuffixes:
@@ -54,15 +55,7 @@ def main():
         ".svg, in which case the svg backend will be used.",
     )
     args = parser.parse_args()
-    settings = BlackRendererSettings()
-    settings.fontSize = args.font_size
-    settings.margin = args.margin
-    settings.useFontMetrics = args.use_font_metrics
-    settings.floatBbox = args.backend == "svg" and args.float_bbox
-    if args.float_bbox and not settings.floatBbox:
-        raise argparse.ArgumentTypeError(
-            "--float-bbox option only makes sense with `svg` backend"
-        )
+    settings = BlackRendererSettings(args)
     renderText(
         args.font,
         args.text,
@@ -70,7 +63,6 @@ def main():
         settings=settings,
         features=args.features,
         variations=args.variations,
-        backendName=args.backend,
     )
 
 
@@ -86,11 +78,13 @@ def outputFilePath(path):
     if path == "-":
         return None
     path = pathlib.Path(path).resolve()
-    if path.suffix not in {".png", ".pdf", ".svg"}:
+    if path.suffix not in {".png", ".pdf", ".svg"} and not path.suffix == "":
         raise argparse.ArgumentTypeError(
             f"path does not have the right extension; should be .png or .svg: "
             f"'{path}'"
         )
+    elif path.suffix == "":
+        warnings.warn("No file extension, will write out SVG format")
     return path
 
 
