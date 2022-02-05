@@ -3,61 +3,9 @@ try:
 except ImportError:
     __version__ = "<unknown>"
 
+from .backends import Backend, RequestedFileType
 import argparse
 import os
-from enum import Enum, auto, unique
-
-
-@unique
-class Backend(Enum):
-    CAIRO = "cairo"
-    COREGRAPHICS = "coregraphics"
-    SKIA = "skia"
-    PUREPYTHON_SVG = "svg"
-
-    @staticmethod
-    def from_filetype_and_backend_name(fileType, backendName):
-        if fileType.value != ".svg":
-            return Backend.SKIA
-        else:
-            return Backend.PUREPYTHON_SVG
-
-    @classmethod
-    def _missing_(cls, backendName):
-        if backendName is None or backendName == "":
-            return Backend.PUREPYTHON_SVG
-        raise argparse.ArgumentTypeError(f"Non-existent backend: {backendName}")
-
-
-@unique
-class RequestedFileType(Enum):
-    def _generate_next_value_(name, start, count, last_values):
-        return "." + name.lower()
-
-    PNG = auto()
-    PDF = auto()
-    SVG = auto()
-
-    @staticmethod
-    def from_filename(outputPath):
-        if outputPath is None:
-            suffix = ".svg"
-        else:
-            suffix = os.path.splitext(outputPath)[1].lower()
-        if suffix != "":
-            return RequestedFileType(suffix)
-        else:
-            return RequestedFileType.SVG
-
-    @classmethod
-    def _missing_(cls, value):
-        if value == "":
-            return RequestedFileType.SVG
-        value = value.lower()
-        for member in cls:
-            if member.value == value:
-                return member
-        raise argparse.ArgumentTypeError(f"Unsupported file extension — {value}")
 
 
 # Optional command line arguments.
