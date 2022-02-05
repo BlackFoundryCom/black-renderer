@@ -27,9 +27,7 @@ class BlackRendererSettings:
         self.margin = args.margin
         self.useFontMetrics = args.use_font_metrics
         self.fileType = RequestedFileType.from_filename(args.output)
-        self.backend = Backend.from_filetype_and_backend_name(
-            self.fileType, self.backend
-        )
+        self.backend = Backend.default_for_filetype(self.fileType)
         self.floatBbox = self.backend == Backend.PUREPYTHON_SVG and args.float_bbox
 
         if args.float_bbox and not self.floatBbox:

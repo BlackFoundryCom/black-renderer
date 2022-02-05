@@ -38,7 +38,7 @@ class Backend(Enum):
     PUREPYTHON_SVG = "svg"
 
     @staticmethod
-    def from_filetype_and_backend_name(fileType, backendName):
+    def default_for_filetype(fileType):
         if fileType.value != ".svg":
             return Backend.SKIA
         else:
