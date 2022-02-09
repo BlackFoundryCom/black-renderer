@@ -113,7 +113,7 @@ class CoreGraphicsCanvas(Canvas):
         if self.clipIsEmpty:
             return
         CG.CGContextAddPath(self.context, path.path)
-        CG.CGContextSetRGBFillColor(self.context, *color)
+        CG.CGContextSetFillColorWithColor(self.context, CG.CGColorCreate(self.colorSpace, color))
         CG.CGContextFillPath(self.context)
 
     def drawPathLinearGradient(
@@ -122,7 +122,7 @@ class CoreGraphicsCanvas(Canvas):
         if self.clipIsEmpty or CG.CGPathGetBoundingBox(path.path) == CG.CGRectNull:
             return
         colors, stops = _unpackColorLine(colorLine, self.colorSpace)
-        gradient = CG.CGGradientCreateWithColors(None, colors, stops)
+        gradient = CG.CGGradientCreateWithColors(self.colorSpace, colors, stops)
         with self.savedState():
             CG.CGContextAddPath(self.context, path.path)
             CG.CGContextClip(self.context)
@@ -150,7 +150,7 @@ class CoreGraphicsCanvas(Canvas):
         if self.clipIsEmpty or CG.CGPathGetBoundingBox(path.path) == CG.CGRectNull:
             return
         colors, stops = _unpackColorLine(colorLine, self.colorSpace)
-        gradient = CG.CGGradientCreateWithColors(None, colors, stops)
+        gradient = CG.CGGradientCreateWithColors(self.colorSpace, colors, stops)
         with self.savedState():
             CG.CGContextAddPath(self.context, path.path)
             CG.CGContextClip(self.context)
@@ -200,7 +200,7 @@ class CoreGraphicsCanvas(Canvas):
                 CG.CGContextMoveToPoint(self.context, center[0], center[1])
                 CG.CGContextAddLineToPoint(self.context, P0[0], P0[1])
                 CG.CGContextAddLineToPoint(self.context, P1[0], P1[1])
-                CG.CGContextSetRGBFillColor(self.context, *color)
+                CG.CGContextSetFillColorWithColor(self.context, CG.CGColorCreate(self.colorSpace, color))
                 CG.CGContextFillPath(self.context)
             CG.CGContextSetAllowsAntialiasing(self.context, True)
             CG.CGContextEndTransparencyLayer(self.context)
