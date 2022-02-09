@@ -63,8 +63,9 @@ class CoreGraphicsPathPen(BasePen):
 
 
 class CoreGraphicsCanvas(Canvas):
-    def __init__(self, context):
+    def __init__(self, context, colorSpace):
         self.context = context
+        self.colorSpace = colorSpace
         self.clipIsEmpty = None
 
     @staticmethod
@@ -120,7 +121,7 @@ class CoreGraphicsCanvas(Canvas):
     ):
         if self.clipIsEmpty or CG.CGPathGetBoundingBox(path.path) == CG.CGRectNull:
             return
-        colors, stops = _unpackColorLine(colorLine)
+        colors, stops = _unpackColorLine(colorLine, self.colorSpace)
         gradient = CG.CGGradientCreateWithColors(None, colors, stops)
         with self.savedState():
             CG.CGContextAddPath(self.context, path.path)
@@ -148,7 +149,7 @@ class CoreGraphicsCanvas(Canvas):
     ):
         if self.clipIsEmpty or CG.CGPathGetBoundingBox(path.path) == CG.CGRectNull:
             return
-        colors, stops = _unpackColorLine(colorLine)
+        colors, stops = _unpackColorLine(colorLine, self.colorSpace)
         gradient = CG.CGGradientCreateWithColors(None, colors, stops)
         with self.savedState():
             CG.CGContextAddPath(self.context, path.path)
@@ -207,17 +208,18 @@ class CoreGraphicsCanvas(Canvas):
     # TODO: blendMode for PaintComposite
 
 
-def _unpackColorLine(colorLine):
+def _unpackColorLine(colorLine, colorSpace):
     colors = []
     stops = []
     for stop, color in colorLine:
-        colors.append(CG.CGColorCreateGenericRGB(*color))
+        colors.append(CG.CGColorCreate(colorSpace, color))
         stops.append(stop)
     return colors, stops
 
 
 class CoreGraphicsPixelSurface(Surface):
     fileExtension = ".png"
+    colorSpace = CG.CGColorSpaceCreateWithName(CG.kCGColorSpaceSRGB)
 
     def __init__(self):
         self.context = None
@@ -228,12 +230,11 @@ class CoreGraphicsPixelSurface(Surface):
         width = xMax - x
         height = yMax - y
         self._setupCGContext(x, y, width, height)
-        yield CoreGraphicsCanvas(self.context)
+        yield CoreGraphicsCanvas(self.context, self.colorSpace)
 
     def _setupCGContext(self, x, y, width, height):
-        rgbColorSpace = CG.CGColorSpaceCreateDeviceRGB()
         self.context = CG.CGBitmapContextCreate(
-            None, width, height, 8, 0, rgbColorSpace, CG.kCGImageAlphaPremultipliedFirst
+            None, width, height, 8, 0, self.colorSpace, CG.kCGImageAlphaPremultipliedFirst
         )
         CG.CGContextTranslateCTM(self.context, -x, -y)
 
