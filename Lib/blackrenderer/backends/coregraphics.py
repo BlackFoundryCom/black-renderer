@@ -63,9 +63,9 @@ class CoreGraphicsPathPen(BasePen):
 
 
 class CoreGraphicsCanvas(Canvas):
-    def __init__(self, context, colorSpace):
+    def __init__(self, context):
         self.context = context
-        self.colorSpace = colorSpace
+        self.colorSpace = CG.CGColorSpaceCreateWithName(CG.kCGColorSpaceSRGB)
         self.clipIsEmpty = None
 
     @staticmethod
@@ -219,7 +219,6 @@ def _unpackColorLine(colorLine, colorSpace):
 
 class CoreGraphicsPixelSurface(Surface):
     fileExtension = ".png"
-    colorSpace = CG.CGColorSpaceCreateWithName(CG.kCGColorSpaceSRGB)
 
     def __init__(self):
         self.context = None
@@ -230,11 +229,12 @@ class CoreGraphicsPixelSurface(Surface):
         width = xMax - x
         height = yMax - y
         self._setupCGContext(x, y, width, height)
-        yield CoreGraphicsCanvas(self.context, self.colorSpace)
+        yield CoreGraphicsCanvas(self.context)
 
     def _setupCGContext(self, x, y, width, height):
+        colorSpace = CG.CGColorSpaceCreateWithName(CG.kCGColorSpaceSRGB)
         self.context = CG.CGBitmapContextCreate(
-            None, width, height, 8, 0, self.colorSpace, CG.kCGImageAlphaPremultipliedFirst
+            None, width, height, 8, 0, colorSpace, CG.kCGImageAlphaPremultipliedFirst
         )
         CG.CGContextTranslateCTM(self.context, -x, -y)
 
