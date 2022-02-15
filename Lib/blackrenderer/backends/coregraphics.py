@@ -40,7 +40,9 @@ _compositeModeMap = {
     CompositeMode.HSL_LUMINOSITY: CG.kCGBlendModeLuminosity,
 }
 
+
 _sRGBColorSpace = CG.CGColorSpaceCreateWithName(CG.kCGColorSpaceSRGB)
+
 
 class CoreGraphicsPathPen(BasePen):
     def __init__(self):
@@ -113,7 +115,9 @@ class CoreGraphicsCanvas(Canvas):
         if self.clipIsEmpty:
             return
         CG.CGContextAddPath(self.context, path.path)
-        CG.CGContextSetFillColorWithColor(self.context, CG.CGColorCreate(_sRGBColorSpace, color))
+        CG.CGContextSetFillColorWithColor(
+            self.context, CG.CGColorCreate(_sRGBColorSpace, color)
+        )
         CG.CGContextFillPath(self.context)
 
     def drawPathLinearGradient(
@@ -200,7 +204,9 @@ class CoreGraphicsCanvas(Canvas):
                 CG.CGContextMoveToPoint(self.context, center[0], center[1])
                 CG.CGContextAddLineToPoint(self.context, P0[0], P0[1])
                 CG.CGContextAddLineToPoint(self.context, P1[0], P1[1])
-                CG.CGContextSetFillColorWithColor(self.context, CG.CGColorCreate(_sRGBColorSpace, color))
+                CG.CGContextSetFillColorWithColor(
+                    self.context, CG.CGColorCreate(_sRGBColorSpace, color)
+                )
                 CG.CGContextFillPath(self.context)
             CG.CGContextSetAllowsAntialiasing(self.context, True)
             CG.CGContextEndTransparencyLayer(self.context)
@@ -233,7 +239,13 @@ class CoreGraphicsPixelSurface(Surface):
 
     def _setupCGContext(self, x, y, width, height):
         self.context = CG.CGBitmapContextCreate(
-            None, width, height, 8, 0, _sRGBColorSpace, CG.kCGImageAlphaPremultipliedFirst
+            None,
+            width,
+            height,
+            8,
+            0,
+            _sRGBColorSpace,
+            CG.kCGImageAlphaPremultipliedFirst,
         )
         CG.CGContextTranslateCTM(self.context, -x, -y)
 
