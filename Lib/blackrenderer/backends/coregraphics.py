@@ -40,6 +40,7 @@ _compositeModeMap = {
     CompositeMode.HSL_LUMINOSITY: CG.kCGBlendModeLuminosity,
 }
 
+_sRGBColorSpace = CG.CGColorSpaceCreateWithName(CG.kCGColorSpaceSRGB)
 
 class CoreGraphicsPathPen(BasePen):
     def __init__(self):
@@ -112,7 +113,7 @@ class CoreGraphicsCanvas(Canvas):
         if self.clipIsEmpty:
             return
         CG.CGContextAddPath(self.context, path.path)
-        CG.CGContextSetRGBFillColor(self.context, *color)
+        CG.CGContextSetFillColorWithColor(self.context, CG.CGColorCreate(_sRGBColorSpace, color))
         CG.CGContextFillPath(self.context)
 
     def drawPathLinearGradient(
@@ -121,7 +122,7 @@ class CoreGraphicsCanvas(Canvas):
         if self.clipIsEmpty or CG.CGPathGetBoundingBox(path.path) == CG.CGRectNull:
             return
         colors, stops = _unpackColorLine(colorLine)
-        gradient = CG.CGGradientCreateWithColors(None, colors, stops)
+        gradient = CG.CGGradientCreateWithColors(_sRGBColorSpace, colors, stops)
         with self.savedState():
             CG.CGContextAddPath(self.context, path.path)
             CG.CGContextClip(self.context)
@@ -149,7 +150,7 @@ class CoreGraphicsCanvas(Canvas):
         if self.clipIsEmpty or CG.CGPathGetBoundingBox(path.path) == CG.CGRectNull:
             return
         colors, stops = _unpackColorLine(colorLine)
-        gradient = CG.CGGradientCreateWithColors(None, colors, stops)
+        gradient = CG.CGGradientCreateWithColors(_sRGBColorSpace, colors, stops)
         with self.savedState():
             CG.CGContextAddPath(self.context, path.path)
             CG.CGContextClip(self.context)
@@ -199,7 +200,7 @@ class CoreGraphicsCanvas(Canvas):
                 CG.CGContextMoveToPoint(self.context, center[0], center[1])
                 CG.CGContextAddLineToPoint(self.context, P0[0], P0[1])
                 CG.CGContextAddLineToPoint(self.context, P1[0], P1[1])
-                CG.CGContextSetRGBFillColor(self.context, *color)
+                CG.CGContextSetFillColorWithColor(self.context, CG.CGColorCreate(_sRGBColorSpace, color))
                 CG.CGContextFillPath(self.context)
             CG.CGContextSetAllowsAntialiasing(self.context, True)
             CG.CGContextEndTransparencyLayer(self.context)
@@ -211,7 +212,7 @@ def _unpackColorLine(colorLine):
     colors = []
     stops = []
     for stop, color in colorLine:
-        colors.append(CG.CGColorCreateGenericRGB(*color))
+        colors.append(CG.CGColorCreate(_sRGBColorSpace, color))
         stops.append(stop)
     return colors, stops
 
@@ -231,9 +232,8 @@ class CoreGraphicsPixelSurface(Surface):
         yield CoreGraphicsCanvas(self.context)
 
     def _setupCGContext(self, x, y, width, height):
-        rgbColorSpace = CG.CGColorSpaceCreateDeviceRGB()
         self.context = CG.CGBitmapContextCreate(
-            None, width, height, 8, 0, rgbColorSpace, CG.kCGImageAlphaPremultipliedFirst
+            None, width, height, 8, 0, _sRGBColorSpace, CG.kCGImageAlphaPremultipliedFirst
         )
         CG.CGContextTranslateCTM(self.context, -x, -y)
 
