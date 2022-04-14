@@ -64,7 +64,7 @@ test_glyphs = [
     ("more_samples", "clip_shade_bottom_right", None),
     ("more_samples", "clip_shade_top_right", None),
     ("more_samples", "inset_clipped_radial_reflect", None),
-    ("more_samples", "sweep", None),
+    # ("more_samples", "sweep", None),
     ("more_samples", "transformed_sweep", None),
     ("more_samples", "composite_colr_glyph", None),
     ("more_samples", "linear_repeat_0_1", None),
@@ -140,7 +140,7 @@ def test_boundsCanvas():
     font = BlackRendererFont(testFonts["more_samples"])
     canvas = BoundsCanvas()
     font.drawGlyph("transformed_sweep", canvas)
-    assert (317, 154, 1183, 846) == tuple(round(v) for v in canvas.bounds)
+    assert (308, 194, 1019, 906) == tuple(round(v) for v in canvas.bounds)
 
 
 vectorBackends = [
