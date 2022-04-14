@@ -394,6 +394,7 @@ class BlackRendererFont:
 
     def _getGlyphBounds(self, glyphName):
         gid = self.ttFont.getGlyphID(glyphName)
+        assert gid is not None, glyphName
         x, y, w, h = self.hbFont.get_glyph_extents(gid)
         # convert from HB's x/y_bearing + extents to xMin, yMin, xMax, yMax
         y += h
