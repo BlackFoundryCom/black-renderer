@@ -277,7 +277,7 @@ class BlackRendererFont:
     def _drawPaintSkew(self, paint, canvas):
         transform = Transform()
         transform = transform.skew(
-            math.radians(paint.xSkewAngle), math.radians(paint.ySkewAngle)
+            -math.radians(paint.xSkewAngle), math.radians(paint.ySkewAngle)
         )
         self._applyTransform(transform, paint.Paint, canvas)
 
@@ -285,7 +285,7 @@ class BlackRendererFont:
         transform = Transform()
         transform = transform.translate(paint.centerX, paint.centerY)
         transform = transform.skew(
-            math.radians(paint.xSkewAngle), math.radians(paint.ySkewAngle)
+            -math.radians(paint.xSkewAngle), math.radians(paint.ySkewAngle)
         )
         transform = transform.translate(-paint.centerX, -paint.centerY)
         self._applyTransform(transform, paint.Paint, canvas)
