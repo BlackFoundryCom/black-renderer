@@ -6,7 +6,16 @@ import math
 from fontTools.misc.transform import Transform, Identity
 from fontTools.misc.arrayTools import unionRect
 from fontTools.ttLib import TTFont
-from fontTools.ttLib.tables.otTables import CompositeMode, PaintFormat
+from fontTools.ttLib.tables.otTables import (
+    BaseTable,
+    ClipBoxFormat,
+    CompositeMode,
+    Paint,
+    PaintFormat,
+    VarAffine2x3,
+    VarColorStop,
+    VarColorLine,
+)
 from fontTools.varLib.varStore import VarStoreInstancer
 import uharfbuzz as hb
 
@@ -34,6 +43,7 @@ class BlackRendererFont:
         self.colrV0Glyphs = {}
         self.colrV1Glyphs = {}
         self.instancer = None
+        self.varIndexMap = None
 
         if "COLR" in self.ttFont:
             colrTable = self.ttFont["COLR"]
@@ -53,6 +63,8 @@ class BlackRendererFont:
                     self.clipBoxes = colrTable.ClipList.clips
                 self.colrLayersV1 = colrTable.LayerList
                 if colrTable.VarStore is not None:
+                    if colrTable.VarIndexMap:
+                        self.varIndexMap = colrTable.VarIndexMap.mapping
                     self.instancer = VarStoreInstancer(
                         colrTable.VarStore, self.ttFont["fvar"].axes
                     )
@@ -106,6 +118,11 @@ class BlackRendererFont:
             if self.clipBoxes is not None:
                 box = self.clipBoxes.get(glyphName)
                 if box is not None:
+                    if (
+                        box.Format == ClipBoxFormat.Variable
+                        and self.instancer is not None
+                    ):
+                        box = VarTableWrapper(box, self.instancer, self.varIndexMap)
                     bounds = box.xMin, box.yMin, box.xMax, box.yMax
         elif glyphName in self.colrV0Glyphs:
             # For COLRv0, we take the union of all layer bounds
@@ -174,7 +191,7 @@ class BlackRendererFont:
             # PaintVar -- we map to its non-var counterpart and use a wrapper
             # that takes care of instantiating values
             paintName = PAINT_NAMES[nonVarFormat]
-            paint = PaintVarWrapper(paint, self.instancer)
+            paint = VarTableWrapper(paint, self.instancer, self.varIndexMap)
         drawHandler = getattr(self, "_draw" + paintName)
         drawHandler(paint, canvas)
 
@@ -487,34 +504,64 @@ def axisValuesToLocation(normalizedAxisValues, axisTags):
     }
 
 
-# _conversionFactors = {
-#     VarF2Dot14: 1 / (1 << 14),
-#     VarFixed: 1 / (1 << 16),
-# }
+class VarTableWrapper:
 
-
-class PaintVarWrapper:
-    def __init__(self, wrappedPaint, instancer):
-        assert not isinstance(wrappedPaint, PaintVarWrapper)
-        self._wrappedPaint = wrappedPaint
+    def __init__(self, wrapped, instancer, varIndexMap=None):
+        assert not isinstance(wrapped, VarTableWrapper)
+        self._wrapped = wrapped
         self._instancer = instancer
+        self._varIndexMap = varIndexMap
+        try:
+            self._varAttrs = wrapped.getVariableAttrs()
+        except AttributeError:
+            self._varAttrs = None
 
     def __repr__(self):
-        return f"PaintVarWrapper({self._wrappedPaint!r})"
+        return f"VarTableWrapper({self._wrapped!r})"
+
+    def _getVarIndexForAttr(self, attrName):
+        if self._varAttrs is None or attrName not in self._varAttrs:
+            return None
+
+        baseIndex = self._wrapped.VarIndexBase
+        if baseIndex == 0xFFFFFFFF:
+            return baseIndex
+
+        offset = self._varAttrs[attrName]
+        varIdx = baseIndex + offset
+        if self._varIndexMap is not None:
+            try:
+                varIdx = self._varIndexMap[varIdx]
+            except IndexError:
+                pass
+
+        return varIdx
+
+    def _getDeltaForAttr(self, attrName, varIdx):
+        delta = self._instancer[varIdx]
+        # deltas for Fixed or F2Dot14 need to be converted from int to float
+        conv = self._wrapped.getConverterByName(attrName)
+        if hasattr(conv, "fromInt"):
+            delta = conv.fromInt(delta)
+        return delta
 
     def __getattr__(self, attrName):
-        value = getattr(self._wrappedPaint, attrName)
-        raise NotImplementedError("This code is currently not working")
-        # if isinstance(value, VariableValue):
-        #     if value.varIdx != 0xFFFFFFFF:
-        #         factor = _conversionFactors.get(
-        #             type(self._wrappedPaint.getConverterByName(attrName)), 1
-        #         )
-        #         value = value.value + self._instancer[value.varIdx] * factor
-        #     else:
-        #         value = value.value
-        # elif type(value).__name__.startswith("Var"):
-        #     value = PaintVarWrapper(value, self._instancer)
-        # elif isinstance(value, (list, UserList)):
-        #     value = [PaintVarWrapper(item, self._instancer) for item in value]
+        value = getattr(self._wrapped, attrName)
+
+        varIdx = self._getVarIndexForAttr(attrName)
+        if varIdx is not None:
+            if varIdx < 0xFFFFFFFF:
+                value += self._getDeltaForAttr(attrName, varIdx)
+        elif isinstance(value, (VarAffine2x3, VarColorLine)):
+            value = VarTableWrapper(value, self._instancer, self._varIndexMap)
+        elif (
+            isinstance(value, (list, UserList))
+            and value
+            and isinstance(value[0], VarColorStop)
+        ):
+            value = [
+                VarTableWrapper(item, self._instancer, self._varIndexMap)
+                for item in value
+            ]
+
         return value
