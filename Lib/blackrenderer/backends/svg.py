@@ -136,6 +136,8 @@ class SVGCanvas(Canvas):
                 logger.warning(
                     "SVG canvas does not support more than two nested clip paths"
                 )
+            if clipTransform is not None:
+                clipTransform = fillTransform.inverse().transform(clipTransform)
         self.elements.append(
             (fillPath, fillTransform, clipPath, clipTransform, paint, gradientTransform)
         )
@@ -280,7 +282,7 @@ def writeSVGElements(elements, viewBox, stream):
             attrs.append(("fill", f"url(#{gradients[paint, paintT]})"))
         attrs.append(("transform", formatMatrix(fillT)))
         if clipPath is not None:
-            clipKey = clipPath, clipTransform
+            clipKey = clipPath, clipT
             attrs.append(("clip-path", f"url(#{clipPaths[clipKey]})"))
         ET.SubElement(root, "path", dict(attrs))
 
