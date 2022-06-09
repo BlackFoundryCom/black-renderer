@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='ASCII'?>
 <svg width="150" height="155" preserveAspectRatio="xMinYMin slice" viewBox="0 0 150 155" version="1.1" xmlns="http://www.w3.org/2000/svg">
   <clipPath id="clip_0">
-    <path d="M0,310 h600 v-310 h-600 v310 Z" transform="matrix(0.25,0,0,-0.25,0,155)"/>
+    <path d="M0,310 h600 v-310 h-600 v310 Z" transform="matrix(1,0,0,1,0,-100)"/>
   </clipPath>
   <clipPath id="clip_1">
-    <path d="M0,310 v310 h600 v-310 h-600 Z" transform="matrix(0.25,0,0,-0.25,0,155)"/>
+    <path d="M0,310 v310 h600 v-310 h-600 Z" transform="matrix(1,0,0,1,0,100)"/>
   </clipPath>
   <path d="M300,63 q-68,0 -124,33.5 q-56,33.5 -89.5,89.5 q-33.5,56 -33.5,124 q0,68 33.5,124 q33.5,56 89.5,89.5 q56,33.5 124,33.5 q68,0 124,-33.5 q56,-33.5 89.5,-89.5 q33.5,-56 33.5,-124 q0,-68 -33.5,-124 q-33.5,-56 -89.5,-89.5 q-56,-33.5 -124,-33.5 Z" fill="#EE7262" transform="matrix(0.25,0,0,-0.25,0,130)" clip-path="url(#clip_0)"/>
   <path d="M300,63 q-68,0 -124,33.5 q-56,33.5 -89.5,89.5 q-33.5,56 -33.5,124 q0,68 33.5,124 q33.5,56 89.5,89.5 q56,33.5 124,33.5 q68,0 124,-33.5 q56,-33.5 89.5,-89.5 q33.5,-56 33.5,-124 q0,-68 -33.5,-124 q-33.5,-56 -89.5,-89.5 q-56,-33.5 -124,-33.5 Z" fill="#FBB194" transform="matrix(0.25,0,0,-0.25,0,180)" clip-path="url(#clip_1)"/>
