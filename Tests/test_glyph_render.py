@@ -27,6 +27,7 @@ testFonts = {
     "twemoji": dataDir / "TwemojiMozilla.subset.default.3299.ttf",
     "more_samples": dataDir / "more_samples-glyf_colr_1.ttf",
     "crash": dataDir / "crash.subset.otf",
+    "nested_paintglyph": dataDir / "nested-paintglyph.ttf",
 }
 
 
@@ -91,6 +92,7 @@ test_glyphs = [
     ("more_samples", "skew_25_0_center_500.0_500.0", None),
     ("more_samples", "skew_0_15_center_0_0", None),
     ("more_samples", "upem_box_glyph", None),
+    ("nested_paintglyph", "A", None),
 ]
 
 

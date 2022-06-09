@@ -370,10 +370,10 @@ class BlackRendererFont:
         self.currentPath = path
         self.currentTransform = Identity
         with canvas.savedState():
-            if currentTransform != Identity:
-                canvas.transform(currentTransform)
             if currentPath is not None:
                 canvas.clipPath(currentPath)
+            if currentTransform != Identity:
+                canvas.transform(currentTransform)
             yield
         self.currentPath = currentPath
         self.currentTransform = currentTransform
