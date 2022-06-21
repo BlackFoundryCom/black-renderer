@@ -511,16 +511,20 @@ class VarTableWrapper:
         self._wrapped = wrapped
         self._instancer = instancer
         self._varIndexMap = varIndexMap
-        try:
-            self._varAttrs = wrapped.getVariableAttrs()
-        except AttributeError:
-            self._varAttrs = None
+        # Map {attrName: varIndexOffset}, where the offset is a number to add to
+        # VarIndexBase to get to the VarIndex associated with each attribute.
+        # getVariableAttrs method returns a sequence of variable attributes in the
+        # order in which they appear in a table.
+        # E.g. in ColorStop table, the first variable attribute is "StopOffset",
+        # and the second is "Alpha": hence the StopOffset's VarIndex is computed as
+        # VarIndexBase + 0, Alpha's is VarIndexBase + 1, etc.
+        self._varAttrs = {a: i for i, a in enumerate(wrapped.getVariableAttrs())}
 
     def __repr__(self):
         return f"VarTableWrapper({self._wrapped!r})"
 
     def _getVarIndexForAttr(self, attrName):
-        if self._varAttrs is None or attrName not in self._varAttrs:
+        if attrName not in self._varAttrs:
             return None
 
         baseIndex = self._wrapped.VarIndexBase
