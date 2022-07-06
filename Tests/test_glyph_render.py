@@ -118,10 +118,7 @@ def test_renderGlyph(backendName, surfaceClass, fontName, glyphName, location):
         canvas.scale(scaleFactor)
         font.drawGlyph(glyphName, canvas)
 
-    if location:
-        locationString = "_" + _locationToString(location)
-    else:
-        locationString = ""
+    locationString = "_" + _locationToString(location) if location else ""
     fileName = f"glyph_{fontName}_{glyphName}{locationString}_{backendName}{ext}"
     expectedPath = expectedOutputDir / fileName
     outputPath = tmpOutputDir / fileName
