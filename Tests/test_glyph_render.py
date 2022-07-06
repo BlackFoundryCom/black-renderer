@@ -28,6 +28,7 @@ testFonts = {
     "more_samples": dataDir / "more_samples-glyf_colr_1.ttf",
     "crash": dataDir / "crash.subset.otf",
     "nested_paintglyph": dataDir / "nested-paintglyph.ttf",
+    "ftvartest": dataDir / "TestVariableCOLR-VF.ttf",
 }
 
 
@@ -93,6 +94,10 @@ test_glyphs = [
     ("more_samples", "skew_0_15_center_0_0", None),
     ("more_samples", "upem_box_glyph", None),
     ("nested_paintglyph", "A", None),
+    ("ftvartest", "A", {"wght": 400}),
+    ("ftvartest", "A", {"wght": 700}),
+    ("ftvartest", "B", {"wght": 400}),
+    ("ftvartest", "B", {"wght": 700}),
 ]
 
 
@@ -113,12 +118,20 @@ def test_renderGlyph(backendName, surfaceClass, fontName, glyphName, location):
         canvas.scale(scaleFactor)
         font.drawGlyph(glyphName, canvas)
 
-    fileName = f"glyph_{fontName}_{glyphName}_{backendName}{ext}"
+    if location:
+        locationString = "_" + _locationToString(location)
+    else:
+        locationString = ""
+    fileName = f"glyph_{fontName}_{glyphName}{locationString}_{backendName}{ext}"
     expectedPath = expectedOutputDir / fileName
     outputPath = tmpOutputDir / fileName
     surface.saveImage(outputPath)
     diff = compareImages(expectedPath, outputPath)
     assert diff < 0.00012, diff
+
+
+def _locationToString(location):
+    return ",".join(f"{name}={value}" for name, value in sorted(location.items()))
 
 
 def test_pathCollector():
