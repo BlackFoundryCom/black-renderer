@@ -26,6 +26,8 @@ def renderText(
     features=None,
     variations=None,
     backendName=None,
+    lang=None,
+    script=None,
 ):
     font = BlackRendererFont(fontPath)
     glyphNames = font.glyphNames
@@ -36,6 +38,10 @@ def renderText(
     buf.add_str(textString)
     buf.guess_segment_properties()
 
+    if script:
+        buf.script = script
+    if lang:
+        buf.language = lang
     if variations:
         font.setLocation(variations)
 
