@@ -176,8 +176,6 @@ class SkiaCanvas(Canvas):
         )
         self.canvas.drawPath(path.path, skia.Paint(AntiAlias=True, Shader=shader))
 
-    # TODO: blendMode for PaintComposite
-
 
 def _unpackColorLine(colorLine):
     colors = []

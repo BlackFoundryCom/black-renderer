@@ -125,8 +125,6 @@ class SVGCanvas(Canvas):
     ):
         self.drawPathSolid(path, colorLine[0][1])
 
-    # TODO: blendMode for PaintComposite
-
     def _addElement(self, fillPath, fillTransform, paint, gradientTransform):
         clipPath, clipTransform = None, None
         if self.clipStack:

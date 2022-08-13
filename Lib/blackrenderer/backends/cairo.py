@@ -179,8 +179,6 @@ class CairoCanvas(Canvas):
         self.context.paint()
         self.context.restore()
 
-    # TODO: blendMode for PaintComposite)
-
     def _drawGradient(self, path, gradient, gradientTransform):
         self.context.new_path()
         path.replay(self._pen)

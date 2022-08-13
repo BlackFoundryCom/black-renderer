@@ -211,8 +211,6 @@ class CoreGraphicsCanvas(Canvas):
             CG.CGContextSetAllowsAntialiasing(self.context, True)
             CG.CGContextEndTransparencyLayer(self.context)
 
-    # TODO: blendMode for PaintComposite
-
 
 def _unpackColorLine(colorLine):
     colors = []
