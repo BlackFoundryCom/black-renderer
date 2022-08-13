@@ -33,11 +33,21 @@ PAINT_VAR_MAPPING = {
 
 
 class BlackRendererFont:
-    def __init__(self, path, *, fontNumber=0, lazy=True):
-        with open(path, "rb") as f:
-            fontData = f.read()
-        file = BytesIO(fontData)
-        self.ttFont = TTFont(file, fontNumber=fontNumber, lazy=lazy)
+    def __init__(self, path=None, *, fontNumber=0, lazy=True, ttFont=None, hbFont=None):
+        if path is not None:
+            if ttFont is not None or hbFont is not None:
+                raise TypeError("either pass 'path', or both 'ttFont' and 'hbFont")
+
+            with open(path, "rb") as f:
+                fontData = f.read()
+            self.ttFont = TTFont(BytesIO(fontData), fontNumber=fontNumber, lazy=lazy)
+            self.hbFont = hb.Font(hb.Face(fontData, fontNumber))
+        else:
+            if ttFont is None or hbFont is None:
+                raise TypeError("either pass 'path', or both 'ttFont' and 'hbFont")
+
+            self.ttFont = ttFont
+            self.hbFont = hbFont
 
         self.textColor = (0, 0, 0, 1)
         self.colrV0Glyphs = {}
@@ -82,8 +92,6 @@ class BlackRendererFont:
             self.axisTags = [a.axisTag for a in self.ttFont["fvar"].axes]
         else:
             self.axisTags = []
-
-        self.hbFont = hb.Font(hb.Face(fontData, fontNumber))
 
     @property
     def unitsPerEm(self):
@@ -505,7 +513,6 @@ def axisValuesToLocation(normalizedAxisValues, axisTags):
 
 
 class VarTableWrapper:
-
     def __init__(self, wrapped, instancer, varIndexMap=None):
         assert not isinstance(wrapped, VarTableWrapper)
         self._wrapped = wrapped
