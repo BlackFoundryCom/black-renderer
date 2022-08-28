@@ -156,34 +156,38 @@ class BlackRendererFont:
         if glyph is not None:
             self.currentTransform = Identity
             self.currentPath = None
-            self._drawGlyphCOLRv1(glyph, canvas)
-            return
+            return self._drawGlyphCOLRv1(glyph, canvas)
         glyph = self.colrV0Glyphs.get(glyphName)
         if glyph is not None:
-            self._drawGlyphCOLRv0(glyph, canvas)
-            return
+            return self._drawGlyphCOLRv0(glyph, canvas)
         else:
-            self._drawGlyphNoColor(glyphName, canvas)
+            return self._drawGlyphNoColor(glyphName, canvas)
 
     def _drawGlyphNoColor(self, glyphName, canvas):
         path = canvas.newPath()
         self._drawGlyphOutline(glyphName, path)
         canvas.drawPathSolid(path, self.textColor)
+        return path
 
     def _drawGlyphCOLRv0(self, layers, canvas):
+        layerPaths = []
         for layer in layers:
             path = canvas.newPath()
             self._drawGlyphOutline(layer.name, path)
             canvas.drawPathSolid(path, self._getColor(layer.colorID, 1))
+            layerPaths.append(path)
+        return layerPaths
 
     def _drawGlyphCOLRv1(self, glyph, canvas):
         if glyph.BaseGlyph in self._recursionCheck:
             raise RecursionError(f"Glyph '{glyph.BaseGlyph}' references itself")
         self._recursionCheck.add(glyph.BaseGlyph)
+        res = None
         try:
-            self._drawPaint(glyph.Paint, canvas)
+            res = self._drawPaint(glyph.Paint, canvas)
         finally:
             self._recursionCheck.remove(glyph.BaseGlyph)
+        return res
 
     # COLRv1 Paint dispatch
 
@@ -201,15 +205,18 @@ class BlackRendererFont:
             paintName = PAINT_NAMES[nonVarFormat]
             paint = VarTableWrapper(paint, self.instancer, self.varIndexMap)
         drawHandler = getattr(self, "_draw" + paintName)
-        drawHandler(paint, canvas)
+        res = drawHandler(paint, canvas)
+        return res
 
     def _drawPaintColrLayers(self, paint, canvas):
         n = paint.NumLayers
         s = paint.FirstLayerIndex
+        layers = []
         with self._ensureClipAndPushPath(canvas, None):
             for i in range(s, s + n):
                 with self._savedTransform():
-                    self._drawPaint(self.colrLayersV1.Paint[i], canvas)
+                    layers.append(self._drawPaint(self.colrLayersV1.Paint[i], canvas))
+        return layers
 
     def _drawPaintSolid(self, paint, canvas):
         color = self._getColor(paint.PaletteIndex, paint.Alpha)
@@ -273,6 +280,7 @@ class BlackRendererFont:
         self._drawGlyphOutline(paint.Glyph, path)
         with self._ensureClipAndPushPath(canvas, path):
             self._drawPaint(paint.Paint, canvas)
+        return path
 
     def _drawPaintColrGlyph(self, paint, canvas):
         with self._ensureClipAndPushPath(canvas, None):
