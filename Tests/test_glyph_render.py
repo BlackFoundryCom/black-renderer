@@ -104,7 +104,6 @@ test_glyphs = [
 @pytest.mark.parametrize("fontName, glyphName, location", test_glyphs)
 @pytest.mark.parametrize("backendName, surfaceClass", backends)
 def test_renderGlyph(backendName, surfaceClass, fontName, glyphName, location):
-    print(">>>>>>>>>>>>>>", fontName)
     font = BlackRendererFont(testFonts[fontName])
     font.setLocation(location)
 
