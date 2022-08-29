@@ -104,6 +104,7 @@ test_glyphs = [
 @pytest.mark.parametrize("fontName, glyphName, location", test_glyphs)
 @pytest.mark.parametrize("backendName, surfaceClass", backends)
 def test_renderGlyph(backendName, surfaceClass, fontName, glyphName, location):
+    print(">>>>>>>>>>>>>>", fontName)
     font = BlackRendererFont(testFonts[fontName])
     font.setLocation(location)
 
@@ -134,9 +135,12 @@ def _locationToString(location):
 def test_pathCollector():
     font = BlackRendererFont(testFonts["noto"])
     canvas = PathCollectorCanvas()
-    font.drawGlyph("uni2693", canvas)
+    glyph = font.drawGlyph("uni2693", canvas)
     assert len(canvas.paths) == 6
-
+    
+    assert len(glyph) == 6
+    assert glyph[0].method == "drawPathSolid"
+    assert len(glyph[0].data["color"]) == 4
 
 def test_boundsCanvas():
     font = BlackRendererFont(testFonts["mutator"])

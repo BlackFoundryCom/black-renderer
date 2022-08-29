@@ -150,7 +150,7 @@ class BoundsCanvas(PathCollectorCanvas):
     def bounds(self):
         return calcBounds(self.points)
 
-    def _addPath(self, path):
+    def _addPath(self, path, method, data):
         points = path.points
         if self.currentTransform != Identity:
             points = self.currentTransform.transformPoints(points)
