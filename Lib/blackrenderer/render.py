@@ -25,6 +25,7 @@ def renderText(
     margin=20,
     features=None,
     variations=None,
+    paletteIndex=0,
     backendName=None,
     lang=None,
     script=None,
@@ -44,6 +45,7 @@ def renderText(
         buf.language = lang
     if variations:
         font.setLocation(variations)
+    palette = font.getPalette(paletteIndex)
 
     hb.shape(font.hbFont, buf, features)
 
@@ -73,7 +75,7 @@ def renderText(
         for glyph in glyphLine:
             with canvas.savedState():
                 canvas.translate(glyph.xOffset, glyph.yOffset)
-                font.drawGlyph(glyph.name, canvas)
+                font.drawGlyph(glyph.name, canvas, palette=palette)
             canvas.translate(glyph.xAdvance, glyph.yAdvance)
 
     if outputPath is not None:

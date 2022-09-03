@@ -29,81 +29,85 @@ testFonts = {
     "crash": dataDir / "crash.subset.otf",
     "nested_paintglyph": dataDir / "nested-paintglyph.ttf",
     "ftvartest": dataDir / "TestVariableCOLR-VF.ttf",
+    "nabla": dataDir / "Nabla.subset.ttf",
 }
 
 
 test_glyphs = [
-    ("noto", "uni2693", None),
-    ("noto", "uni2694", None),
-    ("noto", "u1F30A", None),
-    ("noto", "u1F943", None),
-    ("mutator", "B", None),
-    ("mutator", "D", {"wdth": 1000}),
-    ("twemoji", "uni3299", None),
-    ("more_samples", "cross_glyph", None),
-    ("more_samples", "skew_0_15_center_500.0_500.0", None),
-    ("more_samples", "skew_-10_20_center_500.0_500.0", None),
-    ("more_samples", "skew_-10_20_center_1000_1000", None),
-    ("more_samples", "transform_matrix_1_0_0_1_125_125", None),
-    ("more_samples", "transform_matrix_1.5_0_0_1.5_0_0", None),
-    ("more_samples", "transform_matrix_0.9659_0.2588_-0.2588_0.9659_0_0", None),
-    ("more_samples", "transform_matrix_1.0_0.0_0.6_1.0_-300.0_0.0", None),
-    ("more_samples", "clip_box_top_left", None),
-    ("more_samples", "clip_box_bottom_left", None),
-    ("more_samples", "clip_box_bottom_right", None),
-    ("more_samples", "clip_box_top_right", None),
-    ("more_samples", "clip_box_center", None),
-    ("more_samples", "composite_DEST_OVER", None),
-    ("more_samples", "composite_XOR", None),
-    ("more_samples", "composite_OVERLAY", None),
-    ("more_samples", "composite_SRC_IN", None),
-    ("more_samples", "composite_PLUS", None),
-    ("more_samples", "composite_LIGHTEN", None),
-    ("more_samples", "composite_MULTIPLY", None),
-    ("more_samples", "clip_shade_center", None),
-    ("more_samples", "clip_shade_top_left", None),
-    ("more_samples", "clip_shade_bottom_left", None),
-    ("more_samples", "clip_shade_bottom_right", None),
-    ("more_samples", "clip_shade_top_right", None),
-    ("more_samples", "inset_clipped_radial_reflect", None),
-    # ("more_samples", "sweep", None),
-    ("more_samples", "transformed_sweep", None),
-    ("more_samples", "composite_colr_glyph", None),
-    ("more_samples", "linear_repeat_0_1", None),
-    ("more_samples", "linear_repeat_0.2_0.8", None),
-    ("more_samples", "linear_repeat_0_1.5", None),
-    ("more_samples", "linear_repeat_0.5_1.5", None),
-    ("more_samples", "scale_0.5_1.5_center_500.0_500.0", None),
-    ("more_samples", "scale_1.5_1.5_center_500.0_500.0", None),
-    ("more_samples", "scale_0.5_1.5_center_0_0", None),
-    ("more_samples", "scale_1.5_1.5_center_0_0", None),
-    ("more_samples", "scale_0.5_1.5_center_1000_1000", None),
-    ("more_samples", "scale_1.5_1.5_center_1000_1000", None),
-    ("more_samples", "linear_gradient_extend_mode_pad", None),
-    ("more_samples", "linear_gradient_extend_mode_repeat", None),
-    ("more_samples", "linear_gradient_extend_mode_reflect", None),
-    ("more_samples", "radial_gradient_extend_mode_pad", None),
-    ("more_samples", "radial_gradient_extend_mode_repeat", None),
-    ("more_samples", "radial_gradient_extend_mode_reflect", None),
-    ("more_samples", "rotate_10_center_0_0", None),
-    ("more_samples", "rotate_-10_center_1000_1000", None),
-    ("more_samples", "rotate_25_center_500.0_500.0", None),
-    ("more_samples", "rotate_-15_center_500.0_500.0", None),
-    ("more_samples", "skew_25_0_center_0_0", None),
-    ("more_samples", "skew_25_0_center_500.0_500.0", None),
-    ("more_samples", "skew_0_15_center_0_0", None),
-    ("more_samples", "upem_box_glyph", None),
-    ("nested_paintglyph", "A", None),
-    ("ftvartest", "A", {"wght": 400}),
-    ("ftvartest", "A", {"wght": 700}),
-    ("ftvartest", "B", {"wght": 400}),
-    ("ftvartest", "B", {"wght": 700}),
+    ("noto", "uni2693", None, 0),
+    ("noto", "uni2694", None, 0),
+    ("noto", "u1F30A", None, 0),
+    ("noto", "u1F943", None, 0),
+    ("mutator", "B", None, 0),
+    ("mutator", "D", {"wdth": 1000}, 0),
+    ("twemoji", "uni3299", None, 0),
+    ("more_samples", "cross_glyph", None, 0),
+    ("more_samples", "skew_0_15_center_500.0_500.0", None, 0),
+    ("more_samples", "skew_-10_20_center_500.0_500.0", None, 0),
+    ("more_samples", "skew_-10_20_center_1000_1000", None, 0),
+    ("more_samples", "transform_matrix_1_0_0_1_125_125", None, 0),
+    ("more_samples", "transform_matrix_1.5_0_0_1.5_0_0", None, 0),
+    ("more_samples", "transform_matrix_0.9659_0.2588_-0.2588_0.9659_0_0", None, 0),
+    ("more_samples", "transform_matrix_1.0_0.0_0.6_1.0_-300.0_0.0", None, 0),
+    ("more_samples", "clip_box_top_left", None, 0),
+    ("more_samples", "clip_box_bottom_left", None, 0),
+    ("more_samples", "clip_box_bottom_right", None, 0),
+    ("more_samples", "clip_box_top_right", None, 0),
+    ("more_samples", "clip_box_center", None, 0),
+    ("more_samples", "composite_DEST_OVER", None, 0),
+    ("more_samples", "composite_XOR", None, 0),
+    ("more_samples", "composite_OVERLAY", None, 0),
+    ("more_samples", "composite_SRC_IN", None, 0),
+    ("more_samples", "composite_PLUS", None, 0),
+    ("more_samples", "composite_LIGHTEN", None, 0),
+    ("more_samples", "composite_MULTIPLY", None, 0),
+    ("more_samples", "clip_shade_center", None, 0),
+    ("more_samples", "clip_shade_top_left", None, 0),
+    ("more_samples", "clip_shade_bottom_left", None, 0),
+    ("more_samples", "clip_shade_bottom_right", None, 0),
+    ("more_samples", "clip_shade_top_right", None, 0),
+    ("more_samples", "inset_clipped_radial_reflect", None, 0),
+    ("more_samples", "transformed_sweep", None, 0),
+    ("more_samples", "composite_colr_glyph", None, 0),
+    ("more_samples", "linear_repeat_0_1", None, 0),
+    ("more_samples", "linear_repeat_0.2_0.8", None, 0),
+    ("more_samples", "linear_repeat_0_1.5", None, 0),
+    ("more_samples", "linear_repeat_0.5_1.5", None, 0),
+    ("more_samples", "scale_0.5_1.5_center_500.0_500.0", None, 0),
+    ("more_samples", "scale_1.5_1.5_center_500.0_500.0", None, 0),
+    ("more_samples", "scale_0.5_1.5_center_0_0", None, 0),
+    ("more_samples", "scale_1.5_1.5_center_0_0", None, 0),
+    ("more_samples", "scale_0.5_1.5_center_1000_1000", None, 0),
+    ("more_samples", "scale_1.5_1.5_center_1000_1000", None, 0),
+    ("more_samples", "linear_gradient_extend_mode_pad", None, 0),
+    ("more_samples", "linear_gradient_extend_mode_repeat", None, 0),
+    ("more_samples", "linear_gradient_extend_mode_reflect", None, 0),
+    ("more_samples", "radial_gradient_extend_mode_pad", None, 0),
+    ("more_samples", "radial_gradient_extend_mode_repeat", None, 0),
+    ("more_samples", "radial_gradient_extend_mode_reflect", None, 0),
+    ("more_samples", "rotate_10_center_0_0", None, 0),
+    ("more_samples", "rotate_-10_center_1000_1000", None, 0),
+    ("more_samples", "rotate_25_center_500.0_500.0", None, 0),
+    ("more_samples", "rotate_-15_center_500.0_500.0", None, 0),
+    ("more_samples", "skew_25_0_center_0_0", None, 0),
+    ("more_samples", "skew_25_0_center_500.0_500.0", None, 0),
+    ("more_samples", "skew_0_15_center_0_0", None, 0),
+    ("more_samples", "upem_box_glyph", None, 0),
+    ("nested_paintglyph", "A", None, 0),
+    ("ftvartest", "A", {"wght": 400}, 0),
+    ("ftvartest", "A", {"wght": 700}, 0),
+    ("ftvartest", "B", {"wght": 400}, 0),
+    ("ftvartest", "B", {"wght": 700}, 0),
+    ("nabla", "A", None, 0),
+    ("nabla", "A", None, 1),
 ]
 
 
-@pytest.mark.parametrize("fontName, glyphName, location", test_glyphs)
+@pytest.mark.parametrize("fontName, glyphName, location, paletteIndex", test_glyphs)
 @pytest.mark.parametrize("backendName, surfaceClass", backends)
-def test_renderGlyph(backendName, surfaceClass, fontName, glyphName, location):
+def test_renderGlyph(
+    backendName, surfaceClass, fontName, glyphName, location, paletteIndex
+):
     font = BlackRendererFont(testFonts[fontName])
     font.setLocation(location)
 
@@ -111,15 +115,20 @@ def test_renderGlyph(backendName, surfaceClass, fontName, glyphName, location):
     boundingBox = font.getGlyphBounds(glyphName)
     boundingBox = scaleRect(boundingBox, scaleFactor, scaleFactor)
     boundingBox = intRect(boundingBox)
+    palette = font.getPalette(paletteIndex)
 
     surface = surfaceClass()
     ext = surface.fileExtension
     with surface.canvas(boundingBox) as canvas:
         canvas.scale(scaleFactor)
-        font.drawGlyph(glyphName, canvas)
+        font.drawGlyph(glyphName, canvas, palette=palette)
 
     locationString = "_" + _locationToString(location) if location else ""
-    fileName = f"glyph_{fontName}_{glyphName}{locationString}_{backendName}{ext}"
+    paletteString = "_" + str(paletteIndex) if paletteIndex else ""
+    fileName = (
+        f"glyph_{fontName}_{glyphName}{locationString}{paletteString}"
+        f"_{backendName}{ext}"
+    )
     expectedPath = expectedOutputDir / fileName
     outputPath = tmpOutputDir / fileName
     surface.saveImage(outputPath)

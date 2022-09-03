@@ -31,6 +31,7 @@ def main():
     parser.add_argument("--features", type=parseFeatures)
     parser.add_argument("--variations", type=parseVariations)
     parser.add_argument("--margin", type=float, default=20)
+    parser.add_argument("--palette-index", type=int, default=0)
     parser.add_argument(
         "--backend",
         default=None,
@@ -47,6 +48,7 @@ def main():
         margin=args.margin,
         features=args.features,
         variations=args.variations,
+        paletteIndex=args.palette_index,
         backendName=args.backend,
     )
 
