@@ -97,6 +97,13 @@ class BlackRendererFont:
     def unitsPerEm(self):
         return self.hbFont.face.upem
 
+    def getPalette(self, paletteIndex):
+        if not self.palettes:
+            return None
+        # clamp index
+        paletteIndex = max(0, min(paletteIndex, len(self.palettes) - 1))
+        return self.palettes[paletteIndex]
+
     def setLocation(self, location):
         if location is None:
             location = {}

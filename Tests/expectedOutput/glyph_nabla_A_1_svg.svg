@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='ASCII'?>
+<svg width="120" height="247" preserveAspectRatio="xMinYMin slice" viewBox="10 -13 120 247" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient_0" spreadMethod="pad" gradientUnits="userSpaceOnUse" x1="0" y1="375" x2="99.8204" y2="547.1042">
+      <stop offset="0%" stop-color="#9B1EAF"/>
+      <stop offset="100%" stop-color="#780082"/>
+    </linearGradient>
+    <linearGradient id="gradient_1" spreadMethod="pad" gradientUnits="userSpaceOnUse" x1="0" y1="675" x2="147.5606" y2="929.4148">
+      <stop offset="0%" stop-color="#9B1EAF"/>
+      <stop offset="100%" stop-color="#780082"/>
+    </linearGradient>
+    <linearGradient id="gradient_2" spreadMethod="pad" gradientUnits="userSpaceOnUse" x1="0" y1="415" x2="130.2005" y2="639.4837">
+      <stop offset="0%" stop-color="#9B1EAF"/>
+      <stop offset="100%" stop-color="#FF6B8B"/>
+    </linearGradient>
+    <linearGradient id="gradient_3" spreadMethod="pad" gradientUnits="userSpaceOnUse" x1="0" y1="25" x2="473.062" y2="840.6241">
+      <stop offset="0%" stop-color="#780082"/>
+      <stop offset="59%" stop-color="#9B1EAF"/>
+      <stop offset="77%" stop-color="#FF9CC2"/>
+      <stop offset="100%" stop-color="#FF9CC2"/>
+    </linearGradient>
+    <linearGradient id="gradient_4" spreadMethod="pad" gradientUnits="userSpaceOnUse" x1="0" y1="-100" x2="-259.2114" y2="351.0279">
+      <stop offset="0%" stop-color="#FF1471"/>
+      <stop offset="100%" stop-color="#FF6B8B"/>
+    </linearGradient>
+  </defs>
+  <path d="M217,740 l216,125 q34,20 60.5,5 q26.5,-15 26.5,-55 v-640 l-87,-50 v200 l-216,-125 v-200 l-87,-50 v640 q0,27 12,56.5 q12,29.5 32,55 q20,25.5 43,38.5 Z M433,425 v340 l-216,-125 v-340 l216,125 Z M433,325 v-200 l-87,50 v200 l87,-50 Z M433,765 v-340 l-87,50 v340 l87,-50 Z M433,425 l-216,-125 l-87,50 l216,125 l87,-50 Z M494,870 q-27,15 -61,-5 l-216,-125 q-23,-13 -43,-38.5 q-20,-25.5 -32,-55 q-12,-29.5 -12,-56.5 v-640 l-87,50 v640 q0,27 12,56.5 q12,29.5 32,55 q20,25.5 43,38.5 l216,125 q35,20 61,5 l87,-50 Z" fill="#FF1471" transform="matrix(0.25,0,0,-0.25,0,221)"/>
+  <path d="M433,325 v-200 l-87,50 v200 l87,-50 Z" fill="url(#gradient_0)" transform="matrix(0.25,0,0,-0.25,0,221)"/>
+  <path d="M433,765 v-340 l-87,50 v340 l87,-50 Z" fill="url(#gradient_1)" transform="matrix(0.25,0,0,-0.25,0,221)"/>
+  <path d="M433,425 l-216,-125 l-87,50 l216,125 l87,-50 Z" fill="url(#gradient_2)" transform="matrix(0.25,0,0,-0.25,0,221)"/>
+  <path d="M494,870 q-27,15 -61,-5 l-216,-125 q-23,-13 -43,-38.5 q-20,-25.5 -32,-55 q-12,-29.5 -12,-56.5 v-640 l-87,50 v640 q0,27 12,56.5 q12,29.5 32,55 q20,25.5 43,38.5 l216,125 q35,20 61,5 l87,-50 Z" fill="url(#gradient_3)" transform="matrix(0.25,0,0,-0.25,0,221)"/>
+  <path d="M217,740 l216,125 q34,20 60.5,5 q26.5,-15 26.5,-55 v-640 l-87,-50 v200 l-216,-125 v-200 l-87,-50 v640 q0,27 12,56.5 q12,29.5 32,55 q20,25.5 43,38.5 Z M433,425 v340 l-216,-125 v-340 l216,125 Z" fill="url(#gradient_4)" transform="matrix(0.25,0,0,-0.25,0,221)"/>
+  <path d="M433,665 q-3,-58 -4,-100 q-1,-42 -1,-74.5 q0,-32.5 0,-62.5 q-27,-16 -56,-33 q-29,-17 -66.5,-39.5 q-37.5,-22.5 -88.5,-55.5 q56,30 95.5,51.5 q39.5,21.5 69,38 q29.5,16.5 56.5,32.5 q0,30 0,62.5 q0,32.5 -1,76 q-1,43.5 -4,104.5 Z M433,865 q-57,-30 -96.5,-51.5 q-39.5,-21.5 -69,-38 q-29.5,-16.5 -56.5,-32.5 q-23,-13 -42.5,-38.5 q-19.5,-25.5 -31.5,-55 q-12,-29.5 -12,-56.5 q0,-55 0,-114.5 q0,-59.5 1,-138 q1,-78.5 4,-190.5 q3,109 4,186 q1,77 1,136.5 q0,59.5 0,114.5 q0,27 12,56.5 q12,29.5 32,55 q20,25.5 43,38.5 q27,16 56,33 q29,17 66,39.5 q37,22.5 89,55.5 Z" fill="#FFFFFF" transform="matrix(0.25,0,0,-0.25,0,221)"/>
+</svg>
