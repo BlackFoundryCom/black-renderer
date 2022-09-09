@@ -6,7 +6,7 @@ BlackRenderer is a Python-based renderer for OpenType COLR fonts, with multiple
 backends. It supports the new COLRv1 format as well as the old COLR format. It
 fully supports variable fonts, including variable COLRv1 data.
 
-![Big Smiley Face Icon](https://github.com/BlackFoundryCom/black-renderer/blob/master/smile.png?raw=true)
+![Big Smiley Face Icon](https://github.com/BlackFoundryCom/black-renderer/blob/main/smile.png?raw=true)
 
 ## Features
 
