@@ -30,6 +30,7 @@ testFonts = {
     "nested_paintglyph": dataDir / "nested-paintglyph.ttf",
     "ftvartest": dataDir / "TestVariableCOLR-VF.ttf",
     "nabla": dataDir / "Nabla.subset.ttf",
+    "issue113": dataDir / "issue113.ttf",
 }
 
 
@@ -100,6 +101,7 @@ test_glyphs = [
     ("ftvartest", "B", {"wght": 700}, 0),
     ("nabla", "A", None, 0),
     ("nabla", "A", None, 1),
+    ("issue113", "B", None, 0),
 ]
 
 

@@ -463,6 +463,8 @@ def _reduceThreeAnchorsToTwo(p):
     x01 = p.x1 - p.x0
     y01 = p.y1 - p.y0
     squaredNorm02 = x02 * x02 + y02 * y02
+    if squaredNorm02 < 0.000001:
+        return ((p.x0, p.y0), (p.x1, p.y1))
     k = (x01 * x02 + y01 * y02) / squaredNorm02
     x = p.x1 - k * x02
     y = p.y1 - k * y02
