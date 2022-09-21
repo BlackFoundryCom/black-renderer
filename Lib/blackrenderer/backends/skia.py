@@ -77,15 +77,19 @@ class SkiaCanvas(Canvas):
     @contextmanager
     def savedState(self):
         self.canvas.save()
-        yield
-        self.canvas.restore()
+        try:
+            yield
+        finally:
+            self.canvas.restore()
 
     @contextmanager
     def compositeMode(self, compositeMode):
         paint = skia.Paint(BlendMode=_compositeModeMap[compositeMode])
         self.canvas.saveLayer(paint=paint)
-        yield
-        self.canvas.restore()
+        try:
+            yield
+        finally:
+            self.canvas.restore()
 
     def transform(self, transform):
         matrix = skia.Matrix()

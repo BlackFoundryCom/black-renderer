@@ -78,14 +78,18 @@ class CairoCanvas(Canvas):
     @contextmanager
     def savedState(self):
         self.context.save()
-        yield
-        self.context.restore()
+        try:
+            yield
+        finally:
+            self.context.restore()
 
     @contextmanager
     def compositeMode(self, compositeMode):
         self.context.push_group()
-        yield
-        self.context.pop_group_to_source()
+        try:
+            yield
+        finally:
+            self.context.pop_group_to_source()
         self.context.set_operator(_compositeModeMap[compositeMode])
         self.context.paint()
 
