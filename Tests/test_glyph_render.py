@@ -31,6 +31,7 @@ testFonts = {
     "ftvartest": dataDir / "TestVariableCOLR-VF.ttf",
     "nabla": dataDir / "Nabla.subset.ttf",
     "issue113": dataDir / "issue113.ttf",
+    "issue116": dataDir / "Noto-COLRv1.subset.ttf",
 }
 
 
@@ -102,6 +103,9 @@ test_glyphs = [
     ("nabla", "A", None, 0),
     ("nabla", "A", None, 1),
     ("issue113", "B", None, 0),
+    ("issue116", "u1F39B", None, 0),
+    ("issue116", "u1F39F", None, 0),
+    ("issue116", "u1F3AB", None, 0),
 ]
 
 
