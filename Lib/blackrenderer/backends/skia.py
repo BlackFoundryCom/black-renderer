@@ -105,7 +105,10 @@ class SkiaCanvas(Canvas):
             Color=skia.Color4f(tuple(color)),
             Style=skia.Paint.kFill_Style,
         )
-        self.canvas.drawPath(path.path, paint)
+        if path is None:
+            self.canvas.drawPaint(paint)
+        else:
+            self.canvas.drawPath(path.path, paint)
 
     def drawPathLinearGradient(
         self, path, colorLine, pt1, pt2, extendMode, gradientTransform
