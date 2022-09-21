@@ -78,9 +78,11 @@ class CoreGraphicsCanvas(Canvas):
     def savedState(self):
         clipIsEmpty = self.clipIsEmpty
         CG.CGContextSaveGState(self.context)
-        yield
-        CG.CGContextRestoreGState(self.context)
-        self.clipIsEmpty = clipIsEmpty
+        try:
+            yield
+        finally:
+            CG.CGContextRestoreGState(self.context)
+            self.clipIsEmpty = clipIsEmpty
 
     @contextmanager
     def compositeMode(self, compositeMode):
@@ -93,9 +95,11 @@ class CoreGraphicsCanvas(Canvas):
         else:
             CG.CGContextSetBlendMode(self.context, _compositeModeMap[compositeMode])
         CG.CGContextBeginTransparencyLayer(self.context, None)
-        yield
-        CG.CGContextEndTransparencyLayer(self.context)
-        CG.CGContextRestoreGState(self.context)
+        try:
+            yield
+        finally:
+            CG.CGContextEndTransparencyLayer(self.context)
+            CG.CGContextRestoreGState(self.context)
 
     def transform(self, transform):
         CG.CGContextConcatCTM(self.context, transform)
@@ -259,8 +263,10 @@ class CoreGraphicsPDFSurface(CoreGraphicsPixelSurface):
     def canvas(self, boundingBox):
         with super().canvas(boundingBox) as canvas:
             CG.CGContextBeginPage(self.context, self._mediaBox)
-            yield canvas
-            CG.CGContextEndPage(self.context)
+            try:
+                yield canvas
+            finally:
+                CG.CGContextEndPage(self.context)
 
     def _setupCGContext(self, x, y, width, height):
         if self.context is None:
