@@ -121,6 +121,7 @@ class CoreGraphicsCanvas(Canvas):
         if path is not None:
             CG.CGContextAddPath(self.context, path.path)
         else:
+            # unbounded source, paint the existing clip area
             clipRect = CG.CGContextGetClipBoundingBox(self.context)
             CG.CGContextAddRect(self.context, clipRect)
         CG.CGContextSetFillColorWithColor(
@@ -139,6 +140,7 @@ class CoreGraphicsCanvas(Canvas):
             if path is not None:
                 CG.CGContextAddPath(self.context, path.path)
                 CG.CGContextClip(self.context)
+            # else: unbounded source, paint the existing clip area
             self.transform(gradientTransform)
             CG.CGContextDrawLinearGradient(
                 self.context,
@@ -168,6 +170,7 @@ class CoreGraphicsCanvas(Canvas):
             if path is not None:
                 CG.CGContextAddPath(self.context, path.path)
                 CG.CGContextClip(self.context)
+            # else: unbounded source, paint the existing clip area
             self.transform(gradientTransform)
             CG.CGContextDrawRadialGradient(
                 self.context,
@@ -196,6 +199,7 @@ class CoreGraphicsCanvas(Canvas):
             if path is not None:
                 CG.CGContextAddPath(self.context, path.path)
                 CG.CGContextClip(self.context)
+            # else: unbounded source, paint the existing clip area
             self.transform(gradientTransform)
             # find current path' extent
             (x1, y1), (w, h) = CG.CGContextGetClipBoundingBox(self.context)

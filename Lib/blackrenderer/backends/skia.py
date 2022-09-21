@@ -182,6 +182,7 @@ class SkiaCanvas(Canvas):
 
     def _drawPath(self, path, paint):
         if path is None:
+            # unbounded source, paint the entire clip area
             self.canvas.drawPaint(paint)
         else:
             self.canvas.drawPath(path.path, paint)
