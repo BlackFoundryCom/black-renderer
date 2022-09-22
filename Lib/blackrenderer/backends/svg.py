@@ -59,6 +59,7 @@ class SVGCanvas(Canvas):
         self.clipStack = ()
         self.currentTransform = transform
         self.elements = []
+        self._loggedWarningCategories = set()
 
     @staticmethod
     def newPath():
@@ -85,11 +86,15 @@ class SVGCanvas(Canvas):
         )
 
     def drawPathSolid(self, path, color):
+        if not self._canDrawPath(path):
+            return
         self._addElement(path.svgPath(), self.currentTransform, RGBAPaint(color), None)
 
     def drawPathLinearGradient(
         self, path, colorLine, pt1, pt2, extendMode, gradientTransform
     ):
+        if not self._canDrawPath(path):
+            return
         gradient = LinearGradientPaint(tuple(colorLine), pt1, pt2, extendMode)
         self._addElement(
             path.svgPath(), self.currentTransform, gradient, gradientTransform
@@ -106,6 +111,8 @@ class SVGCanvas(Canvas):
         extendMode,
         gradientTransform,
     ):
+        if not self._canDrawPath(path):
+            return
         gradient = RadialGradientPaint(
             tuple(colorLine), startCenter, startRadius, endCenter, endRadius, extendMode
         )
@@ -131,7 +138,8 @@ class SVGCanvas(Canvas):
             clipPath, clipTransform = self.clipStack[-1]
             if len(self.clipStack) > 1:
                 # FIXME: intersect clip paths with pathops
-                logger.warning(
+                self._warn(
+                    "nested_clip"
                     "SVG canvas does not support more than two nested clip paths"
                 )
             if clipTransform is not None:
@@ -139,6 +147,21 @@ class SVGCanvas(Canvas):
         self.elements.append(
             (fillPath, fillTransform, clipPath, clipTransform, paint, gradientTransform)
         )
+
+    def _canDrawPath(self, path):
+        if path is None:
+            self._warn(
+                "unbounded",
+                "SVG canvas currently does not support unbounded draw operations",
+            )
+            return False
+        else:
+            return True
+
+    def _warn(self, category, message):
+        if category not in self._loggedWarningCategories:
+            logger.warning(message)
+            self._loggedWarningCategories.add(category)
 
 
 class RGBAPaint(tuple):

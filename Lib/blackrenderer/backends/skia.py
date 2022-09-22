@@ -105,7 +105,7 @@ class SkiaCanvas(Canvas):
             Color=skia.Color4f(tuple(color)),
             Style=skia.Paint.kFill_Style,
         )
-        self.canvas.drawPath(path.path, paint)
+        self._drawPath(path, paint)
 
     def drawPathLinearGradient(
         self, path, colorLine, pt1, pt2, extendMode, gradientTransform
@@ -120,7 +120,7 @@ class SkiaCanvas(Canvas):
             mode=_extendModeMap[extendMode],
             localMatrix=matrix,
         )
-        self.canvas.drawPath(path.path, skia.Paint(AntiAlias=True, Shader=shader))
+        self._drawPath(path, skia.Paint(AntiAlias=True, Shader=shader))
 
     def drawPathRadialGradient(
         self,
@@ -146,7 +146,7 @@ class SkiaCanvas(Canvas):
             mode=_extendModeMap[extendMode],
             localMatrix=matrix,
         )
-        self.canvas.drawPath(path.path, skia.Paint(AntiAlias=True, Shader=shader))
+        self._drawPath(path, skia.Paint(AntiAlias=True, Shader=shader))
 
     def drawPathSweepGradient(
         self,
@@ -178,7 +178,14 @@ class SkiaCanvas(Canvas):
             endAngle=endAngle,
             localMatrix=matrix,
         )
-        self.canvas.drawPath(path.path, skia.Paint(AntiAlias=True, Shader=shader))
+        self._drawPath(path, skia.Paint(AntiAlias=True, Shader=shader))
+
+    def _drawPath(self, path, paint):
+        if path is None:
+            # unbounded source, paint the entire clip area
+            self.canvas.drawPaint(paint)
+        else:
+            self.canvas.drawPath(path.path, paint)
 
 
 def _unpackColorLine(colorLine):

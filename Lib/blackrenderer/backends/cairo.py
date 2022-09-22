@@ -106,7 +106,7 @@ class CairoCanvas(Canvas):
     def drawPathSolid(self, path, color):
         self.context.set_source_rgba(*color)
         self.context.new_path()
-        path.replay(self._pen)
+        self._drawPath(path)
         self.context.fill()
 
     def drawPathLinearGradient(
@@ -153,9 +153,11 @@ class CairoCanvas(Canvas):
         gradientTransform,
     ):
         self.context.save()
-        self.context.new_path()
-        path.replay(self._pen)
-        self.context.clip()
+        if path is not None:
+            self.context.new_path()
+            path.replay(self._pen)
+            self.context.clip()
+        # else: unbounded source, paint the entire clip area
         self.transform(gradientTransform)
         # alloc the mesh pattern
         pat = cairo.MeshPattern()
@@ -185,12 +187,20 @@ class CairoCanvas(Canvas):
 
     def _drawGradient(self, path, gradient, gradientTransform):
         self.context.new_path()
-        path.replay(self._pen)
+        self._drawPath(path)
         self.context.save()
         self.transform(gradientTransform)
         self.context.set_source(gradient)
         self.context.fill()
         self.context.restore()
+
+    def _drawPath(self, path):
+        if path is not None:
+            path.replay(self._pen)
+        else:
+            # unbounded source, paint the entire clip area
+            x1, y1, x2, y2 = self.context.clip_extents()
+            self.context.rectangle(x1, y1, x2 - x1, y2 - y1)
 
 
 class CairoPixelSurface(Surface):

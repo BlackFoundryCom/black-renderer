@@ -116,9 +116,14 @@ class CoreGraphicsCanvas(Canvas):
             CG.CGContextClip(self.context)
 
     def drawPathSolid(self, path, color):
-        if self.clipIsEmpty:
+        if self._shouldNotDrawPath(path):
             return
-        CG.CGContextAddPath(self.context, path.path)
+        if path is not None:
+            CG.CGContextAddPath(self.context, path.path)
+        else:
+            # unbounded source, paint the existing clip area
+            clipRect = CG.CGContextGetClipBoundingBox(self.context)
+            CG.CGContextAddRect(self.context, clipRect)
         CG.CGContextSetFillColorWithColor(
             self.context, CG.CGColorCreate(_sRGBColorSpace, color)
         )
@@ -127,13 +132,15 @@ class CoreGraphicsCanvas(Canvas):
     def drawPathLinearGradient(
         self, path, colorLine, pt1, pt2, extendMode, gradientTransform
     ):
-        if self.clipIsEmpty or CG.CGPathGetBoundingBox(path.path) == CG.CGRectNull:
+        if self._shouldNotDrawPath(path):
             return
         colors, stops = _unpackColorLine(colorLine)
         gradient = CG.CGGradientCreateWithColors(_sRGBColorSpace, colors, stops)
         with self.savedState():
-            CG.CGContextAddPath(self.context, path.path)
-            CG.CGContextClip(self.context)
+            if path is not None:
+                CG.CGContextAddPath(self.context, path.path)
+                CG.CGContextClip(self.context)
+            # else: unbounded source, paint the existing clip area
             self.transform(gradientTransform)
             CG.CGContextDrawLinearGradient(
                 self.context,
@@ -155,13 +162,15 @@ class CoreGraphicsCanvas(Canvas):
         extendMode,
         gradientTransform,
     ):
-        if self.clipIsEmpty or CG.CGPathGetBoundingBox(path.path) == CG.CGRectNull:
+        if self._shouldNotDrawPath(path):
             return
         colors, stops = _unpackColorLine(colorLine)
         gradient = CG.CGGradientCreateWithColors(_sRGBColorSpace, colors, stops)
         with self.savedState():
-            CG.CGContextAddPath(self.context, path.path)
-            CG.CGContextClip(self.context)
+            if path is not None:
+                CG.CGContextAddPath(self.context, path.path)
+                CG.CGContextClip(self.context)
+            # else: unbounded source, paint the existing clip area
             self.transform(gradientTransform)
             CG.CGContextDrawRadialGradient(
                 self.context,
@@ -184,11 +193,13 @@ class CoreGraphicsCanvas(Canvas):
         extendMode,
         gradientTransform,
     ):
-        if self.clipIsEmpty or CG.CGPathGetBoundingBox(path.path) == CG.CGRectNull:
+        if self._shouldNotDrawPath(path):
             return
         with self.savedState():
-            CG.CGContextAddPath(self.context, path.path)
-            CG.CGContextClip(self.context)
+            if path is not None:
+                CG.CGContextAddPath(self.context, path.path)
+                CG.CGContextClip(self.context)
+            # else: unbounded source, paint the existing clip area
             self.transform(gradientTransform)
             # find current path' extent
             (x1, y1), (w, h) = CG.CGContextGetClipBoundingBox(self.context)
@@ -214,6 +225,11 @@ class CoreGraphicsCanvas(Canvas):
                 CG.CGContextFillPath(self.context)
             CG.CGContextSetAllowsAntialiasing(self.context, True)
             CG.CGContextEndTransparencyLayer(self.context)
+
+    def _shouldNotDrawPath(self, path):
+        return self.clipIsEmpty or (
+            path is not None and CG.CGPathGetBoundingBox(path.path) == CG.CGRectNull
+        )
 
 
 def _unpackColorLine(colorLine):
