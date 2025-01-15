@@ -76,7 +76,7 @@ glyphName = "A"
 boundingBox = brFont.getGlyphBounds(glyphName)
 surfaceClass = getSurfaceClass("skia")
 surface = surfaceClass()
-with surface.canvas(boundingBox)
+with surface.canvas(boundingBox):
     brFont.drawGlyph(glyphName, canvas)
 surface.saveImage("image.png")
 ```
